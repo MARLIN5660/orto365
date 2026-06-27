@@ -2322,11 +2322,13 @@ function formatAIText(text) {
 //         upload: uploadfile in cartella /Orto365/
 //         download: getfilelink + fetch
 // ═══════════════════════════════════════════════════════
-const PCLOUD_API    = 'https://api.pcloud.com';
-const PCLOUD_FOLDER = 'Orto365';
-const MAX_BACKUPS   = 10; // numero massimo di backup rotanti
+const PCLOUD_API_US  = 'https://api.pcloud.com';
+const PCLOUD_API_EU  = 'https://eapi.pcloud.com';
+const PCLOUD_FOLDER  = 'Orto365';
+const MAX_BACKUPS    = 10;
 let   pcloudToken    = null;
 let   pcloudFolderId = null;
+let   pcloudAPI      = PCLOUD_API_EU; // default EU per utenti italiani
 let   syncPending    = false;
 let   syncTimer      = null;
 
@@ -2348,20 +2350,20 @@ function nextSlot() {
 function pcloudLoad() {
   pcloudToken    = localStorage.getItem('pcloud_token')    || null;
   pcloudFolderId = localStorage.getItem('pcloud_folderid') || null;
+  pcloudAPI      = localStorage.getItem('pcloud_api')      || PCLOUD_API_EU;
 }
 
 function pcloudSave() {
   if (pcloudToken)    localStorage.setItem('pcloud_token',    pcloudToken);
   if (pcloudFolderId) localStorage.setItem('pcloud_folderid', pcloudFolderId);
+  localStorage.setItem('pcloud_api', pcloudAPI);
 }
 
 function pcloudClear() {
   pcloudToken    = null;
   pcloudFolderId = null;
-  localStorage.removeItem('pcloud_token');
-  localStorage.removeItem('pcloud_folderid');
-  localStorage.removeItem('pcloud_last_sync');
-  localStorage.removeItem('pcloud_slot');
+  pcloudAPI      = PCLOUD_API_EU;
+  ['pcloud_token','pcloud_folderid','pcloud_last_sync','pcloud_slot','pcloud_api'].forEach(k => localStorage.removeItem(k));
 }
 
 // ── Login ─────────────────────────────────────────────
@@ -2372,23 +2374,50 @@ async function pcloudLogin() {
 
   const btn = document.getElementById('pcloud-login-btn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="ai-spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff;"></span> Connessione…';
 
-  try {
-    const url  = `${PCLOUD_API}/userinfo?getauth=1&logout=1&username=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`;
-    const res  = await fetch(url);
-    const data = await res.json();
-    if (data.result !== 0) throw new Error(data.error || 'Credenziali non valide');
+  // Prova EU poi US automaticamente
+  const servers = [
+    { api: PCLOUD_API_EU, label: 'EU' },
+    { api: PCLOUD_API_US, label: 'US' },
+  ];
 
-    pcloudToken = data.auth;
-    pcloudSave();
-    await pcloudEnsureFolder();
-    toast('✅ Connesso a pCloud!');
-    await pcloudUpload(false);
-    initPcloudSection();
-  } catch(e) {
-    toast('❌ ' + (e.message || 'Errore di connessione pCloud'));
+  for (const server of servers) {
+    btn.innerHTML = `<span class="ai-spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff;"></span> Provo server ${server.label}…`;
+    try {
+      const url  = `${server.api}/userinfo?getauth=1&logout=1&username=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`;
+      const res  = await fetch(url);
+      const data = await res.json();
+
+      if (data.result !== 0) {
+        // Credenziali sbagliate (non problema di server) → interrompi subito
+        if (data.result === 2000) throw new Error('WRONG_CREDENTIALS');
+        continue; // altro errore → prova server successivo
+      }
+
+      // Successo
+      pcloudAPI   = server.api;
+      pcloudToken = data.auth;
+      pcloudSave();
+      await pcloudEnsureFolder();
+      toast(`✅ Connesso a pCloud (server ${server.label})!`);
+      await pcloudUpload(false);
+      initPcloudSection();
+      btn.disabled = false;
+      btn.innerHTML = 'Connetti a pCloud';
+      return;
+
+    } catch(e) {
+      if (e.message === 'WRONG_CREDENTIALS') {
+        toast('❌ Email o password non corretti — controlla le credenziali pCloud');
+        btn.disabled = false;
+        btn.innerHTML = 'Connetti a pCloud';
+        return;
+      }
+      // Continua con il prossimo server
+    }
   }
+
+  toast('❌ Impossibile connettersi a pCloud. Controlla la connessione internet.');
   btn.disabled = false;
   btn.innerHTML = 'Connetti a pCloud';
 }
@@ -2424,7 +2453,7 @@ async function pcloudEnsureFolder() {
 // ── Request helper ────────────────────────────────────
 async function pcloudReq(endpoint, params = {}) {
   const qs  = new URLSearchParams({ ...params, auth: pcloudToken }).toString();
-  const res = await fetch(`${PCLOUD_API}/${endpoint}?${qs}`);
+  const res = await fetch(`${pcloudAPI}/${endpoint}?${qs}`);
   const data = await res.json();
   if (data.result !== 0) throw new Error(data.error || endpoint + ' failed');
   return data;
@@ -2450,7 +2479,7 @@ async function pcloudUpload(showToast = true) {
     form.append('filename', filename);
     form.append('file', blob, filename);
 
-    const res  = await fetch(`${PCLOUD_API}/uploadfile?auth=${pcloudToken}&renameifexists=0&nopartial=1`, {
+    const res  = await fetch(`${pcloudAPI}/uploadfile?auth=${pcloudToken}&renameifexists=0&nopartial=1`, {
       method: 'POST', body: form
     });
     const data = await res.json();
