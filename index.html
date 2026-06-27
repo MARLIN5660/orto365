@@ -373,29 +373,31 @@
     </div>
   </div>
 
-  <!-- Form login -->
+  <!-- Form OAuth -->
   <div class="card" id="pcloud-login-card">
-    <div style="font-size:.9rem;font-weight:600;color:var(--soil);margin-bottom:14px;">🔐 Accedi al tuo account pCloud</div>
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      <label style="font-size:.83rem;color:var(--muted);">Email pCloud
-        <input type="email" id="pcloud-email" placeholder="tua@email.com"
-          style="display:block;width:100%;margin-top:4px;padding:9px 12px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.9rem;">
-      </label>
-      <label style="font-size:.83rem;color:var(--muted);">Password
-        <div style="position:relative;">
-          <input type="password" id="pcloud-pass" placeholder="••••••••"
-            style="display:block;width:100%;margin-top:4px;padding:9px 12px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.9rem;"
-            onkeydown="if(event.key==='Enter')pcloudLogin()">
-          <button onclick="togglePassVis()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;" id="pass-eye">👁</button>
-        </div>
-      </label>
-      <div style="font-size:.75rem;color:var(--muted);background:var(--fog);border-radius:7px;padding:8px 10px;line-height:1.5;">
-        🔒 Le credenziali vengono usate <strong>solo</strong> per ottenere un token di accesso da pCloud. Non vengono mai salvate — solo il token viene memorizzato localmente.
+    <div style="font-size:.9rem;font-weight:600;color:var(--soil);margin-bottom:14px;">🔐 Connetti con pCloud (OAuth sicuro)</div>
+
+    <div style="background:#eef5ec;border-radius:8px;padding:12px 14px;font-size:.82rem;line-height:1.7;color:var(--text);margin-bottom:14px;">
+      <strong>Configurazione iniziale (una volta sola):</strong><br>
+      1. Vai su <a href="https://docs.pcloud.com/my_apps/" target="_blank" style="color:var(--moss);font-weight:600;">docs.pcloud.com/my_apps</a> e accedi<br>
+      2. Crea una nuova app (New app), dalle un nome (es. "Orto365")<br>
+      3. Nel campo <strong>Redirect URI</strong> incolla questo:
+      <div style="display:flex;gap:6px;margin:6px 0;align-items:center;">
+        <code id="redirect-uri-box" style="background:#fff;border:1px solid var(--border);border-radius:5px;padding:6px 8px;font-size:.72rem;flex:1;word-break:break-all;"></code>
+        <button onclick="copyRedirectUri()" class="btn btn-secondary" style="font-size:.72rem;padding:5px 8px;flex-shrink:0;">📋 Copia</button>
       </div>
-      <button class="btn btn-primary" id="pcloud-login-btn" onclick="pcloudLogin()" style="align-self:flex-start;">
-        Connetti a pCloud
-      </button>
-      <div id="pcloud-diag" style="display:none;background:#fde8e6;border:1px solid #f5b7b1;border-radius:7px;padding:10px 12px;font-size:.78rem;color:#922b21;line-height:1.5;"></div>
+      4. Salva l'app e copia il <strong>Client ID</strong> che ti viene assegnato
+    </div>
+
+    <label style="font-size:.83rem;color:var(--muted);">Client ID della tua app pCloud
+      <input type="text" id="pcloud-clientid" placeholder="es. AbCdEf123XyZ"
+        style="display:block;width:100%;margin-top:4px;padding:9px 12px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.9rem;">
+    </label>
+    <button class="btn btn-primary" id="pcloud-login-btn" onclick="pcloudStartOAuth()" style="align-self:flex-start;margin-top:12px;">
+      🔓 Autorizza con pCloud
+    </button>
+    <div style="font-size:.75rem;color:var(--muted);background:var(--fog);border-radius:7px;padding:8px 10px;line-height:1.5;margin-top:12px;">
+      🔒 Verrai reindirizzato alla pagina ufficiale pCloud per autorizzare. La password non passa mai dall'app.
     </div>
   </div>
 
@@ -2368,83 +2370,57 @@ function pcloudClear() {
 }
 
 // ── Login ─────────────────────────────────────────────
-async function pcloudLogin() {
-  const email = document.getElementById('pcloud-email').value.trim();
-  const pass  = document.getElementById('pcloud-pass').value;
-  if (!email || !pass) { toast('⚠️ Inserisci email e password'); return; }
+// ── OAuth 2.0 (token flow) ────────────────────────────
+// pCloud rifiuta il login con password via API → usiamo OAuth.
+// L'utente registra un'app su https://docs.pcloud.com/my_apps/
+// e inserisce qui il Client ID. Redirect URI = URL di questa pagina.
+const PCLOUD_REDIRECT = window.location.origin + window.location.pathname;
 
-  const btn = document.getElementById('pcloud-login-btn');
-  btn.disabled = true;
-
-  const servers = [
-    { api: PCLOUD_API_EU, label: 'EU' },
-    { api: PCLOUD_API_US, label: 'US' },
-  ];
-
-  let lastError = '';
-
-  for (const server of servers) {
-    btn.innerHTML = `<span class="ai-spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff;"></span> Provo server ${server.label}…`;
-    try {
-      // 1. getdigest dallo stesso server
-      const dRes  = await fetch(`${server.api}/getdigest`);
-      const dData = await dRes.json();
-      if (dData.result !== 0 || !dData.digest) { lastError = 'getdigest fallito'; continue; }
-      const digest = dData.digest;
-
-      // 2. passworddigest = sha1(password + sha1(lowercase(email)) + digest)
-      //    Tutto come byte UTF-8 espliciti
-      const emailHash  = await sha1Hex(email.toLowerCase());
-      const passDigest = await sha1Hex(pass + emailHash + digest);
-
-      // 3. login — i parametri vanno URL-encoded
-      const params = new URLSearchParams({
-        getauth: '1', logout: '1',
-        username: email,
-        digest: digest,
-        passworddigest: passDigest,
-      });
-      const res  = await fetch(`${server.api}/userinfo?${params.toString()}`);
-      const data = await res.json();
-
-      if (data.result === 0 && data.auth) {
-        pcloudAPI   = server.api;
-        pcloudToken = data.auth;
-        pcloudSave();
-        await pcloudEnsureFolder();
-        toast(`✅ Connesso a pCloud (server ${server.label})!`);
-        await pcloudUpload(false);
-        initPcloudSection();
-        btn.disabled = false;
-        btn.innerHTML = 'Connetti a pCloud';
-        return;
-      }
-
-      // Salva l'errore esatto del server
-      lastError = `[${server.label}] result ${data.result}: ${data.error || 'errore'}`;
-      // result 2000 = credenziali rifiutate. Prova comunque l'altro server.
-    } catch(e) {
-      lastError = `[${server.label}] ${e.message}`;
-    }
-  }
-
-  // Mostra l'errore diagnostico esatto nella card
-  const diag = document.getElementById('pcloud-diag');
-  if (diag) {
-    diag.style.display = 'block';
-    diag.innerHTML = `<strong>Dettaglio errore pCloud:</strong><br>${lastError}<br><br>
-      Se vedi <em>"result 2000: Log in failed"</em> con credenziali corrette nel browser, è probabile che pCloud richieda l'autorizzazione via <strong>OAuth</strong> per le app esterne. Possiamo passare a quel metodo.`;
-  }
-  toast('❌ Login fallito — vedi dettaglio sotto');
-  btn.disabled = false;
-  btn.innerHTML = 'Connetti a pCloud';
+function pcloudClientId() {
+  return localStorage.getItem('pcloud_clientid') || '';
 }
 
-// SHA-1 con encoding UTF-8 robusto
-async function sha1Hex(str) {
-  const buf  = new TextEncoder().encode(str); // sempre UTF-8
-  const hash = await crypto.subtle.digest('SHA-1', buf);
-  return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2,'0')).join('');
+function pcloudStartOAuth() {
+  const cid = document.getElementById('pcloud-clientid').value.trim();
+  if (!cid) { toast('⚠️ Inserisci il Client ID della tua app pCloud'); return; }
+  localStorage.setItem('pcloud_clientid', cid);
+  // Token flow: response_type=token → il token torna nell'hash dell'URL
+  const url = `https://my.pcloud.com/oauth2/authorize?client_id=${encodeURIComponent(cid)}`
+            + `&response_type=token`
+            + `&redirect_uri=${encodeURIComponent(PCLOUD_REDIRECT)}`;
+  window.location.href = url;
+}
+
+// Al caricamento pagina, controlla se torniamo da pCloud con un token nell'hash
+function pcloudCheckOAuthReturn() {
+  const hash = window.location.hash;
+  if (!hash || hash.indexOf('access_token=') === -1) return false;
+
+  const params = new URLSearchParams(hash.substring(1));
+  const token      = params.get('access_token');
+  const locationid = params.get('locationid'); // 1=US, 2=EU
+  const hostname   = params.get('hostname');
+
+  if (token) {
+    pcloudToken = token;
+    // hostname indica il server corretto (es. eapi.pcloud.com)
+    pcloudAPI   = hostname ? ('https://' + hostname) : (locationid === '2' ? PCLOUD_API_EU : PCLOUD_API_US);
+    localStorage.setItem('pcloud_token', pcloudToken);
+    localStorage.setItem('pcloud_api', pcloudAPI);
+    localStorage.setItem('pcloud_oauth', '1');
+    // Pulisci l'hash dall'URL
+    history.replaceState(null, '', window.location.pathname);
+    toast('✅ Autorizzazione pCloud completata!');
+    return true;
+  }
+  return false;
+}
+
+function pcloudLogout() {
+  pcloudClear();
+  localStorage.removeItem('pcloud_oauth');
+  toast('👋 Disconnesso da pCloud');
+  initPcloudSection();
 }
 
 function pcloudLogout() {
@@ -2617,12 +2593,26 @@ function scheduleCloudSync() {
 }
 
 // ── UI sezione impostazioni ───────────────────────────
+function copyRedirectUri() {
+  const uri = PCLOUD_REDIRECT;
+  navigator.clipboard?.writeText(uri).then(
+    () => toast('📋 Redirect URI copiato!'),
+    () => toast('⚠️ Copia manualmente: ' + uri)
+  );
+}
+
 function initPcloudSection() {
   pcloudLoad();
   const connected = !!pcloudToken;
 
   document.getElementById('pcloud-login-card').style.display     = connected ? 'none'  : 'block';
   document.getElementById('pcloud-connected-card').style.display = connected ? 'block' : 'none';
+
+  // Mostra redirect URI e ripristina client ID salvato
+  const rb = document.getElementById('redirect-uri-box');
+  if (rb) rb.textContent = PCLOUD_REDIRECT;
+  const cidInput = document.getElementById('pcloud-clientid');
+  if (cidInput && pcloudClientId()) cidInput.value = pcloudClientId();
 
   const icon  = document.getElementById('pcloud-status-icon');
   const title = document.getElementById('pcloud-status-title');
@@ -2636,13 +2626,12 @@ function initPcloudSection() {
     const last = localStorage.getItem('pcloud_last_sync');
     updateSyncLabel(last);
     document.getElementById('pcloud-btn').style.color = 'rgba(168,196,154,.8)';
-    // Carica lista backup in background
     renderBackupList();
   } else {
     icon.textContent  = '☁️';
     title.textContent = 'Non connesso';
     title.style.color = 'var(--soil)';
-    sub.textContent   = 'Inserisci le credenziali per attivare il backup automatico';
+    sub.textContent   = 'Autorizza l\'app per attivare il backup automatico';
     document.getElementById('pcloud-btn').style.color = 'rgba(255,255,255,.5)';
   }
 }
@@ -2657,15 +2646,22 @@ function updateSyncLabel(dateStr) {
 // ═══════════════════════════════════════════════════════
 (function init() {
   loadState();
-  pcloudLoad(); // carica token pCloud se presente
+  pcloudLoad();
+  // Controlla se torniamo da un redirect OAuth pCloud con un token
+  const cameFromOAuth = pcloudCheckOAuthReturn();
   document.getElementById('diary-date').value = new Date().toISOString().split('T')[0];
   document.getElementById('garden-svg').addEventListener('click', onSVGClick);
-  // Aggiorna indicatore nav pCloud
   if (pcloudToken) {
     const btn = document.getElementById('pcloud-btn');
     if (btn) btn.style.color = 'rgba(168,196,154,.8)';
   }
-  showSection('home');
+  // Se torniamo da OAuth, apri direttamente la sezione pCloud
+  if (cameFromOAuth) {
+    showSection('impostazioni');
+    pcloudEnsureFolder().then(() => pcloudUpload(false));
+  } else {
+    showSection('home');
+  }
 })();
 </script>
 </body>
