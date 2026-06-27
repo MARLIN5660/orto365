@@ -2375,7 +2375,6 @@ async function pcloudLogin() {
   const btn = document.getElementById('pcloud-login-btn');
   btn.disabled = true;
 
-  // Prova EU poi US automaticamente
   const servers = [
     { api: PCLOUD_API_EU, label: 'EU' },
     { api: PCLOUD_API_US, label: 'US' },
@@ -2384,42 +2383,62 @@ async function pcloudLogin() {
   for (const server of servers) {
     btn.innerHTML = `<span class="ai-spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff;"></span> Provo server ${server.label}…`;
     try {
-      const url  = `${server.api}/userinfo?getauth=1&logout=1&username=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`;
+      // ── Metodo digest (sicuro, raccomandato da pCloud) ──
+      // 1. Richiedi un digest dal server
+      const dRes  = await fetch(`${server.api}/getdigest`);
+      const dData = await dRes.json();
+      if (dData.result !== 0 || !dData.digest) continue; // server non raggiungibile → prova l'altro
+      const digest = dData.digest;
+
+      // 2. Calcola passworddigest = sha1(password + sha1(lowercase(email) + digest))
+      const emailHash = await sha1Hex(email.toLowerCase());
+      const passDigest = await sha1Hex(pass + emailHash + digest);
+
+      // 3. Login con digest
+      const url  = `${server.api}/userinfo?getauth=1&logout=1&username=${encodeURIComponent(email)}&digest=${digest}&passworddigest=${passDigest}`;
       const res  = await fetch(url);
       const data = await res.json();
 
-      if (data.result !== 0) {
-        // Credenziali sbagliate (non problema di server) → interrompi subito
-        if (data.result === 2000) throw new Error('WRONG_CREDENTIALS');
-        continue; // altro errore → prova server successivo
-      }
-
-      // Successo
-      pcloudAPI   = server.api;
-      pcloudToken = data.auth;
-      pcloudSave();
-      await pcloudEnsureFolder();
-      toast(`✅ Connesso a pCloud (server ${server.label})!`);
-      await pcloudUpload(false);
-      initPcloudSection();
-      btn.disabled = false;
-      btn.innerHTML = 'Connetti a pCloud';
-      return;
-
-    } catch(e) {
-      if (e.message === 'WRONG_CREDENTIALS') {
-        toast('❌ Email o password non corretti — controlla le credenziali pCloud');
+      if (data.result === 0 && data.auth) {
+        pcloudAPI   = server.api;
+        pcloudToken = data.auth;
+        pcloudSave();
+        await pcloudEnsureFolder();
+        toast(`✅ Connesso a pCloud (server ${server.label})!`);
+        await pcloudUpload(false);
+        initPcloudSection();
         btn.disabled = false;
         btn.innerHTML = 'Connetti a pCloud';
         return;
       }
-      // Continua con il prossimo server
+
+      // result 2000 = login fallito (credenziali). Su EU potrebbe essere account US → prova US
+      if (data.result === 2000) {
+        // Se è l'ultimo server, mostra errore credenziali
+        if (server.label === 'US') {
+          toast('❌ Email o password non corretti');
+          btn.disabled = false;
+          btn.innerHTML = 'Connetti a pCloud';
+          return;
+        }
+        continue; // prova server US
+      }
+      // Altri errori → prova prossimo server
+    } catch(e) {
+      // errore rete → prova prossimo server
     }
   }
 
-  toast('❌ Impossibile connettersi a pCloud. Controlla la connessione internet.');
+  toast('❌ Login fallito. Verifica credenziali e connessione.');
   btn.disabled = false;
   btn.innerHTML = 'Connetti a pCloud';
+}
+
+// SHA-1 helper usando Web Crypto API
+async function sha1Hex(str) {
+  const buf  = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest('SHA-1', buf);
+  return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
 function pcloudLogout() {
