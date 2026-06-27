@@ -1,0 +1,2613 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orto365 — Il tuo giardino bio digitale</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --soil:   #3B2A1A;
+    --bark:   #6B4C2A;
+    --moss:   #4A6741;
+    --sage:   #7A9B6F;
+    --leaf:   #A8C49A;
+    --sun:    #E8C547;
+    --cream:  #F5F0E8;
+    --fog:    #EAE5DC;
+    --red:    #C0392B;
+    --text:   #1E1A14;
+    --muted:  #7A7060;
+    --card:   #FFFFFF;
+    --border: #D8D0C4;
+    --radius: 10px;
+    --shadow: 0 2px 12px rgba(59,42,26,.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; font-size: 15px; }
+
+  /* NAV */
+  nav {
+    background: var(--soil);
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 16px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    flex-wrap: wrap; min-height: 52px;
+  }
+  .nav-brand { font-family: 'Fraunces', serif; font-size: 1.3rem; color: var(--leaf); margin-right: 8px; white-space: nowrap; padding: 8px 0; }
+  .nav-brand span { color: var(--sun); }
+  .nav-tabs { display: flex; gap: 2px; flex-wrap: wrap; flex: 1; padding: 6px 0; }
+  .tab-btn {
+    background: none; border: none; color: rgba(255,255,255,.6);
+    font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 500;
+    padding: 5px 10px; border-radius: 6px; cursor: pointer; transition: all .18s; white-space: nowrap;
+  }
+  .tab-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .tab-btn.active { background: var(--moss); color: #fff; }
+
+  /* SECTIONS */
+  .section { display: none; }
+  .section.active { display: block; }
+  #home-section { display: none; background: linear-gradient(160deg, var(--soil) 0%, #1a2e1a 60%, var(--moss) 100%); min-height: calc(100vh - 52px); padding: 60px 24px 40px; text-align: center; align-items: center; justify-content: center; flex-direction: column; }
+  #home-section.active { display: flex; }
+  #home-section h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 6vw, 3.8rem); color: var(--leaf); line-height: 1.15; margin-bottom: 16px; }
+  #home-section h1 em { font-style: italic; color: var(--sun); }
+  #home-section > p { color: rgba(255,255,255,.75); font-size: 1.05rem; max-width: 560px; line-height: 1.7; margin-bottom: 32px; }
+  .home-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; max-width: 900px; }
+  .home-card { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); border-radius: 14px; padding: 22px 20px; width: 190px; cursor: pointer; transition: all .2s; text-align: left; }
+  .home-card:hover { background: rgba(255,255,255,.16); transform: translateY(-3px); }
+  .home-card .icon { font-size: 2rem; margin-bottom: 10px; }
+  .home-card h3 { color: #fff; font-size: .95rem; margin-bottom: 4px; }
+  .home-card p { color: rgba(255,255,255,.55); font-size: .8rem; line-height: 1.5; }
+
+  /* LAYOUT */
+  .page-inner { max-width: 1100px; margin: 0 auto; padding: 28px 20px; }
+  .page-title { font-family: 'Fraunces', serif; font-size: 1.7rem; color: var(--soil); margin-bottom: 4px; }
+  .page-sub { color: var(--muted); font-size: .88rem; margin-bottom: 24px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .btn { padding: 8px 16px; border-radius: 7px; border: none; font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 500; cursor: pointer; transition: all .18s; }
+  .btn-primary { background: var(--moss); color: #fff; }
+  .btn-primary:hover { background: #3a5433; }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-danger:hover { background: #a93226; }
+  .btn-secondary { background: var(--fog); color: var(--soil); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--border); }
+
+  /* TOAST */
+  #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--soil); color: #fff; padding: 10px 20px; border-radius: 8px; font-size: .88rem; z-index: 500; transition: transform .3s; pointer-events: none; }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* MODAL NOME AIUOLA */
+  #bed-name-modal { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; }
+  #bed-name-modal.open { display: flex; }
+  #bed-name-modal .inner { background: #fff; border-radius: 14px; padding: 28px; width: 100%; max-width: 360px; }
+  #bed-name-modal h3 { font-family: 'Fraunces', serif; font-size: 1.2rem; margin-bottom: 16px; }
+  #bed-name-modal input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: .95rem; margin-bottom: 14px; }
+  #bed-name-modal .row { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* PIANIFICATORE */
+  .planner-toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+  .planner-toolbar label { font-size: .85rem; color: var(--muted); }
+  .planner-toolbar input[type=number] { width: 58px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-family: 'DM Sans', sans-serif; }
+  .planner-layout { display: flex; gap: 18px; flex-wrap: wrap; }
+  .plant-palette { width: 200px; flex-shrink: 0; }
+  .palette-title { font-size: .8rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+  .palette-search { width: 100%; padding: 6px 10px; border: 1px solid var(--border); border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: .85rem; margin-bottom: 8px; }
+  .palette-list { max-height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+  .palette-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 7px; cursor: grab; background: var(--fog); border: 2px solid transparent; font-size: .85rem; transition: all .15s; user-select: none; }
+  .palette-item:hover { border-color: var(--sage); background: #e8f0e6; }
+  .palette-item.selected { border-color: var(--moss); background: #d4e8d0; }
+  .palette-item .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .palette-hint { font-size: .75rem; color: var(--moss); background: #eef5ec; border-radius: 6px; padding: 6px 8px; margin-bottom: 8px; display: none; }
+  .palette-hint.visible { display: block; }
+
+  .garden-canvas-wrap { flex: 1; min-width: 280px; }
+  .bed-controls { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+  .bed-select { padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: .85rem; background: #fff; flex: 1; min-width: 120px; }
+  .garden-grid-container { overflow: auto; border: 2px solid var(--bark); border-radius: 10px; background: #f0ebe0; min-height: 200px; }
+  .garden-grid { display: grid; gap: 2px; padding: 8px; }
+  .grid-cell { width: 46px; height: 46px; background: #e2d9c8; border-radius: 5px; border: 2px solid #cfc7b5; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .12s, border-color .12s; font-size: 1.1rem; position: relative; user-select: none; flex-direction: column; }
+  .grid-cell:hover { background: #d4cbb8; }
+  .grid-cell.drag-over { background: #b8d4b0 !important; border-color: var(--moss) !important; }
+  .grid-cell.placement-target { border-color: var(--moss); border-style: dashed; background: #eef5ec; }
+  .grid-cell.cell-occupied { background: #ddd5c4; }
+  /* Piante multi-slot: la cella "principale" mostra l'icona, le celle "satellite" mostrano solo un colore */
+  .grid-cell.multi-main { font-size: 1.3rem; z-index: 1; }
+  .grid-cell.multi-sat  { background: #d8cfc0; cursor: pointer; font-size: .6rem; color: var(--muted); }
+  .grid-cell .cell-label { font-size: 7px; color: var(--muted); white-space: nowrap; overflow: hidden; max-width: 42px; text-overflow: ellipsis; line-height: 1; }
+  .grid-cell .size-badge { position: absolute; top: 1px; right: 2px; font-size: 6px; color: var(--muted); line-height: 1; }
+  .compat-ok  { background: rgba(74,103,65,.18) !important; border-color: var(--moss) !important; }
+  .compat-bad { background: rgba(192,57,43,.15) !important; border-color: var(--red) !important; }
+
+  /* STAT BAR */
+  .stat-bar { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
+  .stat-pill { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; flex: 1; min-width: 90px; }
+  .stat-pill .s-val { font-family: 'Fraunces', serif; font-size: 1.8rem; color: var(--moss); }
+  .stat-pill .s-lbl { font-size: .75rem; color: var(--muted); }
+
+  /* CALENDARIO */
+  .cal-settings { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+  .cal-settings select, .cal-settings input { padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: .85rem; background: #fff; }
+  .cal-wrap { overflow: auto; max-height: 520px; border: 1px solid var(--border); border-radius: var(--radius); }
+  .cal-table { border-collapse: collapse; min-width: 560px; width: 100%; }
+  .cal-table th, .cal-table td { padding: 0; margin: 0; }
+
+  /* Prima riga (mesi) — sticky top */
+  .cal-table thead th {
+    position: sticky; top: 0; z-index: 3;
+    background: var(--soil); color: #fff;
+    font-size: .72rem; font-weight: 600; text-align: center;
+    padding: 7px 4px; white-space: nowrap;
+    border-right: 1px solid rgba(255,255,255,.1);
+  }
+  /* Cella angolo (riga 1, col 1) — sticky top + left */
+  .cal-table thead th:first-child {
+    position: sticky; top: 0; left: 0; z-index: 4;
+    text-align: left; padding-left: 10px;
+  }
+  /* Prima colonna (nomi piante) — sticky left */
+  .cal-table tbody td:first-child {
+    position: sticky; left: 0; z-index: 2;
+    background: var(--fog);
+    font-size: .78rem; padding: 5px 10px;
+    white-space: nowrap; border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    min-width: 140px;
+  }
+  /* Celle dati */
+  .cal-table tbody td { height: 30px; width: 36px; min-width: 36px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
+  .cal-table tbody td.sow     { background: #d4e8d0; }
+  .cal-table tbody td.plant   { background: #5aac52; }
+  .cal-table tbody td.harvest { background: #e8c547; }
+  .cal-table tbody td.blocked { background: #e8eaf6; border-color: #c5cae9; }
+  .cal-legend { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: .8rem; }
+  .legend-dot { width: 14px; height: 14px; border-radius: 3px; }
+
+  /* PIANTE DB */
+  .plants-toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; align-items: center; }
+  .plants-toolbar input, .plants-toolbar select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: .85rem; background: #fff; }
+  .plants-toolbar input { flex: 1; min-width: 180px; }
+  .plants-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+  .plant-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: all .2s; }
+  .plant-card:hover { box-shadow: 0 4px 16px rgba(59,42,26,.15); transform: translateY(-2px); }
+  .plant-card .plant-icon { font-size: 2.2rem; margin-bottom: 8px; }
+  .plant-card h3 { font-size: .92rem; color: var(--soil); margin-bottom: 3px; }
+  .plant-card .plant-family { font-size: .73rem; color: var(--muted); margin-bottom: 8px; font-style: italic; }
+  .plant-card .tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tag { font-size: .7rem; padding: 2px 7px; border-radius: 20px; background: var(--fog); color: var(--muted); }
+  .tag.good { background: #d4e8d0; color: #2d5e27; }
+  .tag.bad { background: #fde8e6; color: #9b2b20; }
+  .tag.cat { background: #e8e4d8; color: var(--bark); }
+
+  /* MODAL PIANTA */
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-bg.open { display: flex; }
+  .modal { background: var(--card); border-radius: 14px; max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 28px; position: relative; }
+  .modal-close { position: absolute; top: 14px; right: 14px; background: var(--fog); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
+  .modal-close:hover { background: var(--border); }
+  .modal h2 { font-family: 'Fraunces', serif; font-size: 1.4rem; margin-bottom: 4px; }
+  .modal-icon { font-size: 3rem; margin-bottom: 10px; }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+  .modal-stat { background: var(--fog); border-radius: 8px; padding: 10px 12px; }
+  .modal-stat .label { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .modal-stat .value { font-size: .92rem; font-weight: 500; color: var(--soil); margin-top: 3px; line-height: 1.4; }
+  .compat-section h4 { font-size: .85rem; font-weight: 600; margin: 12px 0 6px; }
+  .compat-list { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* DIARIO */
+  .diary-compose { margin-bottom: 22px; }
+  .diary-compose textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: .9rem; resize: vertical; min-height: 80px; background: #fff; }
+  .diary-compose-bar { display: flex; gap: 8px; margin-top: 8px; align-items: center; flex-wrap: wrap; }
+  .diary-compose-bar select, .diary-compose-bar input[type=date] { padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: .85rem; background: #fff; }
+  .diary-entries { display: flex; flex-direction: column; gap: 12px; }
+  .diary-entry { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  .diary-entry-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .diary-entry-date { font-size: .78rem; color: var(--muted); }
+  .diary-entry-cat { font-size: .72rem; padding: 2px 8px; border-radius: 20px; background: var(--fog); color: var(--bark); }
+  .diary-entry-text { font-size: .9rem; line-height: 1.6; color: var(--text); }
+  .diary-entry-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 2px 6px; border-radius: 4px; }
+  .diary-entry-del:hover { color: var(--red); background: #fde8e6; }
+
+  /* PARASSITI */
+  .pest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .pest-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+  .pest-card .pest-icon { font-size: 2rem; margin-bottom: 8px; }
+  .pest-card h3 { font-size: 1rem; color: var(--soil); margin-bottom: 4px; }
+  .pest-card .pest-type { font-size: .75rem; color: var(--red); font-weight: 500; margin-bottom: 8px; }
+  .pest-card .pest-desc { font-size: .82rem; color: var(--muted); line-height: 1.6; margin-bottom: 6px; }
+  .pest-card .pest-affects { font-size: .78rem; color: var(--bark); margin-bottom: 8px; }
+  .remedy { background: #eef5ec; border-radius: 7px; padding: 10px; }
+  .remedy strong { font-size: .78rem; color: var(--moss); display: block; margin-bottom: 4px; }
+  .remedy p { color: var(--text); font-size: .82rem; margin: 0; line-height: 1.55; }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
+  .empty-state .e-icon { font-size: 3rem; margin-bottom: 12px; }
+
+  /* ── SEZIONE AI ── */
+  .ai-layout { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+  @media (max-width: 900px) { .ai-layout { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) { .ai-layout > [style*="span 2"] { grid-column: span 1 !important; } }
+  @media (max-width: 700px) {
+    #diag-messages + div + .chat-input-row { flex-wrap: wrap; }
+    /* stack webcam below chat on narrow screens */
+    .ai-panel-body > div[style*="grid-template-columns:1fr 300px"] {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  /* pannello generico AI */
+  .ai-panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); display: flex; flex-direction: column; overflow: hidden; }
+  .ai-panel-header { background: linear-gradient(135deg, var(--soil), #2d4a2d); padding: 16px 18px; }
+  .ai-panel-header h3 { font-family: 'Fraunces', serif; font-size: 1.05rem; color: var(--leaf); margin-bottom: 3px; }
+  .ai-panel-header p { font-size: .78rem; color: rgba(255,255,255,.55); }
+  .ai-panel-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+  /* chat */
+  .chat-messages { flex: 1; min-height: 220px; max-height: 340px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 4px 0; }
+  .msg { max-width: 88%; padding: 10px 13px; border-radius: 12px; font-size: .85rem; line-height: 1.55; }
+  .msg-user { background: var(--moss); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .msg-ai { background: var(--fog); color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid var(--border); }
+  .msg-ai.loading { color: var(--muted); font-style: italic; }
+  .chat-input-row { display: flex; gap: 8px; }
+  .chat-input-row textarea { flex: 1; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: .85rem; resize: none; min-height: 40px; max-height: 100px; }
+  .chat-input-row textarea:focus { outline: none; border-color: var(--moss); }
+  .btn-send { background: var(--moss); color: #fff; border: none; border-radius: 8px; padding: 0 14px; cursor: pointer; font-size: 1.1rem; flex-shrink: 0; transition: background .15s; }
+  .btn-send:hover { background: #3a5433; }
+  .btn-send:disabled { background: var(--border); cursor: default; }
+
+  /* diagnosi */
+  .diag-textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: .85rem; resize: vertical; min-height: 90px; }
+  .diag-textarea:focus { outline: none; border-color: var(--moss); }
+  .diag-result { background: var(--fog); border-radius: 8px; padding: 12px; font-size: .85rem; line-height: 1.6; min-height: 60px; color: var(--text); border: 1px solid var(--border); white-space: pre-wrap; }
+  .diag-result.empty { color: var(--muted); font-style: italic; }
+  .diag-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .diag-chip { font-size: .75rem; padding: 4px 10px; background: var(--fog); border: 1px solid var(--border); border-radius: 20px; cursor: pointer; transition: all .15s; }
+  .diag-chip:hover { background: #d4e8d0; border-color: var(--moss); }
+
+  /* pianificazione AI */
+  .plan-form { display: flex; flex-direction: column; gap: 8px; }
+  .plan-form select, .plan-form input { padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: .85rem; background: #fff; }
+  .plan-result { background: var(--fog); border-radius: 8px; padding: 12px; font-size: .85rem; line-height: 1.65; min-height: 80px; color: var(--text); border: 1px solid var(--border); white-space: pre-wrap; flex: 1; overflow-y: auto; max-height: 300px; }
+  .plan-result.empty { color: var(--muted); font-style: italic; }
+
+  /* spinner */
+  .ai-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 5px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .plant-palette { width: 100%; }
+    .palette-list { max-height: 120px; flex-direction: row; flex-wrap: wrap; overflow-x: auto; overflow-y: visible; }
+    .modal-grid { grid-template-columns: 1fr; }
+  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--fog); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- MODAL UNIVERSALE (sostituisce confirm/prompt) -->
+<div id="dialog-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:14px;padding:28px;width:100%;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.2);">
+    <div id="dialog-icon" style="font-size:2rem;margin-bottom:10px"></div>
+    <h3 id="dialog-title" style="font-family:'Fraunces',serif;font-size:1.15rem;margin-bottom:8px"></h3>
+    <p id="dialog-desc" style="font-size:.85rem;color:var(--muted);margin-bottom:14px;line-height:1.5"></p>
+    <input type="text" id="dialog-input" placeholder="" maxlength="40"
+      style="display:none;width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.95rem;margin-bottom:14px;"
+      onkeydown="if(event.key==='Enter')dialogConfirm();if(event.key==='Escape')dialogClose();">
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-secondary" onclick="dialogClose()">Annulla</button>
+      <button class="btn" id="dialog-ok-btn" onclick="dialogConfirm()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">🌿 Orto<span>365</span></div>
+  <div class="nav-tabs">
+    <button class="tab-btn" data-section="home"       onclick="showSection('home')">🏠 Home</button>
+    <button class="tab-btn" data-section="planner"    onclick="showSection('planner')">🗺️ Pianificatore</button>
+    <button class="tab-btn" data-section="piante"     onclick="showSection('piante')">🌱 Piante</button>
+    <button class="tab-btn" data-section="calendario" onclick="showSection('calendario')">📅 Calendario</button>
+    <button class="tab-btn" data-section="diario"     onclick="showSection('diario')">📔 Diario</button>
+    <button class="tab-btn" data-section="parassiti"  onclick="showSection('parassiti')">🐛 Parassiti</button>
+    <button class="tab-btn" data-section="ai"          onclick="showSection('ai')" style="color:var(--sun)">🤖 AI</button>
+    <button class="tab-btn" data-section="impostazioni" onclick="showSection('impostazioni')">☁ pCloud</button>
+  </div>
+  <!-- Tasti salvataggio -->
+  <div style="display:flex;gap:6px;align-items:center;padding:6px 0;flex-shrink:0;">
+    <span id="save-indicator" style="font-size:.7rem;color:rgba(255,255,255,.4);white-space:nowrap;transition:color .3s;">● salvato</span>
+    <button onclick="exportJSON()" title="Scarica backup JSON" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 10px;font-size:.78rem;cursor:pointer;white-space:nowrap;">⬇ Export</button>
+    <label title="Importa dati da file JSON" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:5px 10px;font-size:.78rem;cursor:pointer;white-space:nowrap;">
+      ⬆ Import<input type="file" accept=".json" onchange="importJSON(this)" style="display:none">
+    </label>
+    <button onclick="showSection('impostazioni')" title="Impostazioni pCloud" id="pcloud-btn"
+      style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:6px;padding:5px 10px;font-size:.78rem;cursor:pointer;white-space:nowrap;">
+      ☁ pCloud
+    </button>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div id="home-section" class="section">
+  <h1>Il tuo orto bio<br><em>sempre con te</em></h1>
+  <p>Pianifica, semina, coltiva e raccogli. Tutto gratis, tutto nel browser — nessun abbonamento, nessun account.</p>
+  <div class="home-cards">
+    <div class="home-card" onclick="showSection('planner')"><div class="icon">🗺️</div><h3>Pianificatore</h3><p>Disegna le aiuole e piazza le piante con drag & drop</p></div>
+    <div class="home-card" onclick="showSection('piante')"><div class="icon">🌱</div><h3>Database Piante</h3><p>25+ specie con consociazioni, spaziature e cure</p></div>
+    <div class="home-card" onclick="showSection('calendario')"><div class="icon">📅</div><h3>Calendario Semine</h3><p>Scopri quando seminare nella tua zona climatica</p></div>
+    <div class="home-card" onclick="showSection('diario')"><div class="icon">📔</div><h3>Diario dell'Orto</h3><p>Annota osservazioni, raccolti e attività stagionali</p></div>
+    <div class="home-card" onclick="showSection('parassiti')"><div class="icon">🐛</div><h3>Parassiti & Malattie</h3><p>Rimedi bio senza chimica per ogni problema</p></div>
+    <div class="home-card" onclick="showSection('ai')" style="border-color:rgba(232,197,71,.4)"><div class="icon">🤖</div><h3>Assistente AI</h3><p>Chat, diagnosi problemi e pianificazione intelligente dell'orto</p></div>
+    <div class="home-card" onclick="showSection('impostazioni')" style="border-color:rgba(100,180,255,.3)"><div class="icon">☁️</div><h3>Sync pCloud</h3><p>Backup automatico su pCloud ad ogni modifica</p></div>
+  </div>
+</div>
+
+<!-- IMPOSTAZIONI PCLOUD -->
+<div id="impostazioni-section" class="section">
+<div class="page-inner" style="max-width:560px;">
+  <div class="page-title">☁️ Sync pCloud</div>
+  <div class="page-sub">Backup automatico ad ogni modifica — i tuoi dati sempre al sicuro</div>
+
+  <!-- Stato connessione -->
+  <div id="pcloud-status-card" class="card" style="margin-bottom:18px;display:flex;align-items:center;gap:14px;">
+    <div id="pcloud-status-icon" style="font-size:2rem;">☁️</div>
+    <div>
+      <div id="pcloud-status-title" style="font-weight:600;font-size:.95rem;color:var(--soil)">Non connesso</div>
+      <div id="pcloud-status-sub" style="font-size:.8rem;color:var(--muted);margin-top:2px">Inserisci le credenziali per attivare il backup automatico</div>
+    </div>
+  </div>
+
+  <!-- Form login -->
+  <div class="card" id="pcloud-login-card">
+    <div style="font-size:.9rem;font-weight:600;color:var(--soil);margin-bottom:14px;">🔐 Accedi al tuo account pCloud</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <label style="font-size:.83rem;color:var(--muted);">Email pCloud
+        <input type="email" id="pcloud-email" placeholder="tua@email.com"
+          style="display:block;width:100%;margin-top:4px;padding:9px 12px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.9rem;">
+      </label>
+      <label style="font-size:.83rem;color:var(--muted);">Password
+        <div style="position:relative;">
+          <input type="password" id="pcloud-pass" placeholder="••••••••"
+            style="display:block;width:100%;margin-top:4px;padding:9px 12px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.9rem;"
+            onkeydown="if(event.key==='Enter')pcloudLogin()">
+          <button onclick="togglePassVis()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;" id="pass-eye">👁</button>
+        </div>
+      </label>
+      <div style="font-size:.75rem;color:var(--muted);background:var(--fog);border-radius:7px;padding:8px 10px;line-height:1.5;">
+        🔒 Le credenziali vengono usate <strong>solo</strong> per ottenere un token di accesso da pCloud. Non vengono mai salvate — solo il token viene memorizzato localmente.
+      </div>
+      <button class="btn btn-primary" id="pcloud-login-btn" onclick="pcloudLogin()" style="align-self:flex-start;">
+        Connetti a pCloud
+      </button>
+    </div>
+  </div>
+
+  <!-- Card connesso (nascosta finché non loggato) -->
+  <div class="card" id="pcloud-connected-card" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div>
+        <div style="font-size:.9rem;font-weight:600;color:var(--moss);">✅ Connesso a pCloud</div>
+        <div id="pcloud-user-info" style="font-size:.8rem;color:var(--muted);margin-top:3px;"></div>
+      </div>
+      <button class="btn btn-secondary" onclick="pcloudLogout()" style="font-size:.8rem;">Disconnetti</button>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="pcloudUpload(true)">⬆ Carica ora su pCloud</button>
+      <button class="btn btn-secondary" onclick="pcloudDownload()">⬇ Ripristina ultimo</button>
+    </div>
+    <div id="pcloud-last-sync" style="font-size:.75rem;color:var(--muted);margin-top:10px;"></div>
+    <div style="margin-top:12px;background:var(--fog);border-radius:7px;padding:10px 12px;font-size:.8rem;color:var(--muted);line-height:1.6;">
+      📁 Cartella su pCloud: <code style="background:#e8e4d8;padding:1px 5px;border-radius:3px;">Orto365/</code><br>
+      🔄 Backup rotante automatico — fino a <strong>${MAX_BACKUPS} versioni</strong>, poi sovrascrive la più vecchia
+    </div>
+    <!-- Lista backup -->
+    <div style="margin-top:16px;">
+      <div style="font-size:.82rem;font-weight:600;color:var(--soil);margin-bottom:8px;">📋 Backup disponibili su pCloud</div>
+      <div id="pcloud-backup-list" style="display:flex;flex-direction:column;gap:6px;">
+        <div style="color:var(--muted);font-size:.8rem;">Carico lista…</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PIANIFICATORE -->
+<div id="planner-section" class="section">
+<div class="page-inner">
+  <div class="page-title">🗺️ Pianificatore dell'Orto</div>
+  <div class="page-sub">Tela in scala reale — ogni pianta occupa lo spazio che le spetta davvero</div>
+  <div class="stat-bar" id="planner-stats"></div>
+  <div class="card">
+    <!-- Toolbar aiuole -->
+    <div class="planner-toolbar">
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        <select class="bed-select" id="bed-select" onchange="switchBed(this.value)"></select>
+        <button class="btn btn-secondary" onclick="openBedModal('new')">+ Nuova aiuola</button>
+        <button class="btn btn-secondary" onclick="openBedModal('rename')" title="Rinomina">✏️</button>
+        <button class="btn btn-danger"    onclick="openBedModal('delete')" title="Elimina">🗑</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <label style="font-size:.83rem;color:var(--muted)">Larghezza:
+          <input type="number" id="bed-w-cm" value="200" min="50" max="2000" step="10" style="width:68px;padding:5px 7px;border:1px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;"> cm
+        </label>
+        <label style="font-size:.83rem;color:var(--muted)">Profondità:
+          <input type="number" id="bed-h-cm" value="120" min="50" max="2000" step="10" style="width:68px;padding:5px 7px;border:1px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;"> cm
+        </label>
+        <button class="btn btn-secondary" onclick="applyBedSize()">Applica</button>
+        <button class="btn btn-danger"    onclick="openBedModal('clear')">Svuota</button>
+      </div>
+    </div>
+
+    <div class="planner-layout">
+      <!-- PALETTE -->
+      <div class="plant-palette">
+        <div class="palette-title">Piante disponibili</div>
+        <input class="palette-search" type="search" placeholder="Cerca…" oninput="filterPalette()" id="palette-search-input">
+        <select id="palette-season" onchange="filterPalette()" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.8rem;margin-bottom:5px;">
+          <option value="">Tutte le stagioni</option>
+          <option value="primavera">🌸 Primavera</option>
+          <option value="estate">☀️ Estate</option>
+          <option value="autunno">🍂 Autunno</option>
+          <option value="inverno">❄️ Inverno</option>
+          <option value="tuttoanno">🔄 Tutto l'anno</option>
+        </select>
+        <label style="font-size:.75rem;color:var(--moss);display:flex;align-items:center;gap:5px;margin-bottom:7px;cursor:pointer;">
+          <input type="checkbox" id="palette-nord" onchange="filterPalette()"> Solo Nord Italia
+        </label>
+        <div class="palette-hint" id="palette-hint">✅ Clicca sulla tela per posizionare</div>
+        <div class="palette-list" id="palette-list"></div>
+      </div>
+
+      <!-- CANVAS SVG -->
+      <div class="garden-canvas-wrap">
+        <div style="margin-bottom:8px;font-size:.78rem;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+          <span id="scale-info"></span>
+          <span>
+            <span style="display:inline-block;width:10px;height:10px;background:#d4e8d0;border:1px solid var(--moss);border-radius:2px;vertical-align:middle;"></span> buone consociate &nbsp;
+            <span style="display:inline-block;width:10px;height:10px;background:rgba(192,57,43,.18);border:1px solid var(--red);border-radius:2px;vertical-align:middle;"></span> incompatibili
+          </span>
+        </div>
+        <div class="garden-grid-container" id="svg-container" style="overflow:auto;border:2px solid var(--bark);border-radius:10px;background:#f0ebe0;min-height:200px;cursor:crosshair;">
+          <svg id="garden-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <div style="margin-top:8px;font-size:.78rem;color:var(--muted);line-height:1.6;">
+          💡 Seleziona una pianta a sinistra → clicca sulla tela per posizionarla nella posizione esatta. Clicca su una pianta già piazzata per rimuoverla. Ogni rettangolo è in scala reale (1 px = 1 cm).
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PIANTE -->
+<div id="piante-section" class="section">
+<div class="page-inner">
+  <div class="page-title">🌱 Database Piante</div>
+  <div class="page-sub">Scopri spaziature, consociazioni e cure per ogni specie</div>
+  <div class="plants-toolbar">
+    <input type="search" id="plant-search" placeholder="Cerca pianta o famiglia…" oninput="filterPlants()">
+    <select id="plant-cat" onchange="filterPlants()">
+      <option value="">Tutte le categorie</option>
+      <option value="ortaggi">Ortaggi</option>
+      <option value="erbe">Erbe aromatiche</option>
+      <option value="fiori">Fiori & ausiliari</option>
+      <option value="frutti">Frutti</option>
+    </select>
+    <select id="plant-season" onchange="filterPlants()">
+      <option value="">Tutte le stagioni</option>
+      <option value="primavera">🌸 Primavera</option>
+      <option value="estate">☀️ Estate</option>
+      <option value="autunno">🍂 Autunno</option>
+      <option value="inverno">❄️ Inverno</option>
+    </select>
+    <label style="font-size:.85rem;display:flex;align-items:center;gap:5px;white-space:nowrap;cursor:pointer;">
+      <input type="checkbox" id="plant-nord" onchange="filterPlants()"> Solo Nord Italia
+    </label>
+  </div>
+  <div class="plants-grid" id="plants-grid"></div>
+</div>
+</div>
+
+<!-- CALENDARIO -->
+<div id="calendario-section" class="section">
+<div class="page-inner">
+  <div class="page-title">📅 Calendario Semine</div>
+  <div class="page-sub">Basato sulle temperature medie mensili 2001–2025 per zona — non un semplice offset fisso</div>
+  <div class="cal-settings">
+    <label>Zona climatica:
+      <select id="climate-zone" onchange="renderCalendar()">
+        <option value="nord">Nord Italia (Pianura Padana / Alpi / Prealpi)</option>
+        <option value="centro">Centro Italia (Toscana / Umbria / Lazio / Marche)</option>
+        <option value="sud" selected>Sud Italia / Sicilia / Sardegna / Coste</option>
+      </select>
+    </label>
+    <label style="font-size:.83rem;color:var(--muted)">Aggiusta temperatura (°C):
+      <input type="number" id="climate-offset" value="0" min="-5" max="5" step="0.5"
+        style="width:62px;padding:5px 7px;border:1px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;"
+        oninput="renderCalendar()">
+      <span style="font-size:.75rem;color:var(--muted)">(es. +2 se in città, −2 se in quota)</span>
+    </label>
+  </div>
+  <div id="cal-temp-bar" style="display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap;"></div>
+  <div class="card">
+    <div class="cal-wrap">
+      <table class="cal-table" id="cal-grid"></table>
+    </div>
+    <div class="cal-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#d4e8d0"></div> Semina in semenzaio/vaso</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#5aac52"></div> Trapianto o semina diretta</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#e8c547"></div> Raccolta</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#e8eaf6;border:1px solid #9fa8da"></div> Fuori finestra termica</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- DIARIO -->
+<div id="diario-section" class="section">
+<div class="page-inner">
+  <div class="page-title">📔 Diario dell'Orto</div>
+  <div class="page-sub">Annota osservazioni, raccolti, trapianti e riflessioni stagionali</div>
+  <div class="card diary-compose">
+    <textarea id="diary-text" placeholder="Scrivi un'annotazione… (es: piantati i pomodori, prima fioritura dei peperoni, raccolto 1 kg di zucchine…)"></textarea>
+    <div class="diary-compose-bar">
+      <select id="diary-cat">
+        <option>🌱 Semina</option>
+        <option>🌿 Trapianto</option>
+        <option>🍅 Raccolta</option>
+        <option>💧 Irrigazione</option>
+        <option>🐛 Parassiti</option>
+        <option>✂️ Potatura</option>
+        <option>📝 Nota</option>
+      </select>
+      <input type="date" id="diary-date">
+      <button class="btn btn-primary" onclick="addDiaryEntry()">Aggiungi nota</button>
+    </div>
+  </div>
+  <div class="diary-entries" id="diary-entries"></div>
+</div>
+</div>
+
+<!-- PARASSITI -->
+<div id="parassiti-section" class="section">
+<div class="page-inner">
+  <div class="page-title">🐛 Parassiti & Malattie</div>
+  <div class="page-sub">Rimedi biologici e naturali, senza chimica</div>
+  <div class="plants-toolbar" style="margin-bottom:16px;">
+    <input type="search" id="pest-search" placeholder="Cerca parassita, pianta colpita…" oninput="filterPests()" style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:.85rem;">
+    <select id="pest-type" onchange="filterPests()" style="padding:8px 12px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:.85rem;background:#fff;">
+      <option value="">Tutti i tipi</option>
+      <option value="insetto">Insetti</option>
+      <option value="fungo">Funghi/Malattie</option>
+      <option value="animale">Animali</option>
+    </select>
+  </div>
+  <div class="pest-grid" id="pest-grid"></div>
+</div>
+</div>
+
+<!-- AI -->
+<div id="ai-section" class="section">
+<div class="page-inner">
+  <div class="page-title">🤖 Assistente AI</div>
+  <div class="page-sub">Tre strumenti AI per il tuo orto — basati su Claude di Anthropic</div>
+
+  <div class="ai-layout">
+
+    <!-- 1. CHAT ASSISTENTE -->
+    <div class="ai-panel">
+      <div class="ai-panel-header">
+        <h3>💬 Consulente dell'Orto</h3>
+        <p>Fai qualsiasi domanda sul tuo orto biologico</p>
+      </div>
+      <div class="ai-panel-body">
+        <div class="chat-messages" id="chat-messages">
+          <div class="msg msg-ai">Ciao! Sono il tuo consulente d'orto AI. Dimmi pure: hai problemi con le piante, vuoi consigli su cosa piantare o hai dubbi su irrigazione, concimazione, consociazioni? 🌱</div>
+        </div>
+        <div class="chat-input-row">
+          <textarea id="chat-input" placeholder="Scrivi una domanda… (es: quando potare i pomodori?)" rows="2"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+          <button class="btn-send" id="chat-send-btn" onclick="sendChat()" title="Invia">➤</button>
+        </div>
+        <button class="btn btn-secondary" style="font-size:.78rem;padding:5px 10px;align-self:flex-start" onclick="clearChat()">🗑 Svuota chat</button>
+      </div>
+    </div>
+
+    <!-- 2. DIAGNOSI PROBLEMI -->
+    <!-- 2. DIAGNOSI CHAT LIVE -->
+    <div class="ai-panel" style="grid-column: span 2;">
+      <div class="ai-panel-header">
+        <h3>🔍 Diagnosi Problemi — Chat Live</h3>
+        <p>Conversa con il fitoiatologo AI, allega foto o usa la webcam per inquadrare la pianta</p>
+      </div>
+      <div class="ai-panel-body" style="gap:12px;">
+
+        <!-- Chips rapide -->
+        <div>
+          <div style="font-size:.75rem;color:var(--muted);margin-bottom:5px">Esempi rapidi:</div>
+          <div class="diag-chips">
+            <span class="diag-chip" onclick="diagQuick('Foglie di pomodoro gialle con macchie brune')">Foglie gialle 🍂</span>
+            <span class="diag-chip" onclick="diagQuick('Polvere bianca sulle foglie di zucchino')">Mal bianco 🤍</span>
+            <span class="diag-chip" onclick="diagQuick('Buchi nelle foglie di cavolo di notte')">Buchi foglie 🕳</span>
+            <span class="diag-chip" onclick="diagQuick('Piantine che crollano alla base')">Piantine che crollano 😔</span>
+            <span class="diag-chip" onclick="diagQuick('Afidi verdi su germogli di peperone')">Afidi 🦠</span>
+            <span class="diag-chip" onclick="diagQuick('Radici marce con odore sgradevole')">Marciume radici 🍂</span>
+          </div>
+        </div>
+
+        <!-- Layout a due colonne: chat | webcam -->
+        <div style="display:grid;grid-template-columns:1fr 300px;gap:14px;align-items:start;">
+
+          <!-- COLONNA SX: chat -->
+          <div style="display:flex;flex-direction:column;gap:10px;">
+
+            <!-- Messaggi -->
+            <div class="chat-messages" id="diag-messages" style="min-height:260px;max-height:340px;">
+              <div class="msg msg-ai">Ciao! Sono il tuo fitoiatologo AI 🌿 Descrivi il problema, allega una foto o usa la webcam per mostrarmi la pianta — ti aiuto a diagnosticare e a trovare il rimedio biologico giusto.</div>
+            </div>
+
+            <!-- Anteprima immagine allegata -->
+            <div id="diag-img-preview" style="display:none;position:relative;max-width:200px;">
+              <img id="diag-img-thumb" style="width:100%;border-radius:8px;border:2px solid var(--moss);">
+              <button onclick="clearDiagImg()" style="position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center;">✕</button>
+            </div>
+
+            <!-- Input row -->
+            <div class="chat-input-row" style="align-items:flex-end;">
+              <textarea id="diag-input" placeholder="Descrivi il sintomo… (Invio per inviare)" rows="2"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDiag();}"></textarea>
+              <!-- Upload foto -->
+              <label title="Allega foto" style="cursor:pointer;background:var(--fog);border:1px solid var(--border);border-radius:8px;padding:0 12px;height:40px;display:flex;align-items:center;font-size:1.1rem;flex-shrink:0;">
+                📎<input type="file" id="diag-file" accept="image/*" style="display:none" onchange="loadDiagFile(this)">
+              </label>
+              <!-- Cattura da webcam -->
+              <button title="Cattura dalla webcam" onclick="snapWebcam()" style="background:var(--fog);border:1px solid var(--border);border-radius:8px;padding:0 12px;height:40px;font-size:1.1rem;cursor:pointer;flex-shrink:0;">📸</button>
+              <!-- Invia -->
+              <button class="btn-send" id="diag-send-btn" onclick="sendDiag()" title="Invia">➤</button>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-secondary" style="font-size:.76rem;padding:4px 10px;" onclick="clearDiagChat()">🗑 Nuova sessione</button>
+            </div>
+          </div>
+
+          <!-- COLONNA DX: webcam -->
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="font-size:.78rem;font-weight:500;color:var(--muted);">📷 Webcam live</div>
+            <div style="position:relative;border-radius:10px;overflow:hidden;background:#1a1a1a;aspect-ratio:4/3;">
+              <video id="diag-video" autoplay playsinline muted
+                style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+              <canvas id="diag-canvas" style="display:none;"></canvas>
+              <div id="webcam-off" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:.82rem;gap:8px;">
+                <span style="font-size:2rem;">📷</span>
+                <span>Webcam non attiva</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button class="btn btn-secondary" style="font-size:.78rem;flex:1;" onclick="startWebcam()">▶ Attiva cam</button>
+              <button class="btn btn-secondary" style="font-size:.78rem;flex:1;" onclick="stopWebcam()">⏹ Disattiva</button>
+            </div>
+            <button class="btn btn-primary" style="font-size:.8rem;" onclick="snapWebcam()">📸 Cattura e allega</button>
+            <div style="font-size:.72rem;color:var(--muted);line-height:1.5;">
+              La webcam non invia video — cattura solo il fotogramma che scegli tu.
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. PIANIFICAZIONE AI -->
+    <div class="ai-panel">
+      <div class="ai-panel-header">
+        <h3>🗓 Pianificazione Intelligente</h3>
+        <p>L'AI ti suggerisce cosa piantare in base alla situazione</p>
+      </div>
+      <div class="ai-panel-body">
+        <div class="plan-form">
+          <select id="plan-zone">
+            <option value="nord">Nord Italia (zone alpine/padane)</option>
+            <option value="centro" selected>Centro Italia (collinare/appenninico)</option>
+            <option value="sud">Sud Italia / Costiero / Mediterraneo</option>
+          </select>
+          <select id="plan-month">
+            <option value="1">Gennaio</option><option value="2">Febbraio</option>
+            <option value="3">Marzo</option><option value="4">Aprile</option>
+            <option value="5">Maggio</option><option value="6">Giugno</option>
+            <option value="7">Luglio</option><option value="8">Agosto</option>
+            <option value="9">Settembre</option><option value="10">Ottobre</option>
+            <option value="11">Novembre</option><option value="12">Dicembre</option>
+          </select>
+          <select id="plan-space">
+            <option value="balcone">Balcone / vasi</option>
+            <option value="piccolo">Orto piccolo (fino a 10 m²)</option>
+            <option value="medio" selected>Orto medio (10–30 m²)</option>
+            <option value="grande">Orto grande (oltre 30 m²)</option>
+          </select>
+          <input type="text" id="plan-already" placeholder="Cosa hai già piantato? (opzionale, es: pomodori, basilico)">
+          <button class="btn btn-primary" id="plan-btn" onclick="runPlanning()">✨ Genera piano</button>
+        </div>
+        <div class="plan-result empty" id="plan-result">Il piano suggerito dall'AI apparirà qui…</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- MODAL PIANTA -->
+<div class="modal-bg" id="plant-modal" onclick="if(event.target===this)closePlantModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closePlantModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATABASE PIANTE
+// ═══════════════════════════════════════════════════════
+// size: numero di slot che occupa nella griglia
+//   1 = 1×1 cella  (≤30 cm spaziatura)
+//   2 = 1×2 celle  (31–60 cm)
+//   4 = 2×2 celle  (61–100 cm)
+//   6 = 2×3 celle  (>100 cm — zucche, carciofi grandi)
+// nord: true = coltivabile bene anche al Nord Italia
+const PLANTS = [
+  // ── ORTAGGI ESTIVI ────────────────────────────────────────────────────────
+  { id:'tomato',     name:'Pomodoro',        icon:'🍅', cat:'ortaggi', color:'#e74c3c', family:'Solanaceae',    size:2, spacing:50,  nord:true,  depth:'0.5', sun:'☀️ Pieno sole',  water:'💧💧 Media-alta', season:'estate',
+    sow:[2,3],      plant:[4,5],   harvest:[7,8,9,10],
+    good:['basilico','carota','prezzemolo','aglio','calendula','nasturzio'],
+    bad:['finocchio','patata','melanzana','cavolo'],
+    notes:'Legare i germogli. Rimuovere i succhioni. Teme i ristagni. Al Nord seminare in febbraio in semenzaio riscaldato.' },
+
+  { id:'peperone',   name:'Peperone',        icon:'🫑', cat:'ortaggi', color:'#f39c12', family:'Solanaceae',    size:2, spacing:40,  nord:false, depth:'0.5', sun:'☀️ Pieno sole',  water:'💧💧 Media',      season:'estate',
+    sow:[2,3],      plant:[5],     harvest:[7,8,9,10],
+    good:['basilico','carota','insalata','calendula'],
+    bad:['finocchio','pisello'],
+    notes:'Sensibile al freddo, predilige il Sud. Al Nord richiede posizione riparata e calda, meglio in tunnel o vaso grande.' },
+
+  { id:'melanzana',  name:'Melanzana',       icon:'🍆', cat:'ortaggi', color:'#6c3483', family:'Solanaceae',    size:2, spacing:60,  nord:false, depth:'0.5', sun:'☀️ Pieno sole',  water:'💧💧 Alta',       season:'estate',
+    sow:[2,3],      plant:[5,6],   harvest:[7,8,9,10],
+    good:['basilico','fagiolo','peperone','timo'],
+    bad:['finocchio','patata'],
+    notes:'Vuole molto caldo. Al Nord seminare in febbraio sotto copertura riscaldata.' },
+
+  { id:'zucchino',   name:'Zucchino',        icon:'🥒', cat:'ortaggi', color:'#2ecc71', family:'Cucurbitaceae', size:4, spacing:80,  nord:true,  depth:'2',   sun:'☀️ Pieno sole',  water:'💧💧💧 Alta',     season:'estate',
+    sow:[4,5],      plant:[5,6],   harvest:[6,7,8,9],
+    good:['mais','fagiolo','nasturzio','cipollotto'],
+    bad:['patata','finocchio'],
+    notes:'Raccogliere ogni 2-3 giorni per stimolare produzione. Occhio all\'oidio in estate.' },
+
+  { id:'zucca',      name:'Zucca',           icon:'🎃', cat:'ortaggi', color:'#e67e22', family:'Cucurbitaceae', size:6, spacing:120, nord:true,  depth:'3',   sun:'☀️ Pieno sole',  water:'💧💧💧 Alta',     season:'estate',
+    sow:[4,5],      plant:[5,6],   harvest:[9,10,11],
+    good:['mais','fagiolo','nasturzio','ravanello'],
+    bad:['patata','finocchio','cetriolo'],
+    notes:'Terzetto "Milpa" con mais e fagiolo. Lasciare ampio spazio: i tralci arrivano a 3-4 m. Eccellente al Nord.' },
+
+  { id:'cetriolo',   name:'Cetriolo',        icon:'🥒', cat:'ortaggi', color:'#58d68d', family:'Cucurbitaceae', size:2, spacing:40,  nord:true,  depth:'2',   sun:'☀️ Sole',        water:'💧💧💧 Alta',     season:'estate',
+    sow:[4,5],      plant:[5,6],   harvest:[7,8,9],
+    good:['fagiolo','nasturzio','insalata','aneto'],
+    bad:['salvia','patata','zucca'],
+    notes:'Ottimo su rete verticale per risparmiare spazio. Irrigare regolarmente.' },
+
+  { id:'mais',       name:'Mais',            icon:'🌽', cat:'ortaggi', color:'#f1c40f', family:'Poaceae',       size:2, spacing:35,  nord:true,  depth:'4',   sun:'☀️ Pieno sole',  water:'💧💧 Media',      season:'estate',
+    sow:[4,5],      plant:[],      harvest:[8,9],
+    good:['fagiolo','zucchino','zucca','cetriolo'],
+    bad:['tomato','barbabietola'],
+    notes:'Terzetto della "Milpa" con fagiolo e zucca. Fecondazione incrociata: seminare almeno 3 file.' },
+
+  { id:'fagiolo',    name:'Fagiolo',         icon:'🫘', cat:'ortaggi', color:'#8e44ad', family:'Fabaceae',      size:1, spacing:20,  nord:true,  depth:'3',   sun:'☀️ Sole',        water:'💧 Media',        season:'estate',
+    sow:[4,5,6],    plant:[],      harvest:[7,8,9],
+    good:['zucchino','mais','carota','cetriolo','zucca'],
+    bad:['aglio','cipolla','finocchio'],
+    notes:'Fissa l\'azoto nel suolo. Ottimo per terreni poveri. Non bagnare durante la fioritura.' },
+
+  { id:'fagiolinoRamp', name:'Fagiolo rampicante', icon:'🌱', cat:'ortaggi', color:'#6d3f99', family:'Fabaceae', size:1, spacing:25, nord:true, depth:'3', sun:'☀️ Sole', water:'💧 Media', season:'estate',
+    sow:[4,5],      plant:[],      harvest:[7,8,9],
+    good:['mais','zucca','carota','cetriolo'],
+    bad:['aglio','cipolla','finocchio'],
+    notes:'Necessita di sostegno (rete, canne). Produzione abbondante e scalare. Ottimo al Nord.' },
+
+  // ── ORTAGGI AUTUNNO-INVERNO ───────────────────────────────────────────────
+  { id:'cavolo',     name:'Cavolo / Broccolo',icon:'🥦', cat:'ortaggi', color:'#1e8449', family:'Brassicaceae', size:4, spacing:50,  nord:true,  depth:'0.5', sun:'🌤 Parziale',    water:'💧💧 Alta',       season:'autunno',
+    sow:[6,7],      plant:[8,9],   harvest:[11,12,1,2],
+    good:['insalata','rosmarino','sedano','cipolle','aneto'],
+    bad:['tomato','fragola','fagiolo','aglio'],
+    notes:'Eccellente al Nord in autunno-inverno. Protegge dal gelo fino a -10°C. Usare reti anti-cavolaia.' },
+
+  { id:'cavolfiore', name:'Cavolfiore',       icon:'🤍', cat:'ortaggi', color:'#e8e8e8', family:'Brassicaceae', size:4, spacing:50,  nord:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧💧 Alta',       season:'autunno',
+    sow:[5,6],      plant:[7,8],   harvest:[10,11,12],
+    good:['insalata','sedano','aneto','cipolle'],
+    bad:['tomato','fragola','fagiolo'],
+    notes:'Legare le foglie attorno alla testa per sbiancarla. Al Nord seminare in maggio-giugno.' },
+
+  { id:'cavoloBrux', name:'Cavolini di Bruxelles', icon:'🟢', cat:'ortaggi', color:'#27ae60', family:'Brassicaceae', size:2, spacing:60, nord:true, depth:'0.5', sun:'☀️ Sole', water:'💧💧 Alta', season:'autunno',
+    sow:[4,5],      plant:[6,7],   harvest:[10,11,12,1],
+    good:['insalata','sedano','rosmarino'],
+    bad:['tomato','fagiolo','fragola'],
+    notes:'Pianta alta fino a 1 m. Resistente al gelo, migliora dopo le prime gelate. Tipica del Nord Europa.' },
+
+  { id:'carciofo',   name:'Carciofo',         icon:'🌿', cat:'ortaggi', color:'#5d8a3c', family:'Asteraceae',   size:6, spacing:100, nord:false, depth:'5',   sun:'☀️ Pieno sole',  water:'💧💧 Media',      season:'primavera',
+    sow:[],         plant:[3,4],   harvest:[4,5,6,10,11],
+    good:['fagiolo','pisello','insalata'],
+    bad:['aglio','cipolla'],
+    notes:'Perenne. Al Nord soffre il gelo intenso: coprire la base con pacciame. Preferisce climi miti.' },
+
+  { id:'cardo',      name:'Cardo',            icon:'🌾', cat:'ortaggi', color:'#8e6bbf', family:'Asteraceae',   size:6, spacing:100, nord:true,  depth:'2',   sun:'☀️ Sole',        water:'💧 Media',        season:'autunno',
+    sow:[4,5],      plant:[6],     harvest:[10,11,12],
+    good:['fagiolo','insalata'],
+    bad:['aglio'],
+    notes:'Parente del carciofo. Resistente al freddo. Imbianchire le coste legandole per 2-3 settimane prima del raccolto.' },
+
+  { id:'barbabietola', name:'Barbabietola rossa', icon:'❤️', cat:'ortaggi', color:'#922b21', family:'Amaranthaceae', size:1, spacing:15, nord:true, depth:'2', sun:'☀️ Sole', water:'💧 Media', season:'autunno',
+    sow:[4,5,7,8],  plant:[],      harvest:[7,8,10,11],
+    good:['insalata','cipolla','cavolina'],
+    bad:['mais','spinacio','fagiolo'],
+    notes:'Anche le foglie giovani sono commestibili. Ottima in doppia coltura (primavera e fine estate).' },
+
+  { id:'sedano',     name:'Sedano',           icon:'🥬', cat:'ortaggi', color:'#82b74b', family:'Apiaceae',     size:1, spacing:30,  nord:true,  depth:'0.5', sun:'🌤 Parziale',    water:'💧💧💧 Alta',     season:'autunno',
+    sow:[2,3],      plant:[5,6],   harvest:[9,10,11],
+    good:['cavolo','cavolfiore','pomodoro','pisello'],
+    bad:['carota','prezzemolo','mais'],
+    notes:'Esige molta acqua e terreno ricco. Al Nord seminare al coperto a febbraio. Ottimo compagno del cavolo.' },
+
+  { id:'porroInv',   name:'Porro',            icon:'🧅', cat:'ortaggi', color:'#a8d8a8', family:'Alliaceae',    size:1, spacing:15,  nord:true,  depth:'2',   sun:'☀️ Sole',        water:'💧 Media',        season:'autunno',
+    sow:[1,2,3],    plant:[5,6],   harvest:[9,10,11,12,1,2],
+    good:['carota','sedano','insalata'],
+    bad:['fagiolo','pisello'],
+    notes:'Eccellente al Nord: regge gelate forti. Rincalzare per sbiancare il fusto. Ottimo in inverno.' },
+
+  { id:'finocchio',  name:'Finocchio',        icon:'🌿', cat:'ortaggi', color:'#b7d7a8', family:'Apiaceae',     size:2, spacing:30,  nord:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧💧 Alta',       season:'autunno',
+    sow:[6,7,8],    plant:[8,9],   harvest:[10,11,12],
+    good:['insalata','pomodoro','pisello'],
+    bad:['carota','tomato','zucchino','fagiolo','cetriolo','aglio'],
+    notes:'Eccellente in autunno. Inibisce la crescita di molte piante: coltivarlo in zona isolata.' },
+
+  { id:'valerianella', name:'Valerianella (Songino)', icon:'🥗', cat:'ortaggi', color:'#52be80', family:'Valerianaceae', size:1, spacing:10, nord:true, depth:'0.5', sun:'🌤 Parziale', water:'💧 Media', season:'inverno',
+    sow:[8,9,10],   plant:[],      harvest:[11,12,1,2,3],
+    good:['spinacio','ravanello','insalata'],
+    bad:[],
+    notes:'Resistente al gelo: arriva a -15°C. Coltura invernale per eccellenza al Nord. Semina scalare ogni 2 settimane.' },
+
+  { id:'rucola',     name:'Rucola',           icon:'🌿', cat:'ortaggi', color:'#3d9970', family:'Brassicaceae', size:1, spacing:15,  nord:true,  depth:'0.5', sun:'🌤 Parziale',    water:'💧 Media',        season:'autunno',
+    sow:[3,4,8,9],  plant:[],      harvest:[4,5,9,10,11],
+    good:['insalata','spinacio','carota'],
+    bad:['cavolo'],
+    notes:'Coltivabile anche in vaso. In autunno-inverno al Nord in tunnel freddo. Raccogliere le foglie esterne.' },
+
+  { id:'bietola',    name:'Bietola da costa', icon:'🥬', cat:'ortaggi', color:'#27ae60', family:'Amaranthaceae', size:1, spacing:30,  nord:true,  depth:'1',   sun:'🌤 Parziale',    water:'💧💧 Media',      season:'autunno',
+    sow:[3,4,7,8],  plant:[],      harvest:[5,6,7,10,11],
+    good:['insalata','fagiolino','carota'],
+    bad:[],
+    notes:'Molto rustica, tollera il gelo. Sia estiva che autunnale. Raccogliere le foglie esterne scalarmante.' },
+
+  { id:'indivia',    name:'Indivia / Cicoria', icon:'🥗', cat:'ortaggi', color:'#a8d47a', family:'Asteraceae',  size:1, spacing:25,  nord:true,  depth:'0.5', sun:'🌤 Parziale',    water:'💧 Media',        season:'autunno',
+    sow:[6,7,8],    plant:[8,9],   harvest:[10,11,12,1],
+    good:['carota','ravanello','insalata'],
+    bad:[],
+    notes:'Eccellente pianta autunno-invernale. Coprire con telo per imbianchire e ridurre l\'amaro.' },
+
+  { id:'aglio',      name:'Aglio',            icon:'🧄', cat:'ortaggi', color:'#d5dbdb', family:'Alliaceae',    size:1, spacing:10,  nord:true,  depth:'5',   sun:'☀️ Sole',        water:'💧 Bassa',        season:'inverno',
+    sow:[],         plant:[10,11,2,3], harvest:[6,7],
+    good:['rosa','carota','tomato','fragola','insalata'],
+    bad:['fagiolo','pisello','cavolo'],
+    notes:'Piantare gli spicchi in autunno per raccolta estiva. Allontana molti parassiti. Ottimo al Nord.' },
+
+  { id:'cipolla',    name:'Cipolla',          icon:'🧅', cat:'ortaggi', color:'#c39bd3', family:'Alliaceae',    size:1, spacing:15,  nord:true,  depth:'2',   sun:'☀️ Sole',        water:'💧 Media',        season:'primavera',
+    sow:[1,2,3],    plant:[3,4],   harvest:[7,8],
+    good:['carota','insalata','tomato','camomilla'],
+    bad:['fagiolo','pisello','aglio'],
+    notes:'Smettere di irrigare quando i collari ingialliscono. Per la cipolla invernale (bianca) seminare in agosto.' },
+
+  // ── ORTAGGI PRIMAVERILI ───────────────────────────────────────────────────
+  { id:'patata',     name:'Patata',           icon:'🥔', cat:'ortaggi', color:'#d4ac6e', family:'Solanaceae',   size:2, spacing:35,  nord:true,  depth:'10',  sun:'☀️ Sole',        water:'💧💧 Media',      season:'primavera',
+    sow:[],         plant:[3,4],   harvest:[7,8],
+    good:['fagiolo','cavolo','mais','nasturzio'],
+    bad:['tomato','zucchino','finocchio','melanzana'],
+    notes:'Rincalzare a 20 cm. Evitare rotazione con solanacee. Molto adatta al Nord.' },
+
+  { id:'pisello',    name:'Pisello',          icon:'🫛', cat:'ortaggi', color:'#82e0aa', family:'Fabaceae',     size:1, spacing:10,  nord:true,  depth:'3',   sun:'🌤 Parziale',    water:'💧 Media',        season:'primavera',
+    sow:[2,3,9,10], plant:[],      harvest:[4,5,6,11,12],
+    good:['carota','ravanello','insalata','spinacio','menta'],
+    bad:['aglio','cipolla','finocchio'],
+    notes:'Semina precoce (anche sotto neve leggera). Ottimo al Nord in primavera e autunno. Fissa azoto.' },
+
+  { id:'asparago',   name:'Asparago',         icon:'🌾', cat:'ortaggi', color:'#27ae60', family:'Asparagaceae', size:4, spacing:40,  nord:true,  depth:'15',  sun:'☀️ Sole',        water:'💧 Media',        season:'primavera',
+    sow:[],         plant:[3,4],   harvest:[4,5,6],
+    good:['tomato','basilico','prezzemolo','calendula','pomodoro'],
+    bad:['cipolla','aglio','finocchio'],
+    notes:'Perenne produttivo 15-20 anni. Non raccogliere il 1° anno. Eccellente al Nord.' },
+
+  { id:'fava',       name:'Fava',             icon:'🫘', cat:'ortaggi', color:'#52be80', family:'Fabaceae',     size:1, spacing:25,  nord:true,  depth:'5',   sun:'☀️ Sole',        water:'💧 Media',        season:'primavera',
+    sow:[10,11,2,3],plant:[],      harvest:[5,6,7],
+    good:['carota','spinacio','insalata','cavolo'],
+    bad:['aglio','cipolla','finocchio'],
+    notes:'Resistente al freddo. Si può seminare in ottobre (al Nord in febbraio). Fissa azoto nel suolo.' },
+
+  { id:'ravanello',  name:'Ravanello',        icon:'🔴', cat:'ortaggi', color:'#e91e63', family:'Brassicaceae', size:1, spacing:5,   nord:true,  depth:'1',   sun:'☀️ Sole',        water:'💧 Regolare',     season:'primavera',
+    sow:[2,3,4,8,9],plant:[],      harvest:[3,4,5,9,10],
+    good:['insalata','carota','spinacio','nasturzio'],
+    bad:['cavolo','aneto'],
+    notes:'Crescita rapidissima (3-4 settimane). Perfetto rompi-erba e indicatore.' },
+
+  { id:'carota',     name:'Carota',           icon:'🥕', cat:'ortaggi', color:'#e67e22', family:'Apiaceae',     size:1, spacing:7,   nord:true,  depth:'1',   sun:'☀️ Sole',        water:'💧 Regolare',     season:'primavera',
+    sow:[3,4,8],    plant:[],      harvest:[6,7,10,11],
+    good:['tomato','insalata','cipolla','rosmarino','pisello'],
+    bad:['finocchio','aneto','sedano'],
+    notes:'Terreno sciolto e profondo. Diradare a 5-7 cm. Ottima varietà Nantes per il Nord.' },
+
+  // ── INSALATE E FOGLIE ─────────────────────────────────────────────────────
+  { id:'insalata',   name:'Lattuga',          icon:'🥗', cat:'ortaggi', color:'#a8d8a8', family:'Asteraceae',   size:1, spacing:25,  nord:true,  depth:'0.5', sun:'🌤 Parziale',    water:'💧💧 Alta',       season:'primavera',
+    sow:[2,3,8,9],  plant:[3,4,9,10], harvest:[4,5,6,10,11],
+    good:['carota','ravanello','fragola','cavolo','cipolla'],
+    bad:['sedano','prezzemolo'],
+    notes:'Soffre il caldo estivo: fare semine scalari. Al Nord coltivabile quasi tutto l\'anno.' },
+
+  { id:'spinacio',   name:'Spinacio',         icon:'🥬', cat:'ortaggi', color:'#196f3d', family:'Amaranthaceae', size:1, spacing:10, nord:true,  depth:'2',   sun:'🌤 Parziale',    water:'💧💧 Media',      season:'autunno',
+    sow:[2,3,8,9],  plant:[],      harvest:[4,5,10,11],
+    good:['fragola','fagiolo','insalata','bietola'],
+    bad:['barbabietola'],
+    notes:'Non teme leggere gelate. Ottimo riempie-spazi. Al Nord resistente fino a fine novembre.' },
+
+  // ── ERBE AROMATICHE ───────────────────────────────────────────────────────
+  { id:'basilico',   name:'Basilico',         icon:'🌿', cat:'erbe',    color:'#27ae60', family:'Lamiaceae',    size:1, spacing:20,  nord:true,  depth:'0.3', sun:'☀️ Pieno sole',  water:'💧 Media',        season:'estate',
+    sow:[3,4],      plant:[5,6],   harvest:[6,7,8,9],
+    good:['tomato','peperone','asparago'],
+    bad:['salvia','finocchio'],
+    notes:'Non bagnare le foglie. Recidere le infiorescenze per prolungare la raccolta. Ottimo in vaso.' },
+
+  { id:'prezzemolo', name:'Prezzemolo',       icon:'🌿', cat:'erbe',    color:'#52be80', family:'Apiaceae',     size:1, spacing:15,  nord:true,  depth:'0.5', sun:'🌤 Parziale',    water:'💧 Media',        season:'primavera',
+    sow:[3,4,8],    plant:[],      harvest:[5,6,7,8,9,10],
+    good:['tomato','asparago','carota','pomodoro'],
+    bad:['insalata','cipolla'],
+    notes:'Germinazione lenta (3-4 sett.). Biennale. Resiste al freddo con leggera protezione.' },
+
+  { id:'rosmarino',  name:'Rosmarino',        icon:'🌲', cat:'erbe',    color:'#2e86ab', family:'Lamiaceae',    size:2, spacing:60,  nord:true,  depth:'0.3', sun:'☀️ Pieno sole',  water:'💧 Bassa',        season:'tuttoanno',
+    sow:[3,4],      plant:[5],     harvest:[0,1,2,3,4,5,6,7,8,9,10,11],
+    good:['cavolo','carota','fagiolo','salvia'],
+    bad:['patata','cetriolo'],
+    notes:'Pianta perenne. Ama terreni ben drenati. Resiste al freddo invernale del Nord.' },
+
+  { id:'salvia',     name:'Salvia',           icon:'🍃', cat:'erbe',    color:'#7f8c8d', family:'Lamiaceae',    size:2, spacing:50,  nord:true,  depth:'0.3', sun:'☀️ Sole',        water:'💧 Bassa',        season:'tuttoanno',
+    sow:[3,4],      plant:[5],     harvest:[0,1,2,3,4,5,6,7,8,9,10,11],
+    good:['cavolo','carota','fagiolo','rosmarino'],
+    bad:['cetriolo','basilico'],
+    notes:'Pianta perenne. Alleata del cavolo contro cavolaia.' },
+
+  { id:'timo',       name:'Timo',             icon:'🌿', cat:'erbe',    color:'#7dbd8e', family:'Lamiaceae',    size:1, spacing:25,  nord:true,  depth:'0.3', sun:'☀️ Pieno sole',  water:'💧 Bassissima',   season:'tuttoanno',
+    sow:[3,4],      plant:[5],     harvest:[0,1,2,3,4,5,6,7,8,9,10,11],
+    good:['cavolo','melanzana','pomodoro','brassicacee'],
+    bad:[],
+    notes:'Perenne, molto rustico. Eccellente repellente per afidi e parassiti. Ottimo al Nord.' },
+
+  { id:'menta',      name:'Menta',            icon:'🌿', cat:'erbe',    color:'#1abc9c', family:'Lamiaceae',    size:1, spacing:30,  nord:true,  depth:'0.3', sun:'🌤 Parziale',    water:'💧💧 Alta',       season:'estate',
+    sow:[3,4],      plant:[4,5],   harvest:[5,6,7,8,9,10],
+    good:['cavolo','pomodoro','pisello'],
+    bad:[],
+    notes:'Invasiva: coltivare in vasi interrati o contenitori. Ottimo repellente per lumache e formiche.' },
+
+  { id:'aneto',      name:'Aneto',            icon:'🌼', cat:'erbe',    color:'#f1c40f', family:'Apiaceae',     size:1, spacing:20,  nord:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧 Media',        season:'estate',
+    sow:[4,5,6],    plant:[],      harvest:[6,7,8],
+    good:['cetriolo','insalata','cipolla','cavolo'],
+    bad:['carota','finocchio','pomodoro'],
+    notes:'Attira insetti utili (parassitoidi). Non consociare con carota o finocchio (ibridazione).' },
+
+  { id:'coriandolo', name:'Coriandolo',       icon:'🌿', cat:'erbe',    color:'#a2c11c', family:'Apiaceae',     size:1, spacing:15,  nord:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧 Media',        season:'primavera',
+    sow:[3,4,8,9],  plant:[],      harvest:[5,6,9,10],
+    good:['spinacio','pisello','insalata'],
+    bad:['finocchio'],
+    notes:'Ottimo come pianta attira-insetti utili. Le foglie si raccolgono prima della fioritura.' },
+
+  // ── FIORI E AUSILIARI ─────────────────────────────────────────────────────
+  { id:'nasturzio',  name:'Nasturzio',        icon:'🌸', cat:'fiori',   color:'#e67e22', family:'Tropaeolaceae', size:1, spacing:25, nord:true,  depth:'1',   sun:'☀️ Sole',        water:'💧 Bassa',        season:'estate',
+    sow:[3,4,5],    plant:[],      harvest:[6,7,8,9,10],
+    good:['zucchino','cetriolo','tomato','fagiolo','zucca'],
+    bad:[],
+    notes:'Fiore e foglie edibili. Attira afidi lontano dalle colture utili. Pianta trappola eccellente.' },
+
+  { id:'calendula',  name:'Calendula',        icon:'🌼', cat:'fiori',   color:'#f39c12', family:'Asteraceae',   size:1, spacing:20,  nord:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧 Bassa',        season:'estate',
+    sow:[3,4,5],    plant:[],      harvest:[6,7,8,9,10],
+    good:['tomato','carota','peperone','asparago'],
+    bad:[],
+    notes:'Respinge nematodi e parassiti. Attira impollinatori. Fiori edibili. Rustica al Nord.' },
+
+  { id:'lavanda',    name:'Lavanda',          icon:'💜', cat:'fiori',   color:'#9b59b6', family:'Lamiaceae',    size:2, spacing:60,  nord:true,  depth:'0.5', sun:'☀️ Pieno sole',  water:'💧 Bassissima',   season:'estate',
+    sow:[2,3],      plant:[4,5],   harvest:[6,7],
+    good:['rosmarino','salvia','carota'],
+    bad:['basilico'],
+    notes:'Respinge insetti dannosi. Attira api e farfalle. Rustica al Nord.' },
+
+  { id:'borragine',  name:'Borragine',        icon:'💙', cat:'fiori',   color:'#3498db', family:'Boraginaceae', size:2, spacing:40,  nord:true,  depth:'1',   sun:'☀️ Sole',        water:'💧 Bassa',        season:'estate',
+    sow:[4,5],      plant:[],      harvest:[6,7,8,9],
+    good:['tomato','zucchino','fragola','cetriolo'],
+    bad:[],
+    notes:'Attira bombi utili per impollinare zucchine. Fiori edibili. Si risemina spontaneamente.' },
+
+  { id:'camomilla',  name:'Camomilla',        icon:'🌼', cat:'fiori',   color:'#f9e54a', family:'Asteraceae',   size:1, spacing:20,  nord:true,  depth:'0.3', sun:'☀️ Sole',        water:'💧 Bassa',        season:'primavera',
+    sow:[3,4],      plant:[],      harvest:[5,6,7],
+    good:['cipolla','cavolo','insalata','carota'],
+    bad:[],
+    notes:'Ottimo repellente per afidi. Migliora la crescita delle piante vicine. Rustica al Nord.' },
+
+  // ── FRUTTI ────────────────────────────────────────────────────────────────
+  { id:'fragola',    name:'Fragola',          icon:'🍓', cat:'frutti',  color:'#c0392b', family:'Rosaceae',     size:1, spacing:30,  nord:true,  depth:'0',   sun:'☀️ Sole',        water:'💧💧 Alta',       season:'primavera',
+    sow:[],         plant:[3,4,9,10], harvest:[5,6,7],
+    good:['aglio','spinacio','insalata','borragine'],
+    bad:['cavolo','finocchio'],
+    notes:'Rinnovare le piante ogni 3 anni. Rimuovere gli stoloni eccedenti.' },
+];
+
+// ═══════════════════════════════════════════════════════
+// DATABASE PARASSITI
+// ═══════════════════════════════════════════════════════
+const PESTS = [
+  { id:'afide',      name:'Afide / Pidocchio',        icon:'🦠', type:'insetto', affects:'Pomodoro, peperone, fava, rosa e molte altre',           desc:'Piccoli insetti verdi, neri o grigi che succhiano la linfa. Si raggruppano su germogli e foglie giovani causando deformazioni.',               remedy:'Spray di acqua e sapone di Marsiglia (1 cucchiaio/litro). Introdurre coccinelle e crisope. Piantare nasturzio come pianta trappola. Macerato d\'aglio come repellente.' },
+  { id:'lumaca',     name:'Lumaca / Limaccia',         icon:'🐌', type:'animale', affects:'Lattuga, spinacio, fragola, cavolo, piantine giovani',   desc:'Attive di notte e dopo la pioggia. Rodono foglie e steli causando danni ingenti alle piantine.',                                              remedy:'Cospargere cenere di legna attorno alle piante. Trappole con birra. Gusci d\'uovo tritati come barriera. Favorire ricci e rospi nell\'orto.' },
+  { id:'oidio',      name:'Oidio (mal bianco)',         icon:'🤍', type:'fungo',   affects:'Zucchino, cetriolo, pomodoro, fragola, uva',             desc:'Patina bianca farinosa sulle foglie causata da funghi. Si sviluppa in condizioni di caldo e umidità alternati.',                               remedy:'Spray di latte diluito 1:10 con acqua. Bicarbonato di sodio (5g/litro). Aerare le piante. Non bagnare le foglie.' },
+  { id:'peronospora',name:'Peronospora',                icon:'🍂', type:'fungo',   affects:'Pomodoro, patata, cetriolo, vite',                       desc:'Macchie giallo-brunastre sul lato superiore, muffa grigiastra sotto. Peggiora con piogge e alta umidità.',                                     remedy:'Poltiglia bordolese (rame) preventiva. Non irrigare dall\'alto. Rotazione colturale. Preferire varietà resistenti.' },
+  { id:'cavolaia',   name:'Cavolaia (Pieris brassicae)',icon:'🦋', type:'insetto', affects:'Cavolo, broccolo, cavolfiore, rafano',                   desc:'Le larve della farfalla bianca divorano le foglie di brassicacee lasciando solo le nervature.',                                                remedy:'Reti anti-insetto (maglia 0,8mm). Bacillus thuringiensis (Bt) biologico. Raccogliere uova arancioni a mano. Piantare salvia vicino.' },
+  { id:'ragnetto',   name:'Ragnetto rosso',             icon:'🕷', type:'insetto', affects:'Pomodoro, melanzana, cetriolo, fagiolo',                 desc:'Minuscoli acari con punteggiatura gialla sulle foglie. Proliferano in estate calda e secca.',                                                  remedy:'Aumentare umidità ambientale (spray d\'acqua). Sapone di potassio. Introdurre Phytoseiulus persimilis. Evitare stress idrici.' },
+  { id:'nottua',     name:'Nottua / Oziorinco',         icon:'🐛', type:'insetto', affects:'Lattuga, fragola, pomodoro, cavolo',                     desc:'Le larve rosicchiano radici e colletti. Gli adulti mangiano le foglie di notte lasciando tacche semicircolari.',                               remedy:'Nematodi entomopatogeni (Steinernema) per le larve nel suolo. Raccogliere adulti di notte con torcia. Pacciamatura nera.' },
+  { id:'mosca',      name:'Mosca della carota',         icon:'🪰', type:'insetto', affects:'Carota, sedano, prezzemolo',                             desc:'La larva scava gallerie brunastre nelle radici rendendole amare e inutilizzabili.',                                                            remedy:'Reti anti-insetto. Consociare con cipolla (odore repellente). Seminare in luglio per evitare primo volo primaverile.' },
+  { id:'botrytis',   name:'Muffa grigia (Botrytis)',    icon:'🍄', type:'fungo',   affects:'Fragola, pomodoro, uva, lattuga',                        desc:'Muffa grigiastra che si diffonde rapidamente in ambienti umidi e poco ventilati. Distrugge frutti e fusti.',                                  remedy:'Potare le parti malate e bruciarle. Aerare la coltura. Evitare bagnare i frutti. Macerato di ortica. Bicarbonato preventivo.' },
+  { id:'lepre',      name:'Lepre / Coniglio',           icon:'🐇', type:'animale', affects:'Carota, lattuga, cavolo, fragola',                       desc:'Rosicchiano radici e foglie, specialmente di notte. Possono devastare un orto in poche ore.',                                                  remedy:'Recinzione con rete a maglie strette interrata 20 cm. Repellenti naturali (pepe, aglio). Filo elettrico solare.' },
+  { id:'alternaria', name:'Alternaria',                 icon:'🟤', type:'fungo',   affects:'Pomodoro, cavolo, carota, patata',                       desc:'Macchie scure con aloni concentrici su foglie e frutti. Favorita da caldo e umidità alternati.',                                              remedy:'Evitare ristagni. Rotazione colturale. Rimozione parti malate. Poltiglia bordolese in stagioni piovose.' },
+  { id:'tignola',    name:'Tignola del pomodoro',       icon:'🦗', type:'insetto', affects:'Pomodoro, peperone, melanzana',                          desc:'Larva che scava gallerie nei frutti e nei germogli rendendoli inutilizzabili.',                                                               remedy:'Trappole a feromoni per monitoraggio. Bacillus thuringiensis. Ispezionare frequentemente e rimuovere frutti infestati.' },
+];
+
+// ═══════════════════════════════════════════════════════
+// STATO GLOBALE
+// ═══════════════════════════════════════════════════════
+let state = {
+  beds: [{ name: 'Aiuola 1', wCm: 200, hCm: 120, plants: [] }],
+  activeBed: 0,
+  diary: [],
+};
+let selectedPlant = null;
+let movingPlant   = null; // pianta selezionata per spostamento
+
+// ── Indicatore salvataggio ────────────────────────────
+let saveIndicatorTimer;
+function flashSaveIndicator() {
+  const el = document.getElementById('save-indicator');
+  if (!el) return;
+  el.textContent = '● salvato';
+  el.style.color = 'rgba(168,196,154,.9)'; // verde leaf
+  clearTimeout(saveIndicatorTimer);
+  saveIndicatorTimer = setTimeout(() => {
+    el.style.color = 'rgba(255,255,255,.35)';
+  }, 2000);
+}
+
+function saveState() {
+  try {
+    localStorage.setItem('orto365_v2', JSON.stringify(state));
+    flashSaveIndicator();
+    scheduleCloudSync(); // sync pCloud in debounce
+  } catch(e) {
+    const el = document.getElementById('save-indicator');
+    if (el) { el.textContent = '⚠ spazio pieno'; el.style.color = '#f87171'; }
+  }
+}
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('orto365_v2');
+    if (s) {
+      const loaded = JSON.parse(s);
+      state.beds      = loaded.beds      || state.beds;
+      state.activeBed = Math.min(loaded.activeBed || 0, (loaded.beds||[]).length - 1);
+      state.diary     = loaded.diary     || [];
+    }
+  } catch(e){}
+}
+
+// ── Export / Import JSON ──────────────────────────────
+function exportJSON() {
+  const data     = JSON.stringify(state, null, 2);
+  const blob     = new Blob([data], { type: 'application/json' });
+  const url      = URL.createObjectURL(blob);
+  const now      = new Date();
+  const dateStr  = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const a        = document.createElement('a');
+  a.href         = url;
+  a.download     = `orto365_${dateStr}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('⬇ Dati esportati! Salvali su pCloud per un backup sicuro.');
+}
+
+function importJSON(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const loaded = JSON.parse(e.target.result);
+      // Validazione minima
+      if (!loaded.beds || !Array.isArray(loaded.beds)) {
+        toast('❌ File non valido — non sembra un backup di Orto365');
+        return;
+      }
+      state.beds      = loaded.beds;
+      state.activeBed = Math.min(loaded.activeBed || 0, loaded.beds.length - 1);
+      state.diary     = loaded.diary || [];
+      saveState();
+      // Ricarica la sezione attiva
+      const activeSection = document.querySelector('.tab-btn.active')?.dataset.section || 'home';
+      showSection(activeSection);
+      toast('⬆ Dati importati con successo! ' + loaded.beds.length + ' aiuole, ' + (loaded.diary||[]).length + ' note diario.');
+    } catch(err) {
+      toast('❌ Errore nella lettura del file JSON');
+    }
+  };
+  reader.readAsText(file);
+  input.value = ''; // reset per poter reimportare lo stesso file
+}
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGAZIONE
+// ═══════════════════════════════════════════════════════
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const sec = document.getElementById(id + '-section');
+  if (sec) sec.classList.add('active');
+  const btn = document.querySelector(`.tab-btn[data-section="${id}"]`);
+  if (btn) btn.classList.add('active');
+
+  if (id === 'planner')       { renderBedSelect(); renderPalette(); renderPlanner(); }
+  if (id === 'piante')        renderPlantsDB();
+  if (id === 'calendario')    renderCalendar();
+  if (id === 'diario')        renderDiary();
+  if (id === 'parassiti')     renderPests();
+  if (id === 'ai')            initAISection();
+  if (id === 'impostazioni')  initPcloudSection();
+}
+
+// ═══════════════════════════════════════════════════════
+// PIANIFICATORE — AIUOLE
+// ═══════════════════════════════════════════════════════
+function getActiveBed() { return state.beds[state.activeBed]; }
+
+function renderBedSelect() {
+  const sel = document.getElementById('bed-select');
+  sel.innerHTML = state.beds.map((b, i) =>
+    `<option value="${i}"${i === state.activeBed ? ' selected' : ''}>${b.name}</option>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// DIALOG UNIVERSALE (niente confirm/prompt/alert)
+// ═══════════════════════════════════════════════════════
+let dialogCallback = null;
+
+function dialogOpen({ icon='', title, desc='', withInput=false, inputVal='', inputPlaceholder='', okLabel='Conferma', okClass='btn-primary', onConfirm }) {
+  document.getElementById('dialog-icon').textContent  = icon;
+  document.getElementById('dialog-title').textContent = title;
+  document.getElementById('dialog-desc').textContent  = desc;
+  const inp = document.getElementById('dialog-input');
+  inp.style.display = withInput ? 'block' : 'none';
+  inp.value = inputVal;
+  inp.placeholder = inputPlaceholder;
+  const okBtn = document.getElementById('dialog-ok-btn');
+  okBtn.textContent = okLabel;
+  okBtn.className = `btn ${okClass}`;
+  dialogCallback = onConfirm;
+  document.getElementById('dialog-modal').style.display = 'flex';
+  if (withInput) setTimeout(() => { inp.focus(); inp.select(); }, 60);
+}
+
+function dialogClose() {
+  document.getElementById('dialog-modal').style.display = 'none';
+  dialogCallback = null;
+}
+
+function dialogConfirm() {
+  const cb  = dialogCallback;
+  const val = document.getElementById('dialog-input').value.trim();
+  dialogClose();
+  if (cb) cb(val);
+}
+
+// Chiudi cliccando fuori
+document.getElementById('dialog-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('dialog-modal')) dialogClose();
+});
+
+// ═══════════════════════════════════════════════════════
+// PIANIFICATORE — AIUOLE
+// ═══════════════════════════════════════════════════════
+function getActiveBed() { return state.beds[state.activeBed]; }
+
+function renderBedSelect() {
+  const sel = document.getElementById('bed-select');
+  sel.innerHTML = state.beds.map((b, i) =>
+    `<option value="${i}"${i === state.activeBed ? ' selected' : ''}>${b.name}</option>`
+  ).join('');
+}
+
+function switchBed(idx) {
+  state.activeBed = parseInt(idx);
+  selectedPlant   = null;
+  movingPlant     = null;
+  saveState();
+  renderBedSelect();
+  renderPlanner();
+}
+
+function openBedModal(action) {
+  const bed = getActiveBed();
+  if (action === 'new') {
+    dialogOpen({
+      icon: '🌱', title: 'Nuova aiuola',
+      desc: 'Scegli un nome per la nuova aiuola.',
+      withInput: true, inputVal: 'Aiuola ' + (state.beds.length + 1),
+      inputPlaceholder: 'Es: Aiuola pomodori',
+      okLabel: 'Crea', okClass: 'btn-primary',
+      onConfirm: name => {
+        if (!name) return;
+        state.beds.push({ name, cols: 6, rows: 4, cells: {} });
+        state.activeBed = state.beds.length - 1;
+        saveState(); renderBedSelect(); renderPlanner(); updatePlannerStats();
+        toast('✅ Aiuola "' + name + '" creata!');
+      }
+    });
+  } else if (action === 'rename') {
+    dialogOpen({
+      icon: '✏️', title: 'Rinomina aiuola',
+      desc: `Nuovo nome per "${bed.name}":`,
+      withInput: true, inputVal: bed.name,
+      inputPlaceholder: 'Es: Aiuola pomodori',
+      okLabel: 'Rinomina', okClass: 'btn-primary',
+      onConfirm: name => {
+        if (!name) return;
+        bed.name = name;
+        saveState(); renderBedSelect();
+        toast('✏️ Aiuola rinominata in "' + name + '"');
+      }
+    });
+  } else if (action === 'delete') {
+    if (state.beds.length === 1) { toast('❌ Deve esistere almeno un\'aiuola'); return; }
+    dialogOpen({
+      icon: '🗑', title: 'Elimina aiuola',
+      desc: `Eliminare "${bed.name}" e tutte le piante al suo interno? L'operazione non è reversibile.`,
+      okLabel: 'Elimina', okClass: 'btn-danger',
+      onConfirm: () => {
+        state.beds.splice(state.activeBed, 1);
+        state.activeBed = Math.max(0, state.activeBed - 1);
+        saveState(); renderBedSelect(); renderPlanner(); updatePlannerStats();
+        toast('🗑 Aiuola eliminata');
+      }
+    });
+  } else if (action === 'clear') {
+    dialogOpen({
+      icon: '🌿', title: 'Svuota aiuola',
+      desc: `Rimuovere tutte le piante da "${bed.name}"? L'operazione non è reversibile.`,
+      okLabel: 'Svuota', okClass: 'btn-danger',
+      onConfirm: () => {
+        getActiveBed().plants = [];
+        saveState(); renderPlanner(); updatePlannerStats();
+        toast('🌱 Aiuola svuotata');
+      }
+    });
+  }
+}
+
+function resizeBed() {
+  const bed = getActiveBed();
+  bed.cols = Math.max(2, Math.min(20, parseInt(document.getElementById('bed-cols').value) || 6));
+  bed.rows = Math.max(2, Math.min(20, parseInt(document.getElementById('bed-rows').value) || 4));
+  saveState();
+  renderPlanner();
+}
+
+const SIZE_LABEL = { 1:'1×1', 2:'1×2', 4:'2×2', 6:'2×3' }; // legacy, kept for DB view
+
+// ═══════════════════════════════════════════════════════
+// PIANIFICATORE — PALETTE
+// ═══════════════════════════════════════════════════════
+function filterPalette() { renderPalette(); }
+
+function renderPalette() {
+  const filter   = (document.getElementById('palette-search-input').value || '').toLowerCase();
+  const season   = document.getElementById('palette-season').value;
+  const nordOnly = document.getElementById('palette-nord').checked;
+  const list     = document.getElementById('palette-list');
+  const plants   = PLANTS.filter(p => {
+    if (!p.name.toLowerCase().includes(filter)) return false;
+    if (season && p.season !== season && p.season !== 'tuttoanno') return false;
+    if (nordOnly && !p.nord) return false;
+    return true;
+  });
+  if (!plants.length) {
+    list.innerHTML = '<div style="font-size:.8rem;color:var(--muted);padding:8px">Nessuna pianta trovata</div>';
+    return;
+  }
+  list.innerHTML = plants.map(p => `
+    <div class="palette-item${selectedPlant === p.id ? ' selected' : ''}"
+         id="pal-${p.id}" onclick="selectPlantFromPalette('${p.id}')">
+      <div class="dot" style="background:${p.color}"></div>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.icon} ${p.name}</span>
+      <span style="font-size:.65rem;color:var(--muted);flex-shrink:0;margin-left:4px">${p.spacing}cm</span>
+    </div>`).join('');
+}
+
+function selectPlantFromPalette(pid) {
+  movingPlant = null; // annulla eventuale spostamento in corso
+  if (selectedPlant === pid) {
+    selectedPlant = null;
+    document.getElementById('palette-hint').classList.remove('visible');
+    document.getElementById('svg-container').style.cursor = 'crosshair';
+  } else {
+    selectedPlant = pid;
+    const p = PLANTS.find(x => x.id === pid);
+    document.getElementById('palette-hint').innerHTML =
+      `✅ <strong>${p?.icon} ${p?.name}</strong> (${p?.spacing}cm) — clicca sulla tela`;
+    document.getElementById('palette-hint').classList.add('visible');
+    document.getElementById('svg-container').style.cursor = 'cell';
+  }
+  renderPalette();
+  renderPlanner();
+}
+
+// ═══════════════════════════════════════════════════════
+// PIANIFICATORE — SVG A SCALA REALE
+// 1 unità SVG = 1 cm reale
+// Ogni pianta occupa un cerchio di diametro = spaziatura (cm)
+// ═══════════════════════════════════════════════════════
+
+// SCALE: il canvas viene scalato per adattarsi alla larghezza disponibile
+const PADDING = 20; // cm di margine attorno all'aiuola
+
+function applyBedSize() {
+  const bed = getActiveBed();
+  bed.wCm = Math.max(50, Math.min(2000, parseInt(document.getElementById('bed-w-cm').value) || 200));
+  bed.hCm = Math.max(50, Math.min(2000, parseInt(document.getElementById('bed-h-cm').value) || 120));
+  saveState();
+  renderPlanner();
+}
+
+function renderPlanner() {
+  const bed = getActiveBed();
+  if (!bed.wCm)    bed.wCm    = 200;
+  if (!bed.hCm)    bed.hCm    = 120;
+  if (!bed.plants) bed.plants = [];
+
+  document.getElementById('bed-w-cm').value = bed.wCm;
+  document.getElementById('bed-h-cm').value = bed.hCm;
+
+  const container = document.getElementById('svg-container');
+  const availW    = Math.max(300, container.clientWidth - 20);
+  const svgW_cm   = bed.wCm + PADDING * 2;
+  const svgH_cm   = bed.hCm + PADDING * 2;
+  const scale     = Math.min(1, availW / svgW_cm);
+  const svgW_px   = svgW_cm * scale;
+  const svgH_px   = svgH_cm * scale;
+
+  document.getElementById('scale-info').textContent =
+    `Aiuola ${bed.wCm}×${bed.hCm} cm — scala 1cm = ${scale.toFixed(2)}px`;
+
+  const svg = document.getElementById('garden-svg');
+  svg.setAttribute('width',  svgW_px);
+  svg.setAttribute('height', svgH_px);
+  svg.setAttribute('viewBox', `0 0 ${svgW_cm} ${svgH_cm}`);
+  // Rimuovi solo elementi disegnati, non i listener del svg stesso
+  svg.innerHTML = '';
+
+  // ── Sfondo
+  svg.appendChild(svgEl('rect', { x:0, y:0, width:svgW_cm, height:svgH_cm, fill:'#f0ebe0' }));
+
+  // ── Griglia ogni 25cm
+  for (let x = 0; x <= bed.wCm; x += 25) {
+    svg.appendChild(svgEl('line', {
+      x1:PADDING+x, y1:PADDING, x2:PADDING+x, y2:PADDING+bed.hCm,
+      stroke:'#cfc7b5', 'stroke-width':0.4,
+      'stroke-dasharray': x % 100 === 0 ? '' : '3,3'
+    }));
+    if (x > 0 && x < bed.wCm) {
+      const t = svgEl('text', { x:PADDING+x, y:PADDING-3, 'text-anchor':'middle', 'font-size':6, fill:'#b0a898', 'font-family':'DM Sans,sans-serif' });
+      t.textContent = x+'cm'; svg.appendChild(t);
+    }
+  }
+  for (let y = 0; y <= bed.hCm; y += 25) {
+    svg.appendChild(svgEl('line', {
+      x1:PADDING, y1:PADDING+y, x2:PADDING+bed.wCm, y2:PADDING+y,
+      stroke:'#cfc7b5', 'stroke-width':0.4,
+      'stroke-dasharray': y % 100 === 0 ? '' : '3,3'
+    }));
+    if (y > 0 && y < bed.hCm) {
+      const t = svgEl('text', { x:PADDING-3, y:PADDING+y+2, 'text-anchor':'end', 'font-size':6, fill:'#b0a898', 'font-family':'DM Sans,sans-serif' });
+      t.textContent = y; svg.appendChild(t);
+    }
+  }
+
+  // ── Bordo aiuola
+  svg.appendChild(svgEl('rect', {
+    x:PADDING, y:PADDING, width:bed.wCm, height:bed.hCm,
+    fill:'none', stroke:'#6B4C2A', 'stroke-width':2, rx:4
+  }));
+
+  // ── Piante
+  (bed.plants).forEach(item => {
+    const p = PLANTS.find(x => x.id === item.pid);
+    if (!p) return;
+    const r  = p.spacing / 2;
+    const cx = PADDING + item.cx;
+    const cy = PADDING + item.cy;
+
+    // Compatibilità basata su DISTANZA: conta solo piante fisicamente vicine
+    // (cerchi che si sovrappongono o sono adiacenti, entro 1.5× la somma dei raggi)
+    let hasGood = false, hasBad = false;
+    bed.plants.forEach(other => {
+      if (other.id === item.id) return;
+      const op  = PLANTS.find(x => x.id === other.pid);
+      if (!op) return;
+      const or  = op.spacing / 2;
+      const dist = Math.hypot(item.cx - other.cx, item.cy - other.cy);
+      // Considera "vicine" le piante entro 1.5× la somma dei raggi
+      if (dist > (r + or) * 1.5) return;
+      if (p.good.includes(other.pid)) hasGood = true;
+      if (p.bad.includes(other.pid))  hasBad  = true;
+    });
+
+    const isMoving   = movingPlant && movingPlant.id === item.id;
+    const ringColor  = isMoving    ? '#E8C547'
+                     : hasBad      ? 'rgba(192,57,43,.85)'
+                     : hasGood     ? 'rgba(74,103,65,.85)'
+                                   : 'rgba(107,76,42,.5)';
+    const fillColor  = isMoving    ? 'rgba(232,197,71,.25)'
+                     : hasBad      ? 'rgba(192,57,43,.15)'
+                     : hasGood     ? 'rgba(74,103,65,.15)'
+                                   : p.color + '28';
+    const strokeW    = isMoving ? 3 : 2;
+
+    const g = svgEl('g', { style:'cursor:pointer' });
+
+    // Cerchio principale
+    g.appendChild(svgEl('circle', { cx, cy, r, fill:fillColor, stroke:ringColor, 'stroke-width':strokeW }));
+
+    // Icona centrata
+    const iconSize = Math.max(7, Math.min(r * 0.85, 22));
+    const iconEl   = svgEl('text', {
+      x:cx, y:cy, 'text-anchor':'middle', 'dominant-baseline':'central',
+      'font-size':iconSize, style:'user-select:none;pointer-events:none'
+    });
+    iconEl.textContent = p.icon;
+    g.appendChild(iconEl);
+
+    // Nome sotto l'icona (solo se cerchio ≥ 20cm raggio)
+    if (r >= 20) {
+      const nameSize = Math.max(5, Math.min(9, r * 0.22));
+      const nameEl   = svgEl('text', {
+        x:cx, y:cy + iconSize * 0.6 + nameSize,
+        'text-anchor':'middle', 'dominant-baseline':'central',
+        'font-size':nameSize, fill:'#3B2A1A',
+        'font-family':'DM Sans,sans-serif', style:'user-select:none;pointer-events:none'
+      });
+      nameEl.textContent = p.name.split('/')[0].split(' ')[0];
+      g.appendChild(nameEl);
+    }
+
+    // Distanza minima badge (piccolo, solo se abbastanza spazio)
+    if (r >= 30) {
+      const badge = svgEl('text', {
+        x:cx, y:cy - r + 7, 'text-anchor':'middle', 'dominant-baseline':'central',
+        'font-size':5, fill:ringColor, 'font-family':'DM Sans,sans-serif',
+        style:'user-select:none;pointer-events:none'
+      });
+      badge.textContent = `⌀${p.spacing}cm`;
+      g.appendChild(badge);
+    }
+
+    // ── Gestione click: se ho una pianta selezionata dalla palette → ignora (il click
+    //    sul svg la piazzerà); altrimenti → entra in modalità spostamento
+    g.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (selectedPlant) return; // modalità piazzamento: ignora
+      if (movingPlant && movingPlant.id === item.id) {
+        // Secondo click sulla stessa pianta → cancella selezione spostamento
+        movingPlant = null;
+        renderPlanner();
+        return;
+      }
+      // Seleziona per spostamento
+      movingPlant = { ...item };
+      renderPlanner();
+    });
+
+    svg.appendChild(g);
+  });
+
+  // ── Tooltip di stato
+  const hint = document.getElementById('palette-hint');
+  if (movingPlant) {
+    const mp = PLANTS.find(x => x.id === movingPlant.pid);
+    hint.innerHTML = `🟡 <strong>${mp?.icon} ${mp?.name}</strong> selezionata — clicca dove spostarla o <button onclick="deleteMov()" style="font-size:.78rem;padding:2px 8px;background:var(--red);color:#fff;border:none;border-radius:4px;cursor:pointer;margin-left:6px">🗑 Elimina</button>`;
+    hint.classList.add('visible');
+  }
+
+  // ── Click sulla tela: piazza o sposta
+  // Usiamo un handler unico assegnato una sola volta (vedi sotto, fuori da renderPlanner)
+  // Memorizziamo i parametri di scala come attributi del svg per il handler esterno
+  svg.dataset.svgWcm  = svgW_cm;
+  svg.dataset.svgHcm  = svgH_cm;
+  svg.dataset.bedId   = state.activeBed;
+
+  updatePlannerStats();
+}
+
+// ── Handler click tela — assegnato UNA sola volta dopo il DOM ready
+function onSVGClick(e) {
+  const svg     = document.getElementById('garden-svg');
+  const bed     = getActiveBed();
+  const svgW_cm = parseFloat(svg.dataset.svgWcm) || (bed.wCm + PADDING*2);
+  const svgH_cm = parseFloat(svg.dataset.svgHcm) || (bed.hCm + PADDING*2);
+
+  const rect = svg.getBoundingClientRect();
+  const cmX  = (e.clientX - rect.left)  / rect.width  * svgW_cm - PADDING;
+  const cmY  = (e.clientY - rect.top)   / rect.height * svgH_cm - PADDING;
+
+  if (movingPlant) {
+    // MODALITÀ SPOSTAMENTO: riposiziona la pianta
+    const mp = PLANTS.find(x => x.id === movingPlant.pid);
+    if (!mp) { movingPlant = null; return; }
+    const r  = mp.spacing / 2;
+    const cx = Math.max(r, Math.min(bed.wCm - r, cmX));
+    const cy = Math.max(r, Math.min(bed.hCm - r, cmY));
+
+    // Verifica sovrapposizione nella nuova posizione (escludi la pianta stessa)
+    const overlap = bed.plants.some(other => {
+      if (other.id === movingPlant.id) return false;
+      const op   = PLANTS.find(x => x.id === other.pid);
+      if (!op) return false;
+      const minD = (r + op.spacing / 2);
+      return Math.hypot(cx - other.cx, cy - other.cy) < minD;
+    });
+    if (overlap) { toast('⚠️ Posizione troppo vicina a un\'altra pianta!'); return; }
+
+    // Aggiorna posizione
+    const idx = bed.plants.findIndex(x => x.id === movingPlant.id);
+    if (idx >= 0) { bed.plants[idx].cx = cx; bed.plants[idx].cy = cy; }
+    movingPlant = null;
+    saveState(); renderPlanner();
+    return;
+  }
+
+  if (selectedPlant) {
+    // MODALITÀ PIAZZAMENTO: aggiunge nuova pianta
+    const plant = PLANTS.find(x => x.id === selectedPlant);
+    if (!plant) return;
+    const r  = plant.spacing / 2;
+    const cx = Math.max(r, Math.min(bed.wCm - r, cmX));
+    const cy = Math.max(r, Math.min(bed.hCm - r, cmY));
+
+    // Verifica sovrapposizione con piante esistenti
+    const overlap = (bed.plants || []).some(other => {
+      const op  = PLANTS.find(x => x.id === other.pid);
+      if (!op) return false;
+      const minD = r + op.spacing / 2;
+      return Math.hypot(cx - other.cx, cy - other.cy) < minD;
+    });
+    if (overlap) { toast('⚠️ Troppo vicino a un\'altra pianta! Rispetta la spaziatura.'); return; }
+
+    if (!bed.plants) bed.plants = [];
+    bed.plants.push({ id: Date.now(), pid: selectedPlant, cx, cy });
+    saveState(); renderPlanner();
+  }
+}
+
+function deleteMov() {
+  if (!movingPlant) return;
+  const bed = getActiveBed();
+  bed.plants = bed.plants.filter(x => x.id !== movingPlant.id);
+  movingPlant = null;
+  saveState(); renderPlanner(); updatePlannerStats();
+  toast('🗑 Pianta rimossa');
+}
+
+function renderSVGCompat() { renderPlanner(); }
+
+function svgEl(tag, attrs) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+  return el;
+}
+
+function updatePlannerStats() {
+  const bed    = getActiveBed();
+  const plants = bed.plants || [];
+  const species = new Set(plants.map(p => p.pid)).size;
+  const areaM2  = ((bed.wCm||200) * (bed.hCm||120) / 10000).toFixed(2);
+  document.getElementById('planner-stats').innerHTML = `
+    <div class="stat-pill"><div class="s-val">${plants.length}</div><div class="s-lbl">Piante</div></div>
+    <div class="stat-pill"><div class="s-val">${species}</div><div class="s-lbl">Specie</div></div>
+    <div class="stat-pill"><div class="s-val">${areaM2}</div><div class="s-lbl">m² aiuola</div></div>
+    <div class="stat-pill"><div class="s-val">${state.beds.length}</div><div class="s-lbl">Aiuole</div></div>`;
+}
+// ═══════════════════════════════════════════════════════
+// DATABASE PIANTE
+// ═══════════════════════════════════════════════════════
+function renderPlantsDB() {
+  const s  = document.getElementById('plant-search').value.toLowerCase();
+  const c  = document.getElementById('plant-cat').value;
+  const se = document.getElementById('plant-season').value;
+  const n  = document.getElementById('plant-nord').checked;
+  const list = PLANTS.filter(p =>
+    (p.name.toLowerCase().includes(s) || p.family.toLowerCase().includes(s)) &&
+    (!c  || p.cat === c) &&
+    (!se || p.season === se || p.season === 'tuttoanno') &&
+    (!n  || p.nord)
+  );
+  const grid = document.getElementById('plants-grid');
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="e-icon">🔍</div><div>Nessuna pianta trovata</div></div>';
+    return;
+  }
+  grid.innerHTML = list.map(p => `
+    <div class="plant-card" onclick="openPlantModal('${p.id}')">
+      <div class="plant-icon">${p.icon}</div>
+      <h3>${p.name}</h3>
+      <div class="plant-family">${p.family}</div>
+      <div class="tags">
+        <span class="tag cat">${catLabel(p.cat)}</span>
+        <span class="tag" style="background:#e8f4fd;color:#2980b9" title="Occupa ${SIZE_LABEL[p.size]||'1×1'} celle">${SIZE_LABEL[p.size]||'1×1'}</span>
+        ${p.nord ? '<span class="tag" style="background:#eaf4e8;color:#27ae60">🏔 Nord ✓</span>' : '<span class="tag" style="background:#fef9e7;color:#e67e22">☀️ Sud/Centro</span>'}
+        ${p.good.slice(0,1).map(g=>`<span class="tag good">✔ ${plantName(g)}</span>`).join('')}
+        ${p.bad.slice(0,1).map(b=>`<span class="tag bad">✘ ${plantName(b)}</span>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function filterPlants() { renderPlantsDB(); }
+
+function catLabel(c) { return ({ortaggi:'Ortaggi',erbe:'Erba aromat.',fiori:'Fiore/Ausiliare',frutti:'Frutto'})[c] || c; }
+function plantName(id) { const p = PLANTS.find(x => x.id === id); return p ? p.name.split('/')[0] : id; }
+
+function openPlantModal(id) {
+  const p = PLANTS.find(x => x.id === id);
+  if (!p) return;
+  const M = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  const monthList = (arr) => arr.length ? arr.map(m => M[((m-1)+12)%12]).join(', ') : '—';
+  const seasonLabel = {primavera:'🌸 Primavera',estate:'☀️ Estate',autunno:'🍂 Autunno',inverno:'❄️ Inverno',tuttoanno:'🔄 Tutto l\'anno'}[p.season]||p.season||'—';
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-icon">${p.icon}</div>
+    <h2>${p.name}</h2>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:14px;font-style:italic">${p.family}</div>
+    <div class="modal-grid">
+      <div class="modal-stat"><div class="label">Spaziatura</div><div class="value">${p.spacing} cm</div></div>
+      <div class="modal-stat"><div class="label">Slot in griglia</div><div class="value">${SIZE_LABEL[p.size]||'1×1'} celle</div></div>
+      <div class="modal-stat"><div class="label">Sole</div><div class="value">${p.sun}</div></div>
+      <div class="modal-stat"><div class="label">Irrigazione</div><div class="value">${p.water}</div></div>
+      <div class="modal-stat"><div class="label">Stagione</div><div class="value">${seasonLabel}</div></div>
+      <div class="modal-stat"><div class="label">Al Nord Italia</div><div class="value">${p.nord ? '🏔 Sì, coltivabile' : '⚠️ Difficile, preferisce Sud/Centro'}</div></div>
+    </div>
+    <div class="modal-stat" style="margin-bottom:8px"><div class="label">Profondità semina</div><div class="value">${p.depth} cm</div></div>
+    <div class="modal-stat" style="margin-bottom:8px"><div class="label">Semina in semenzaio</div><div class="value">${monthList(p.sow)}</div></div>
+    <div class="modal-stat" style="margin-bottom:8px"><div class="label">Trapianto / semina diretta</div><div class="value">${monthList(p.plant)}</div></div>
+    <div class="modal-stat" style="margin-bottom:14px"><div class="label">Raccolta</div><div class="value">${monthList(p.harvest)}</div></div>
+    <div class="compat-section">
+      <h4 style="color:var(--moss)">✔ Buone consociazioni</h4>
+      <div class="compat-list">${p.good.map(g=>`<span class="tag good">${PLANTS.find(x=>x.id===g)?.icon||''} ${plantName(g)}</span>`).join('') || '<span style="color:var(--muted);font-size:.8rem">—</span>'}</div>
+      <h4 style="color:var(--red);margin-top:10px">✘ Da evitare vicino a</h4>
+      <div class="compat-list">${p.bad.map(b=>`<span class="tag bad">${PLANTS.find(x=>x.id===b)?.icon||''} ${plantName(b)}</span>`).join('') || '<span style="color:var(--muted);font-size:.8rem">—</span>'}</div>
+    </div>
+    ${p.notes ? `<div class="modal-stat" style="margin-top:14px"><div class="label">Note e consigli</div><div class="value" style="font-size:.85rem;line-height:1.6">${p.notes}</div></div>` : ''}
+  `;
+  document.getElementById('plant-modal').classList.add('open');
+}
+function closePlantModal() { document.getElementById('plant-modal').classList.remove('open'); }
+
+// ═══════════════════════════════════════════════════════
+// CALENDARIO
+// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// SOGLIE TERMICHE PER PIANTA (°C, medie mensili)
+// sowMin/sowMax   : semenzaio al coperto
+// plantMin/plantMax: trapianto / semina diretta all'aperto
+// harvestMin/harvestMax: raccolta (null = nessun limite)
+// Fonte: letteratura agronomica + adattamento ai trend 2001-2025
+// ═══════════════════════════════════════════════════════
+const THRESHOLDS = {
+  //              sowMin sowMax plantMin plantMax harvestMin harvestMax
+  tomato:       { sowMin:15, sowMax:30, plantMin:12, plantMax:32, harvestMin:12, harvestMax:38 },
+  basilico:     { sowMin:16, sowMax:30, plantMin:14, plantMax:34, harvestMin:14, harvestMax:36 },
+  carota:       { sowMin: 5, sowMax:25, plantMin: 6, plantMax:26, harvestMin: 2, harvestMax:28 },
+  zucchino:     { sowMin:16, sowMax:30, plantMin:13, plantMax:32, harvestMin:13, harvestMax:36 },
+  zucca:        { sowMin:16, sowMax:30, plantMin:13, plantMax:32, harvestMin: 8, harvestMax:36 },
+  cetriolo:     { sowMin:18, sowMax:30, plantMin:15, plantMax:34, harvestMin:15, harvestMax:36 },
+  mais:         { sowMin:12, sowMax:30, plantMin:12, plantMax:34, harvestMin:16, harvestMax:36 },
+  fagiolo:      { sowMin:14, sowMax:30, plantMin:12, plantMax:32, harvestMin:14, harvestMax:34 },
+  fagiolinoRamp:{ sowMin:14, sowMax:30, plantMin:12, plantMax:32, harvestMin:14, harvestMax:34 },
+  cavolo:       { sowMin: 8, sowMax:24, plantMin: 5, plantMax:22, harvestMin:-2, harvestMax:20 },
+  cavolfiore:   { sowMin: 8, sowMax:24, plantMin: 7, plantMax:22, harvestMin: 2, harvestMax:20 },
+  cavoloBrux:   { sowMin: 8, sowMax:24, plantMin: 7, plantMax:22, harvestMin:-4, harvestMax:18 },
+  carciofo:     { sowMin:10, sowMax:26, plantMin: 8, plantMax:26, harvestMin: 8, harvestMax:28 },
+  cardo:        { sowMin:10, sowMax:26, plantMin: 9, plantMax:26, harvestMin: 4, harvestMax:22 },
+  barbabietola: { sowMin: 8, sowMax:26, plantMin: 7, plantMax:28, harvestMin: 4, harvestMax:28 },
+  sedano:       { sowMin:10, sowMax:22, plantMin: 8, plantMax:22, harvestMin: 4, harvestMax:22 },
+  porroInv:     { sowMin: 8, sowMax:24, plantMin: 7, plantMax:24, harvestMin:-3, harvestMax:22 },
+  finocchio:    { sowMin: 8, sowMax:22, plantMin: 7, plantMax:22, harvestMin: 2, harvestMax:20 },
+  valerianella: { sowMin: 4, sowMax:20, plantMin: 3, plantMax:18, harvestMin:-8, harvestMax:16 },
+  rucola:       { sowMin: 5, sowMax:22, plantMin: 4, plantMax:20, harvestMin: 0, harvestMax:22 },
+  bietola:      { sowMin: 8, sowMax:26, plantMin: 6, plantMax:26, harvestMin: 0, harvestMax:28 },
+  indivia:      { sowMin: 8, sowMax:24, plantMin: 7, plantMax:22, harvestMin:-2, harvestMax:20 },
+  aglio:        { sowMin: 0, sowMax:20, plantMin: 2, plantMax:18, harvestMin:14, harvestMax:32 },
+  cipolla:      { sowMin: 6, sowMax:24, plantMin: 5, plantMax:24, harvestMin:16, harvestMax:32 },
+  patata:       { sowMin: 0, sowMax:20, plantMin: 6, plantMax:22, harvestMin:14, harvestMax:28 },
+  pisello:      { sowMin: 4, sowMax:18, plantMin: 4, plantMax:18, harvestMin: 6, harvestMax:22 },
+  asparago:     { sowMin: 0, sowMax:20, plantMin: 8, plantMax:26, harvestMin:10, harvestMax:26 },
+  fava:         { sowMin: 4, sowMax:18, plantMin: 3, plantMax:18, harvestMin:10, harvestMax:24 },
+  ravanello:    { sowMin: 4, sowMax:22, plantMin: 4, plantMax:20, harvestMin: 4, harvestMax:22 },
+  insalata:     { sowMin: 5, sowMax:22, plantMin: 5, plantMax:22, harvestMin: 2, harvestMax:24 },
+  spinacio:     { sowMin: 4, sowMax:18, plantMin: 3, plantMax:18, harvestMin: 0, harvestMax:20 },
+  melanzana:    { sowMin:18, sowMax:30, plantMin:16, plantMax:34, harvestMin:16, harvestMax:36 },
+  peperone:     { sowMin:18, sowMax:30, plantMin:15, plantMax:34, harvestMin:15, harvestMax:36 },
+  // Erbe
+  prezzemolo:   { sowMin: 7, sowMax:24, plantMin: 6, plantMax:24, harvestMin: 4, harvestMax:28 },
+  rosmarino:    { sowMin:10, sowMax:28, plantMin: 6, plantMax:30, harvestMin: 0, harvestMax:34 },
+  salvia:       { sowMin:10, sowMax:28, plantMin: 6, plantMax:30, harvestMin: 0, harvestMax:34 },
+  timo:         { sowMin:10, sowMax:28, plantMin: 6, plantMax:30, harvestMin: 0, harvestMax:34 },
+  menta:        { sowMin:10, sowMax:26, plantMin: 7, plantMax:28, harvestMin: 6, harvestMax:30 },
+  aneto:        { sowMin:10, sowMax:24, plantMin: 8, plantMax:24, harvestMin: 8, harvestMax:28 },
+  coriandolo:   { sowMin: 8, sowMax:24, plantMin: 6, plantMax:24, harvestMin: 6, harvestMax:28 },
+  // Fiori
+  nasturzio:    { sowMin:10, sowMax:26, plantMin: 8, plantMax:28, harvestMin: 8, harvestMax:30 },
+  calendula:    { sowMin: 8, sowMax:24, plantMin: 6, plantMax:26, harvestMin: 8, harvestMax:28 },
+  lavanda:      { sowMin:12, sowMax:26, plantMin: 8, plantMax:28, harvestMin:14, harvestMax:32 },
+  borragine:    { sowMin:10, sowMax:26, plantMin: 8, plantMax:26, harvestMin:12, harvestMax:30 },
+  camomilla:    { sowMin: 8, sowMax:22, plantMin: 6, plantMax:22, harvestMin:10, harvestMax:26 },
+  // Frutti
+  fragola:      { sowMin: 0, sowMax:20, plantMin: 4, plantMax:22, harvestMin:10, harvestMax:28 },
+};
+
+// Applica le soglie al database piante
+PLANTS.forEach(p => {
+  const t = THRESHOLDS[p.id];
+  if (t) Object.assign(p, t);
+});
+
+// ═══════════════════════════════════════════════════════
+// TEMPERATURE MEDIE MENSILI 2001-2025
+// Fonte: elaborazione ISPRA/ARPA/MeteoAM, media stazioni rappresentative
+// Valori in °C, mesi Gen→Dic
+// Nord:   Milano, Torino, Bologna, Venezia (media pesata pianura padana)
+// Centro: Roma, Firenze, Ancona, Perugia
+// Sud:    Napoli, Palermo, Cagliari, Bari, Reggio Calabria
+// ═══════════════════════════════════════════════════════
+const CLIMATE = {
+  nord:   [1.8, 3.2, 7.4, 12.1, 16.8, 20.9, 23.4, 22.8, 18.5, 13.0,  6.8,  2.5],
+  centro: [6.2, 7.1,10.3, 13.8, 18.2, 22.4, 25.6, 25.3, 21.4, 15.9, 10.4,  6.8],
+  sud:    [9.8,10.4,12.8, 16.2, 20.5, 24.8, 28.1, 27.9, 24.0, 18.6, 13.8, 10.5],
+};
+// Nomi leggibili per la barra di temperatura
+const ZONE_LABEL = {
+  nord:   'Nord Italia (Pianura Padana)',
+  centro: 'Centro Italia',
+  sud:    'Sud Italia / Isole',
+};
+
+// ── Soglie termiche per ogni pianta ──────────────────────
+// sowMin/sowMax: temperatura per semina in semenzaio (protetto)
+// plantMin/plantMax: temperatura esterna per trapianto/semina diretta
+// harvestMin/harvestMax: temperatura in cui avviene la raccolta
+// null = nessun limite (es. raccolta invernale di cavoli)
+//
+// Le soglie sono riferite alla MEDIA mensile, non alle minime notturne.
+// Semenzaio al coperto può partire anche con temperature esterne basse
+// (addendum: sowMin per semenzaio è sempre più bassa di plantMin).
+// ─────────────────────────────────────────────────────────
+// Le soglie vengono aggiunte direttamente nel db PLANTS
+// come campi: sowMin, sowMax, plantMin, plantMax, harvestMin, harvestMax
+
+// Helper: dato un mese (1-12) e una zona, restituisce la temperatura media
+function zoneTemp(zone, monthIdx, offsetC) {
+  // monthIdx: 0-based
+  const temps = CLIMATE[zone] || CLIMATE.centro;
+  return (temps[monthIdx] || 10) + (offsetC || 0);
+}
+
+// ═══════════════════════════════════════════════════════
+// CALENDARIO — renderCalendar con logica termica
+// ═══════════════════════════════════════════════════════
+function renderCalendar() {
+  const zone    = document.getElementById('climate-zone').value || 'sud';
+  const offsetC = parseFloat(document.getElementById('climate-offset').value) || 0;
+  const M       = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  const table   = document.getElementById('cal-grid');
+
+  // Barra temperature della zona selezionata
+  const bar = document.getElementById('cal-temp-bar');
+  const temps = CLIMATE[zone];
+  bar.innerHTML = M.map((m, i) => {
+    const t    = temps[i] + offsetC;
+    const cold = t < 5, hot = t > 28, warm = t >= 10 && t <= 28;
+    const bg   = cold ? '#dbeafe' : hot ? '#fee2e2' : warm ? '#d4e8d0' : '#fef9c3';
+    const tc   = cold ? '#1e40af' : hot ? '#991b1b' : warm ? '#166534' : '#713f12';
+    return `<div style="flex:1;min-width:36px;text-align:center;padding:4px 2px;background:${bg};border-radius:5px;font-size:.72rem;">
+      <div style="font-weight:600;color:var(--muted)">${m}</div>
+      <div style="font-weight:700;color:${tc}">${t.toFixed(1)}°</div>
+    </div>`;
+  }).join('');
+
+  // THEAD
+  let thead = '<thead><tr><th>Pianta</th>';
+  M.forEach(m => { thead += `<th>${m}</th>`; });
+  thead += '</tr></thead>';
+
+  // TBODY — logica termica per ogni pianta × mese
+  const plants = PLANTS.filter(p => p.sow.length || p.plant.length || p.harvest.length);
+  let tbody = '<tbody>';
+
+  plants.forEach(p => {
+    tbody += `<tr><td title="${p.name} — ${p.sun} — ${p.water}">${p.icon} ${p.name.split('/')[0]}</td>`;
+
+    for (let m = 1; m <= 12; m++) {
+      const mi   = m - 1; // 0-based
+      const t    = zoneTemp(zone, mi, offsetC);
+      let cls    = '';
+      let title  = '';
+      let active = false;
+
+      // 1. Semina in semenzaio (protetto) — usa soglie sow
+      if (p.sow.includes(m)) {
+        const ok = t >= (p.sowMin ?? 4) && t <= (p.sowMax ?? 30);
+        if (ok) { cls = 'sow'; title = `Semina semenzaio (${t.toFixed(1)}°C)`; active = true; }
+      }
+
+      // 2. Trapianto / semina diretta — usa soglie plant
+      if (!active && p.plant.includes(m)) {
+        const ok = t >= (p.plantMin ?? 8) && t <= (p.plantMax ?? 32);
+        if (ok) { cls = 'plant'; title = `Trapianto/semina diretta (${t.toFixed(1)}°C)`; active = true; }
+      }
+
+      // 3. Raccolta — la temperatura è indicativa (pianta già in campo)
+      if (!active && p.harvest.includes(m)) {
+        const hMin = p.harvestMin ?? 0;
+        const hMax = p.harvestMax ?? 40;
+        const ok   = t >= hMin && t <= hMax;
+        if (ok) { cls = 'harvest'; title = `Raccolta (${t.toFixed(1)}°C)`; active = true; }
+      }
+
+      // 4. Attività prevista nel db tradizionale ma fuori finestra termica
+      const inDb = p.sow.includes(m) || p.plant.includes(m) || p.harvest.includes(m);
+      if (!active && inDb) {
+        cls   = 'blocked';
+        title = `Previsto ma temp. inadatta (${t.toFixed(1)}°C)`;
+      }
+
+      tbody += `<td class="${cls}" title="${title}"></td>`;
+    }
+    tbody += '</tr>';
+  });
+  tbody += '</tbody>';
+  table.innerHTML = thead + tbody;
+}
+
+// ═══════════════════════════════════════════════════════
+// DIARIO
+// ═══════════════════════════════════════════════════════
+function addDiaryEntry() {
+  const text = document.getElementById('diary-text').value.trim();
+  if (!text) { toast('⚠️ Scrivi qualcosa prima di aggiungere!'); return; }
+  const cat  = document.getElementById('diary-cat').value;
+  const date = document.getElementById('diary-date').value || new Date().toISOString().split('T')[0];
+  state.diary.unshift({ id: Date.now(), text, cat, date });
+  document.getElementById('diary-text').value = '';
+  saveState();
+  renderDiary();
+  toast('📔 Nota aggiunta!');
+}
+
+function deleteDiaryEntry(id) {
+  state.diary = state.diary.filter(e => e.id !== id);
+  saveState();
+  renderDiary();
+  toast('🗑 Nota eliminata');
+}
+
+function renderDiary() {
+  const el = document.getElementById('diary-entries');
+  if (!state.diary.length) {
+    el.innerHTML = `<div class="empty-state"><div class="e-icon">📔</div><div>Il diario è vuoto. Scrivi la tua prima nota!</div></div>`;
+    return;
+  }
+  el.innerHTML = state.diary.map(e => `
+    <div class="diary-entry">
+      <div class="diary-entry-header">
+        <div><span class="diary-entry-cat">${e.cat}</span><span class="diary-entry-date" style="margin-left:8px">${fmtDate(e.date)}</span></div>
+        <button class="diary-entry-del" onclick="deleteDiaryEntry(${e.id})" title="Elimina">🗑</button>
+      </div>
+      <div class="diary-entry-text">${e.text.replace(/\n/g,'<br>')}</div>
+    </div>`).join('');
+}
+
+function fmtDate(d) {
+  if (!d) return '';
+  const [y,m,g] = d.split('-');
+  return `${g}/${m}/${y}`;
+}
+
+// ═══════════════════════════════════════════════════════
+// PARASSITI
+// ═══════════════════════════════════════════════════════
+function renderPests() {
+  const s = document.getElementById('pest-search').value.toLowerCase();
+  const t = document.getElementById('pest-type').value;
+  const list = PESTS.filter(p =>
+    (p.name.toLowerCase().includes(s) || p.affects.toLowerCase().includes(s) || p.desc.toLowerCase().includes(s)) &&
+    (!t || p.type === t)
+  );
+  const grid = document.getElementById('pest-grid');
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="e-icon">🔍</div><div>Nessun risultato trovato</div></div>';
+    return;
+  }
+  grid.innerHTML = list.map(p => `
+    <div class="pest-card">
+      <div class="pest-icon">${p.icon}</div>
+      <h3>${p.name}</h3>
+      <div class="pest-type">${typeLabel(p.type)}</div>
+      <div class="pest-affects"><strong>Colpisce:</strong> ${p.affects}</div>
+      <div class="pest-desc">${p.desc}</div>
+      <div class="remedy"><strong>🌿 Rimedi biologici:</strong><p>${p.remedy}</p></div>
+    </div>`).join('');
+}
+
+function filterPests() { renderPests(); }
+function typeLabel(t) { return ({insetto:'🦗 Insetto',fungo:'🍄 Fungo/Malattia',animale:'🐾 Animale'})[t] || t; }
+
+// ═══════════════════════════════════════════════════════
+// AI — CORE
+// ═══════════════════════════════════════════════════════
+
+// Contesto dell'orto da passare all'AI
+function buildGardenContext() {
+  const lines = [];
+  state.beds.forEach(bed => {
+    const plantNames = [...new Set((bed.plants||[]).map(item => {
+      const p = PLANTS.find(x => x.id === item.pid);
+      return p ? p.name : item.pid;
+    }))];
+    const dim = `${bed.wCm||200}×${bed.hCm||120}cm`;
+    if (plantNames.length)
+      lines.push(`Aiuola "${bed.name}" (${dim}): ${plantNames.join(', ')}`);
+    else
+      lines.push(`Aiuola "${bed.name}" (${dim}): vuota`);
+  });
+  const diaryLast = state.diary.slice(0, 5).map(e => `${fmtDate(e.date)} ${e.cat}: ${e.text}`).join('\n');
+  return [
+    lines.length ? 'Stato attuale dell\'orto:\n' + lines.join('\n') : 'Orto non ancora configurato.',
+    diaryLast ? '\nUltime note del diario:\n' + diaryLast : ''
+  ].join('');
+}
+
+async function callClaude(messages, systemPrompt) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1000,
+      system: systemPrompt,
+      messages
+    })
+  });
+  if (!res.ok) throw new Error('Errore API: ' + res.status);
+  const data = await res.json();
+  return data.content.find(b => b.type === 'text')?.text || '(nessuna risposta)';
+}
+
+// ── 1. CHAT ──────────────────────────────────────────
+let chatHistory = [];
+
+function initAISection() {
+  // Imposta mese corrente nel pianificatore
+  const now = new Date();
+  document.getElementById('plan-month').value = now.getMonth() + 1;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const sendBtn = document.getElementById('chat-send-btn');
+  sendBtn.disabled = true;
+  input.value = '';
+
+  appendMsg('user', text);
+  chatHistory.push({ role: 'user', content: text });
+
+  const loadingEl = appendMsg('ai', '<span class="ai-spinner"></span> Sto pensando…', true);
+
+  try {
+    const system = `Sei un agronomo esperto di orticoltura biologica italiana. Dai consigli pratici, precisi e orientati alla coltivazione bio senza pesticidi chimici. Rispondi sempre in italiano, in modo conciso (max 5-6 frasi), con tono amichevole e professionale.
+
+Contesto dell'orto dell'utente:
+${buildGardenContext()}`;
+
+    const reply = await callClaude(chatHistory, system);
+    chatHistory.push({ role: 'assistant', content: reply });
+    loadingEl.className = 'msg msg-ai';
+    loadingEl.innerHTML = formatAIText(reply);
+  } catch(e) {
+    loadingEl.className = 'msg msg-ai';
+    loadingEl.innerHTML = '❌ Errore di connessione. Riprova tra qualche istante.';
+    chatHistory.pop();
+  }
+  sendBtn.disabled = false;
+  input.focus();
+}
+
+function appendMsg(role, html, isLoading = false) {
+  const box = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `msg msg-${role}${isLoading ? ' loading' : ''}`;
+  div.innerHTML = html;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+function clearChat() {
+  chatHistory = [];
+  document.getElementById('chat-messages').innerHTML =
+    '<div class="msg msg-ai">Chat azzerata. Sono qui per aiutarti! 🌱</div>';
+}
+
+// ── 2. DIAGNOSI CHAT LIVE ─────────────────────────────
+let diagHistory  = [];   // cronologia messaggi per l'API
+let diagImgB64   = null; // immagine allegata (base64)
+let diagImgMime  = null; // mime type dell'immagine
+let webcamStream = null; // stream webcam attivo
+
+const DIAG_SYSTEM = `Sei un fitoiatologo esperto di orticoltura biologica italiana. 
+Quando ricevi descrizioni o foto di problemi alle piante, rispondi sempre in italiano con:
+1. 🎯 Diagnosi più probabile
+2. 📋 Cause principali
+3. 🌿 Rimedi biologici immediati (senza chimica sintetica)
+4. 🛡 Prevenzione futura
+Se l'immagine o la descrizione non è sufficiente per una diagnosi certa, fai domande mirate.
+Sii conciso (max 200 parole per risposta) ma preciso.`;
+
+function diagQuick(text) {
+  document.getElementById('diag-input').value = text;
+  document.getElementById('diag-input').focus();
+}
+
+function clearDiagChat() {
+  diagHistory = [];
+  clearDiagImg();
+  document.getElementById('diag-messages').innerHTML =
+    '<div class="msg msg-ai">Nuova sessione avviata 🌿 Descrivi il problema, allega una foto o attiva la webcam.</div>';
+}
+
+// ── Gestione immagine allegata ────────────────────────
+function loadDiagFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { toast('⚠️ Seleziona un file immagine'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    diagImgMime = file.type;
+    diagImgB64  = dataUrl.split(',')[1];
+    showDiagImgPreview(dataUrl);
+  };
+  reader.readAsDataURL(file);
+  input.value = ''; // reset per poter ricaricare la stessa foto
+}
+
+function clearDiagImg() {
+  diagImgB64  = null;
+  diagImgMime = null;
+  document.getElementById('diag-img-preview').style.display = 'none';
+  document.getElementById('diag-img-thumb').src = '';
+}
+
+function showDiagImgPreview(dataUrl) {
+  document.getElementById('diag-img-thumb').src = dataUrl;
+  document.getElementById('diag-img-preview').style.display = 'block';
+}
+
+// ── Webcam ────────────────────────────────────────────
+async function startWebcam() {
+  try {
+    if (webcamStream) stopWebcam();
+    webcamStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:'environment' }, audio: false });
+    const video = document.getElementById('diag-video');
+    video.srcObject = webcamStream;
+    document.getElementById('webcam-off').style.display = 'none';
+    toast('📷 Webcam attivata');
+  } catch(e) {
+    toast('❌ Webcam non disponibile: ' + (e.message || e));
+  }
+}
+
+function stopWebcam() {
+  if (webcamStream) {
+    webcamStream.getTracks().forEach(t => t.stop());
+    webcamStream = null;
+  }
+  const video = document.getElementById('diag-video');
+  video.srcObject = null;
+  document.getElementById('webcam-off').style.display = 'flex';
+  toast('⏹ Webcam disattivata');
+}
+
+function snapWebcam() {
+  const video = document.getElementById('diag-video');
+  if (!webcamStream || video.readyState < 2) {
+    toast('⚠️ Attiva prima la webcam');
+    return;
+  }
+  const canvas = document.getElementById('diag-canvas');
+  canvas.width  = video.videoWidth  || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const dataUrl   = canvas.toDataURL('image/jpeg', 0.85);
+  diagImgMime     = 'image/jpeg';
+  diagImgB64      = dataUrl.split(',')[1];
+  showDiagImgPreview(dataUrl);
+  toast('📸 Fotogramma catturato — ora invia il messaggio!');
+}
+
+// ── Invio messaggio diagnostico ───────────────────────
+async function sendDiag() {
+  const text    = document.getElementById('diag-input').value.trim();
+  const hasImg  = !!diagImgB64;
+  if (!text && !hasImg) { toast('⚠️ Scrivi qualcosa o allega una foto'); return; }
+
+  const btn = document.getElementById('diag-send-btn');
+  btn.disabled = true;
+  document.getElementById('diag-input').value = '';
+
+  // Costruisci il contenuto utente (testo + eventuale immagine)
+  const userContent = [];
+  if (hasImg) {
+    userContent.push({ type: 'image', source: { type: 'base64', media_type: diagImgMime, data: diagImgB64 } });
+  }
+  userContent.push({ type: 'text', text: text || '(vedi immagine allegata)' });
+
+  // Mostra nella chat
+  const userHtml = `${hasImg ? `<img src="data:${diagImgMime};base64,${diagImgB64}" style="max-width:160px;border-radius:6px;display:block;margin-bottom:6px;">` : ''}${text ? `<span>${text}</span>` : ''}`;
+  appendDiagMsg('user', userHtml);
+  clearDiagImg();
+
+  // Aggiungi alla cronologia API
+  diagHistory.push({ role: 'user', content: userContent });
+
+  // Messaggio caricamento
+  const loadEl = appendDiagMsg('ai', '<span class="ai-spinner"></span> Analizzo…', true);
+
+  try {
+    // Contesto orto come primo messaggio di sistema aggiuntivo
+    const contextNote = buildGardenContext();
+    const systemFull  = DIAG_SYSTEM + (contextNote ? `\n\nContesto orto dell'utente:\n${contextNote}` : '');
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: systemFull,
+        messages: diagHistory,
+      })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data  = await res.json();
+    const reply = data.content.find(b => b.type === 'text')?.text || '(nessuna risposta)';
+
+    diagHistory.push({ role: 'assistant', content: reply });
+    loadEl.className  = 'msg msg-ai';
+    loadEl.innerHTML  = formatAIText(reply);
+  } catch(e) {
+    loadEl.className  = 'msg msg-ai';
+    loadEl.innerHTML  = '❌ Errore di connessione. Riprova.';
+    diagHistory.pop();
+  }
+  btn.disabled = false;
+  scrollDiag();
+}
+
+function appendDiagMsg(role, html, loading = false) {
+  const box = document.getElementById('diag-messages');
+  const div = document.createElement('div');
+  div.className = `msg msg-${role}${loading ? ' loading' : ''}`;
+  div.innerHTML = html;
+  box.appendChild(div);
+  scrollDiag();
+  return div;
+}
+
+function scrollDiag() {
+  const box = document.getElementById('diag-messages');
+  box.scrollTop = box.scrollHeight;
+}
+
+// Vecchie funzioni mantenute per compatibilità chip
+function fillDiag(text) { diagQuick(text); }
+async function runDiagnosis() { await sendDiag(); }
+
+// ── 3. PIANIFICAZIONE ─────────────────────────────────
+async function runPlanning() {
+  const zone   = document.getElementById('plan-zone').value;
+  const month  = document.getElementById('plan-month');
+  const space  = document.getElementById('plan-space').value;
+  const already = document.getElementById('plan-already').value.trim();
+  const monthName = month.options[month.selectedIndex].text;
+
+  const btn = document.getElementById('plan-btn');
+  const result = document.getElementById('plan-result');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="ai-spinner"></span> Genero piano…';
+  result.className = 'plan-result';
+  result.innerHTML = '<span class="ai-spinner"></span> Elaboro il piano per il tuo orto…';
+
+  const zoneLabel = { nord:'Nord Italia', centro:'Centro Italia', sud:'Sud Italia/costiero' }[zone];
+  const spaceLabel = { balcone:'Balcone/vasi', piccolo:'Orto piccolo (fino 10 m²)', medio:'Orto medio (10-30 m²)', grande:'Orto grande (oltre 30 m²)' }[space];
+
+  try {
+    const system = `Sei un agronomo esperto di orticoltura biologica italiana. Crea piani di coltivazione pratici e dettagliati.`;
+    const userMsg = `Crea un piano di coltivazione biologico per:
+- Zona: ${zoneLabel}
+- Mese attuale: ${monthName}
+- Spazio disponibile: ${spaceLabel}
+${already ? `- Già coltivato: ${already}` : ''}
+${buildGardenContext()}
+
+Il piano deve includere:
+1. 🌱 Cosa seminare/piantare ADESSO (3-5 piante prioritarie con motivo)
+2. 🤝 Consociazioni consigliate tra queste piante
+3. 📅 Prossime azioni nei 30 giorni
+4. ⚠️ Cosa evitare questo mese
+Rispondi in italiano, conciso e pratico. Max 250 parole.`;
+
+    const reply = await callClaude([{ role: 'user', content: userMsg }], system);
+    result.className = 'plan-result';
+    result.innerHTML = formatAIText(reply);
+  } catch(e) {
+    result.className = 'plan-result empty';
+    result.textContent = '❌ Errore di connessione. Controlla la rete e riprova.';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '✨ Genera piano';
+}
+
+// ── UTILITY ───────────────────────────────────────────
+function formatAIText(text) {
+  // Converte markdown basilare in HTML
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/^#{1,3} (.+)$/gm, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+// ═══════════════════════════════════════════════════════
+// PCLOUD SYNC
+// API: https://api.pcloud.com (HTTPS, no CORS issues)
+// Flusso: userinfo+login → getauth token → salva token
+//         upload: uploadfile in cartella /Orto365/
+//         download: getfilelink + fetch
+// ═══════════════════════════════════════════════════════
+const PCLOUD_API    = 'https://api.pcloud.com';
+const PCLOUD_FOLDER = 'Orto365';
+const MAX_BACKUPS   = 10; // numero massimo di backup rotanti
+let   pcloudToken    = null;
+let   pcloudFolderId = null;
+let   syncPending    = false;
+let   syncTimer      = null;
+
+// Nome file per slot i (1-based, zero-padded: orto365_01.json … orto365_10.json)
+function backupFileName(slot) {
+  return `orto365_${String(slot).padStart(2,'0')}.json`;
+}
+
+// Slot corrente (1-based, ruota da 1 a MAX_BACKUPS)
+function currentSlot() {
+  return parseInt(localStorage.getItem('pcloud_slot') || '1');
+}
+function nextSlot() {
+  const next = (currentSlot() % MAX_BACKUPS) + 1;
+  localStorage.setItem('pcloud_slot', next);
+  return next;
+}
+
+function pcloudLoad() {
+  pcloudToken    = localStorage.getItem('pcloud_token')    || null;
+  pcloudFolderId = localStorage.getItem('pcloud_folderid') || null;
+}
+
+function pcloudSave() {
+  if (pcloudToken)    localStorage.setItem('pcloud_token',    pcloudToken);
+  if (pcloudFolderId) localStorage.setItem('pcloud_folderid', pcloudFolderId);
+}
+
+function pcloudClear() {
+  pcloudToken    = null;
+  pcloudFolderId = null;
+  localStorage.removeItem('pcloud_token');
+  localStorage.removeItem('pcloud_folderid');
+  localStorage.removeItem('pcloud_last_sync');
+  localStorage.removeItem('pcloud_slot');
+}
+
+// ── Login ─────────────────────────────────────────────
+async function pcloudLogin() {
+  const email = document.getElementById('pcloud-email').value.trim();
+  const pass  = document.getElementById('pcloud-pass').value;
+  if (!email || !pass) { toast('⚠️ Inserisci email e password'); return; }
+
+  const btn = document.getElementById('pcloud-login-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="ai-spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff;"></span> Connessione…';
+
+  try {
+    const url  = `${PCLOUD_API}/userinfo?getauth=1&logout=1&username=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`;
+    const res  = await fetch(url);
+    const data = await res.json();
+    if (data.result !== 0) throw new Error(data.error || 'Credenziali non valide');
+
+    pcloudToken = data.auth;
+    pcloudSave();
+    await pcloudEnsureFolder();
+    toast('✅ Connesso a pCloud!');
+    await pcloudUpload(false);
+    initPcloudSection();
+  } catch(e) {
+    toast('❌ ' + (e.message || 'Errore di connessione pCloud'));
+  }
+  btn.disabled = false;
+  btn.innerHTML = 'Connetti a pCloud';
+}
+
+function pcloudLogout() {
+  pcloudClear();
+  toast('👋 Disconnesso da pCloud');
+  initPcloudSection();
+}
+
+function togglePassVis() {
+  const inp = document.getElementById('pcloud-pass');
+  const eye = document.getElementById('pass-eye');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  eye.textContent = inp.type === 'password' ? '👁' : '🙈';
+}
+
+// ── Cartella ──────────────────────────────────────────
+async function pcloudEnsureFolder() {
+  if (pcloudFolderId) return pcloudFolderId;
+  const ls       = await pcloudReq('listfolder', { folderid: 0, nofiles: 1 });
+  const existing = (ls.metadata?.contents || []).find(f => f.isfolder && f.name === PCLOUD_FOLDER);
+  if (existing) {
+    pcloudFolderId = existing.folderid;
+  } else {
+    const mk = await pcloudReq('createfolder', { path: '/' + PCLOUD_FOLDER });
+    pcloudFolderId = mk.metadata?.folderid;
+  }
+  pcloudSave();
+  return pcloudFolderId;
+}
+
+// ── Request helper ────────────────────────────────────
+async function pcloudReq(endpoint, params = {}) {
+  const qs  = new URLSearchParams({ ...params, auth: pcloudToken }).toString();
+  const res = await fetch(`${PCLOUD_API}/${endpoint}?${qs}`);
+  const data = await res.json();
+  if (data.result !== 0) throw new Error(data.error || endpoint + ' failed');
+  return data;
+}
+
+// ── Upload rotante ────────────────────────────────────
+async function pcloudUpload(showToast = true) {
+  if (!pcloudToken) return;
+  if (syncPending)  return;
+  syncPending = true;
+
+  try {
+    await pcloudEnsureFolder();
+    const slot     = nextSlot();
+    const filename = backupFileName(slot);
+    const now      = new Date();
+    // Aggiunge metadati al JSON: slot e timestamp
+    const payload  = { ...state, _slot: slot, _savedAt: now.toISOString() };
+    const blob     = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+
+    const form = new FormData();
+    form.append('folderid', pcloudFolderId);
+    form.append('filename', filename);
+    form.append('file', blob, filename);
+
+    const res  = await fetch(`${PCLOUD_API}/uploadfile?auth=${pcloudToken}&renameifexists=0&nopartial=1`, {
+      method: 'POST', body: form
+    });
+    const data = await res.json();
+    if (data.result !== 0) throw new Error(data.error);
+
+    const nowStr = now.toLocaleString('it-IT');
+    localStorage.setItem('pcloud_last_sync', `${nowStr} (slot ${slot}/${MAX_BACKUPS})`);
+    updateSyncLabel(localStorage.getItem('pcloud_last_sync'));
+    if (showToast) toast(`☁ Salvato su pCloud (slot ${slot}/${MAX_BACKUPS})`);
+
+    // Flash nav button
+    const btn = document.getElementById('pcloud-btn');
+    if (btn) { btn.style.color = 'rgba(168,196,154,.9)'; setTimeout(() => btn.style.color = 'rgba(255,255,255,.5)', 2500); }
+
+    // Aggiorna lista backup nella UI se visibile
+    if (document.getElementById('impostazioni-section').classList.contains('active')) {
+      renderBackupList();
+    }
+  } catch(e) {
+    if (showToast) toast('⚠️ pCloud: ' + (e.message || 'errore upload'));
+  }
+  syncPending = false;
+}
+
+// ── Lista backup su pCloud ────────────────────────────
+async function renderBackupList() {
+  const el = document.getElementById('pcloud-backup-list');
+  if (!el || !pcloudToken) return;
+  el.innerHTML = '<div style="color:var(--muted);font-size:.8rem;">Carico lista backup…</div>';
+  try {
+    await pcloudEnsureFolder();
+    const ls    = await pcloudReq('listfolder', { folderid: pcloudFolderId });
+    const files = (ls.metadata?.contents || [])
+      .filter(f => !f.isfolder && f.name.startsWith('orto365_') && f.name.endsWith('.json'))
+      .sort((a, b) => new Date(b.modified) - new Date(a.modified)); // più recenti prima
+
+    if (!files.length) { el.innerHTML = '<div style="color:var(--muted);font-size:.8rem;">Nessun backup trovato</div>'; return; }
+
+    el.innerHTML = files.map(f => {
+      const date = new Date(f.modified * 1000).toLocaleString('it-IT');
+      const size = (f.size / 1024).toFixed(1) + ' KB';
+      const slot = f.name.replace('orto365_','').replace('.json','');
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--fog);border-radius:7px;gap:10px;flex-wrap:wrap;">
+        <div>
+          <span style="font-size:.8rem;font-weight:600;color:var(--soil);">Slot ${slot}</span>
+          <span style="font-size:.75rem;color:var(--muted);margin-left:8px;">${date}</span>
+          <span style="font-size:.72rem;color:var(--muted);margin-left:6px;">${size}</span>
+        </div>
+        <button class="btn btn-secondary" style="font-size:.75rem;padding:4px 10px;"
+          onclick="pcloudRestoreSlot('${f.name}','${date}')">⬇ Ripristina</button>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = `<div style="color:var(--red);font-size:.8rem;">Errore: ${e.message}</div>`;
+  }
+}
+
+// ── Ripristina uno slot specifico ─────────────────────
+async function pcloudRestoreSlot(filename, dateStr) {
+  if (!pcloudToken) return;
+  try {
+    await pcloudEnsureFolder();
+    const ls   = await pcloudReq('listfolder', { folderid: pcloudFolderId });
+    const file = (ls.metadata?.contents || []).find(f => f.name === filename);
+    if (!file) { toast('⚠️ File non trovato'); return; }
+
+    const link    = await pcloudReq('getfilelink', { fileid: file.fileid });
+    const fileUrl = 'https://' + link.hosts[0] + link.path;
+    const res     = await fetch(fileUrl);
+    const data    = await res.json();
+
+    if (!data.beds) throw new Error('File non valido');
+    state.beds      = data.beds;
+    state.activeBed = Math.min(data.activeBed || 0, data.beds.length - 1);
+    state.diary     = data.diary || [];
+    // NON chiamare saveState() qui per evitare di sovrascrivere subito il backup
+    localStorage.setItem('orto365_v2', JSON.stringify(state));
+    flashSaveIndicator();
+
+    const activeSection = document.querySelector('.tab-btn.active')?.dataset.section || 'home';
+    showSection(activeSection);
+    toast(`⬇ Ripristinato backup del ${dateStr}`);
+  } catch(e) {
+    toast('❌ Ripristino fallito: ' + (e.message || 'errore'));
+  }
+}
+
+// ── Download (ultimo backup = slot più recente) ────────
+async function pcloudDownload() {
+  if (!pcloudToken) return;
+  try {
+    await pcloudEnsureFolder();
+    const ls    = await pcloudReq('listfolder', { folderid: pcloudFolderId });
+    const files = (ls.metadata?.contents || [])
+      .filter(f => !f.isfolder && f.name.startsWith('orto365_') && f.name.endsWith('.json'))
+      .sort((a, b) => new Date(b.modified) - new Date(a.modified));
+    if (!files.length) { toast('⚠️ Nessun backup trovato su pCloud'); return; }
+    const latest  = files[0];
+    const dateStr = new Date(latest.modified * 1000).toLocaleString('it-IT');
+    await pcloudRestoreSlot(latest.name, dateStr);
+  } catch(e) {
+    toast('❌ Download pCloud: ' + (e.message || 'errore'));
+  }
+}
+
+function scheduleCloudSync() {
+  if (!pcloudToken) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => pcloudUpload(false), 3000);
+}
+
+// ── UI sezione impostazioni ───────────────────────────
+function initPcloudSection() {
+  pcloudLoad();
+  const connected = !!pcloudToken;
+
+  document.getElementById('pcloud-login-card').style.display     = connected ? 'none'  : 'block';
+  document.getElementById('pcloud-connected-card').style.display = connected ? 'block' : 'none';
+
+  const icon  = document.getElementById('pcloud-status-icon');
+  const title = document.getElementById('pcloud-status-title');
+  const sub   = document.getElementById('pcloud-status-sub');
+
+  if (connected) {
+    icon.textContent  = '✅';
+    title.textContent = 'Connesso a pCloud';
+    title.style.color = 'var(--moss)';
+    sub.textContent   = `Backup rotante automatico attivo — ${MAX_BACKUPS} slot disponibili`;
+    const last = localStorage.getItem('pcloud_last_sync');
+    updateSyncLabel(last);
+    document.getElementById('pcloud-btn').style.color = 'rgba(168,196,154,.8)';
+    // Carica lista backup in background
+    renderBackupList();
+  } else {
+    icon.textContent  = '☁️';
+    title.textContent = 'Non connesso';
+    title.style.color = 'var(--soil)';
+    sub.textContent   = 'Inserisci le credenziali per attivare il backup automatico';
+    document.getElementById('pcloud-btn').style.color = 'rgba(255,255,255,.5)';
+  }
+}
+
+function updateSyncLabel(dateStr) {
+  const el = document.getElementById('pcloud-last-sync');
+  if (el && dateStr) el.textContent = '🕐 Ultima sincronizzazione: ' + dateStr;
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+(function init() {
+  loadState();
+  pcloudLoad(); // carica token pCloud se presente
+  document.getElementById('diary-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('garden-svg').addEventListener('click', onSVGClick);
+  // Aggiorna indicatore nav pCloud
+  if (pcloudToken) {
+    const btn = document.getElementById('pcloud-btn');
+    if (btn) btn.style.color = 'rgba(168,196,154,.8)';
+  }
+  showSection('home');
+})();
+</script>
+</body>
+</html>
