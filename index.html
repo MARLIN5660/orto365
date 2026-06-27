@@ -395,6 +395,7 @@
       <button class="btn btn-primary" id="pcloud-login-btn" onclick="pcloudLogin()" style="align-self:flex-start;">
         Connetti a pCloud
       </button>
+      <div id="pcloud-diag" style="display:none;background:#fde8e6;border:1px solid #f5b7b1;border-radius:7px;padding:10px 12px;font-size:.78rem;color:#922b21;line-height:1.5;"></div>
     </div>
   </div>
 
@@ -2380,23 +2381,30 @@ async function pcloudLogin() {
     { api: PCLOUD_API_US, label: 'US' },
   ];
 
+  let lastError = '';
+
   for (const server of servers) {
     btn.innerHTML = `<span class="ai-spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff;"></span> Provo server ${server.label}…`;
     try {
-      // ── Metodo digest (sicuro, raccomandato da pCloud) ──
-      // 1. Richiedi un digest dal server
+      // 1. getdigest dallo stesso server
       const dRes  = await fetch(`${server.api}/getdigest`);
       const dData = await dRes.json();
-      if (dData.result !== 0 || !dData.digest) continue; // server non raggiungibile → prova l'altro
+      if (dData.result !== 0 || !dData.digest) { lastError = 'getdigest fallito'; continue; }
       const digest = dData.digest;
 
-      // 2. Calcola passworddigest = sha1(password + sha1(lowercase(email) + digest))
-      const emailHash = await sha1Hex(email.toLowerCase());
+      // 2. passworddigest = sha1(password + sha1(lowercase(email)) + digest)
+      //    Tutto come byte UTF-8 espliciti
+      const emailHash  = await sha1Hex(email.toLowerCase());
       const passDigest = await sha1Hex(pass + emailHash + digest);
 
-      // 3. Login con digest
-      const url  = `${server.api}/userinfo?getauth=1&logout=1&username=${encodeURIComponent(email)}&digest=${digest}&passworddigest=${passDigest}`;
-      const res  = await fetch(url);
+      // 3. login — i parametri vanno URL-encoded
+      const params = new URLSearchParams({
+        getauth: '1', logout: '1',
+        username: email,
+        digest: digest,
+        passworddigest: passDigest,
+      });
+      const res  = await fetch(`${server.api}/userinfo?${params.toString()}`);
       const data = await res.json();
 
       if (data.result === 0 && data.auth) {
@@ -2412,31 +2420,29 @@ async function pcloudLogin() {
         return;
       }
 
-      // result 2000 = login fallito (credenziali). Su EU potrebbe essere account US → prova US
-      if (data.result === 2000) {
-        // Se è l'ultimo server, mostra errore credenziali
-        if (server.label === 'US') {
-          toast('❌ Email o password non corretti');
-          btn.disabled = false;
-          btn.innerHTML = 'Connetti a pCloud';
-          return;
-        }
-        continue; // prova server US
-      }
-      // Altri errori → prova prossimo server
+      // Salva l'errore esatto del server
+      lastError = `[${server.label}] result ${data.result}: ${data.error || 'errore'}`;
+      // result 2000 = credenziali rifiutate. Prova comunque l'altro server.
     } catch(e) {
-      // errore rete → prova prossimo server
+      lastError = `[${server.label}] ${e.message}`;
     }
   }
 
-  toast('❌ Login fallito. Verifica credenziali e connessione.');
+  // Mostra l'errore diagnostico esatto nella card
+  const diag = document.getElementById('pcloud-diag');
+  if (diag) {
+    diag.style.display = 'block';
+    diag.innerHTML = `<strong>Dettaglio errore pCloud:</strong><br>${lastError}<br><br>
+      Se vedi <em>"result 2000: Log in failed"</em> con credenziali corrette nel browser, è probabile che pCloud richieda l'autorizzazione via <strong>OAuth</strong> per le app esterne. Possiamo passare a quel metodo.`;
+  }
+  toast('❌ Login fallito — vedi dettaglio sotto');
   btn.disabled = false;
   btn.innerHTML = 'Connetti a pCloud';
 }
 
-// SHA-1 helper usando Web Crypto API
+// SHA-1 con encoding UTF-8 robusto
 async function sha1Hex(str) {
-  const buf  = new TextEncoder().encode(str);
+  const buf  = new TextEncoder().encode(str); // sempre UTF-8
   const hash = await crypto.subtle.digest('SHA-1', buf);
   return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2,'0')).join('');
 }
