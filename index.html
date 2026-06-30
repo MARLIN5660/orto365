@@ -284,6 +284,86 @@
   .ai-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 5px; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  /* ── PIANO SMART ── */
+  .piano-tab { background:var(--fog); border:1px solid var(--border); border-radius:7px; padding:7px 14px; font-family:'DM Sans',sans-serif; font-size:.82rem; font-weight:500; cursor:pointer; color:var(--muted); transition:all .15s; }
+  .piano-tab.active { background:var(--moss); color:#fff; border-color:var(--moss); }
+  .piano-tab:hover:not(.active) { background:var(--border); color:var(--soil); }
+  .piano-panel { }
+  .prof-label { font-size:.82rem; color:var(--muted); display:flex; flex-direction:column; gap:4px; }
+  .prof-input { padding:8px 10px; border:1px solid var(--border); border-radius:7px; font-family:'DM Sans',sans-serif; font-size:.85rem; background:#fff; width:100%; }
+  .prof-pianta-chip { display:flex; align-items:center; gap:5px; padding:5px 9px; border-radius:20px; border:1.5px solid var(--border); background:var(--fog); cursor:pointer; font-size:.78rem; transition:all .15s; user-select:none; }
+  .prof-pianta-chip.sel { border-color:var(--moss); background:#d4e8d0; color:#1a4d14; }
+
+  /* Piano mese */
+  .piano-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:10px; }
+  .piano-card-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .piano-card-icon { font-size:1.6rem; }
+  .piano-card-title { font-size:.95rem; font-weight:600; color:var(--soil); }
+  .piano-card-sub { font-size:.78rem; color:var(--muted); }
+  .piano-action { display:inline-flex; align-items:center; gap:5px; padding:5px 13px; border-radius:20px; font-size:.78rem; font-weight:600; margin-right:6px; margin-top:6px; letter-spacing:.01em; }
+
+  /* 🌱 Semina — terra/marrone caldo */
+  .pa-sow     { background:#5C3D1E; color:#F5E6D3; }
+
+  /* 🌿 Trapianto — verde bosco */
+  .pa-plant   { background:#2D5A27; color:#D4EDD0; }
+
+  /* 🍅 Raccolta — rosso/arancio vivace */
+  .pa-harvest { background:#C0392B; color:#FDECEA; }
+
+  /* 🫙 Conservazione — blu ardesia */
+  .pa-conserve{ background:#1A3A5C; color:#D6E8F7; }
+
+  /* 🧊 Surgelazione */
+  .pa-freeze  { background:#1565C0; color:#E3F2FD; }
+
+  /* ☀️ Essiccazione */
+  .pa-dry     { background:#E65100; color:#FFF3E0; }
+
+  /* 🥒 Sottaceto */
+  .pa-pickle  { background:#4A235A; color:#F3E5F5; }
+
+  /* 📅 Google Cal — Google blue */
+  .pa-gcal    { background:#4285F4; color:#fff; text-decoration:none; }
+  .pa-gcal:hover { background:#3367D6; }
+
+  /* ↗ Semina scalare — avviso verde tenue */
+  .piano-scal-info { font-size:.78rem; font-weight:500; color:#1B4D1A; background:#C8E6C9; border-radius:6px; padding:5px 11px; margin-top:7px; display:inline-flex; align-items:center; gap:4px; }
+
+  /* ⚠ Temperatura — ambra */
+  .piano-warn { font-size:.78rem; font-weight:500; color:#4E2B00; background:#FFE0B2; border-radius:6px; padding:5px 11px; margin-top:5px; display:inline-flex; align-items:center; gap:4px; }
+  .piano-empty { text-align:center; padding:40px 20px; color:var(--muted); }
+
+  /* Raccolti */
+  .raccolto-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .raccolto-icon { font-size:1.4rem; }
+  .raccolto-info { flex:1; }
+  .raccolto-name { font-size:.9rem; font-weight:500; color:var(--soil); }
+  .raccolto-meta { font-size:.75rem; color:var(--muted); margin-top:2px; }
+  .raccolto-qty { font-size:1.1rem; font-weight:600; color:var(--moss); font-family:'Fraunces',serif; }
+  .raccolto-del { background:none; border:none; color:var(--muted); cursor:pointer; font-size:1rem; padding:4px 6px; border-radius:4px; }
+  .raccolto-del:hover { color:var(--red); background:#fde8e6; }
+
+  /* Conserve */
+  .conserva-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:14px; }
+  .conserva-title { font-size:.95rem; font-weight:600; color:var(--soil); margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+  .conserva-desc { font-size:.83rem; color:var(--muted); line-height:1.6; margin-bottom:10px; }
+  .conserva-step { font-size:.82rem; line-height:1.7; color:var(--text); }
+  .conserva-step li { margin-bottom:3px; }
+  .conserva-durata { display:inline-block; font-size:.75rem; font-weight:600; padding:4px 12px; background:#1A3A5C; color:#D6E8F7; border-radius:20px; margin-top:8px; }
+
+  /* Rotazione */
+  .rot-vaso { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:14px; margin-bottom:10px; }
+  .rot-vaso-title { font-size:.88rem; font-weight:600; color:var(--soil); margin-bottom:8px; }
+  .rot-famiglia { display:inline-block; font-size:.72rem; padding:2px 8px; border-radius:20px; margin:2px; }
+  .rot-ok { background:#d4e8d0; color:#1a4d14; }
+  .rot-warn { background:#fef3c7; color:#92400e; }
+  .rot-bad { background:#fde8e6; color:#9b1c1c; }
+
+  @media (max-width:600px) {
+    #pt-profilo > div { grid-template-columns:1fr !important; }
+  }
+
   /* RESPONSIVE */
   @media (max-width: 600px) {
     .plant-palette { width: 100%; }
@@ -324,7 +404,7 @@
     <button class="tab-btn" data-section="planner"    onclick="showSection('planner')">🗺️ Pianificatore</button>
     <button class="tab-btn" data-section="piante"     onclick="showSection('piante')">🌱 Piante</button>
     <button class="tab-btn" data-section="calendario" onclick="showSection('calendario')">📅 Calendario</button>
-    <button class="tab-btn" data-section="diario"     onclick="showSection('diario')">📔 Diario</button>
+    <button class="tab-btn" data-section="diario"     onclick="showSection('diario')">🌱 Piano</button>
     <button class="tab-btn" data-section="parassiti"  onclick="showSection('parassiti')">🐛 Parassiti</button>
     <button class="tab-btn" data-section="ai"          onclick="showSection('ai')" style="color:var(--sun)">🤖 AI</button>
     <button class="tab-btn" data-section="impostazioni" onclick="showSection('impostazioni')">☁ pCloud</button>
@@ -562,28 +642,153 @@
 </div>
 </div>
 
-<!-- DIARIO -->
+<!-- PIANO SMART -->
 <div id="diario-section" class="section">
-<div class="page-inner">
-  <div class="page-title">📔 Diario dell'Orto</div>
-  <div class="page-sub">Annota osservazioni, raccolti, trapianti e riflessioni stagionali</div>
-  <div class="card diary-compose">
-    <textarea id="diary-text" placeholder="Scrivi un'annotazione… (es: piantati i pomodori, prima fioritura dei peperoni, raccolto 1 kg di zucchine…)"></textarea>
-    <div class="diary-compose-bar">
-      <select id="diary-cat">
-        <option>🌱 Semina</option>
-        <option>🌿 Trapianto</option>
-        <option>🍅 Raccolta</option>
-        <option>💧 Irrigazione</option>
-        <option>🐛 Parassiti</option>
-        <option>✂️ Potatura</option>
-        <option>📝 Nota</option>
-      </select>
-      <input type="date" id="diary-date">
-      <button class="btn btn-primary" onclick="addDiaryEntry()">Aggiungi nota</button>
+<div class="page-inner" style="max-width:1100px;">
+  <div class="page-title">🌱 Piano dell'Orto</div>
+  <div class="page-sub">Pianificazione adattiva, scalatura delle semine, guide conservazione e diario integrato</div>
+
+  <!-- TAB interni -->
+  <div style="display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap;">
+    <button class="piano-tab active" data-tab="profilo"    onclick="pianoTab('profilo')">👤 Profilo</button>
+    <button class="piano-tab"        data-tab="piano"      onclick="pianoTab('piano')">📅 Piano semine</button>
+    <button class="piano-tab"        data-tab="raccolti"   onclick="pianoTab('raccolti')">🍅 Raccolti</button>
+    <button class="piano-tab"        data-tab="conserve"   onclick="pianoTab('conserve')">🫙 Conservazione</button>
+    <button class="piano-tab"        data-tab="rotazione"  onclick="pianoTab('rotazione')">🔄 Rotazione</button>
+    <button class="piano-tab"        data-tab="diario"     onclick="pianoTab('diario')">📔 Diario</button>
+  </div>
+
+  <!-- ── PROFILO ── -->
+  <div id="pt-profilo" class="piano-panel">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="card">
+        <div style="font-size:.9rem;font-weight:600;color:var(--soil);margin-bottom:14px;">👤 Il tuo orto</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <label class="prof-label">Persone in famiglia
+            <input type="number" id="prof-persone" value="2" min="1" max="20" class="prof-input" oninput="saveProfilo()">
+          </label>
+          <label class="prof-label">Zona climatica
+            <select id="prof-zona" class="prof-input" onchange="saveProfilo()">
+              <option value="nord" selected>Nord Italia (Giussano/Lombardia)</option>
+              <option value="centro">Centro Italia</option>
+              <option value="sud">Sud Italia / Coste</option>
+            </select>
+          </label>
+          <label class="prof-label">Tipo di spazio
+            <select id="prof-spazio" class="prof-input" onchange="saveProfilo()">
+              <option value="balcone_piccolo">Balcone piccolo (≤5 vasi)</option>
+              <option value="balcone_medio" selected>Balcone medio (5-20 vasi)</option>
+              <option value="balcone_grande">Balcone grande (20+ vasi)</option>
+              <option value="orto_piccolo">Orto piccolo (≤10 m²)</option>
+              <option value="orto_grande">Orto grande (>10 m²)</option>
+            </select>
+          </label>
+          <label class="prof-label">Copertura invernale
+            <select id="prof-copertura" class="prof-input" onchange="saveProfilo()">
+              <option value="nessuna">Nessuna</option>
+              <option value="parziale" selected>Parziale (mini-serra, telo)</option>
+              <option value="completa">Completa (serra riscaldata)</option>
+            </select>
+          </label>
+          <label class="prof-label">Conservazione
+            <select id="prof-conserva" class="prof-input" onchange="saveProfilo()">
+              <option value="no">Solo fresco</option>
+              <option value="base" selected>Voglio imparare (principiante)</option>
+              <option value="si">Già faccio conserve/surgelo</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:.9rem;font-weight:600;color:var(--soil);margin-bottom:14px;">🥦 Preferenze coltura</div>
+        <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;">Seleziona le verdure che vuoi coltivare (il piano le gestisce in automatico):</div>
+        <div id="prof-piante-grid" style="display:flex;flex-wrap:wrap;gap:6px;max-height:280px;overflow-y:auto;"></div>
+        <button class="btn btn-secondary" style="font-size:.78rem;margin-top:10px;" onclick="profiloSelectAll()">✅ Tutte</button>
+        <button class="btn btn-secondary" style="font-size:.78rem;margin-top:10px;" onclick="profiloSelectNone()">⬜ Nessuna</button>
+      </div>
+    </div>
+    <div style="margin-top:14px;text-align:right;">
+      <button class="btn btn-primary" onclick="generaPiano()">✨ Genera Piano Personalizzato</button>
     </div>
   </div>
-  <div class="diary-entries" id="diary-entries"></div>
+
+  <!-- ── PIANO SEMINE ── -->
+  <div id="pt-piano" class="piano-panel" style="display:none;">
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+      <select id="piano-mese-sel" class="prof-input" style="max-width:160px;" onchange="renderPianoMese()">
+        <option value="0">Gennaio</option><option value="1">Febbraio</option>
+        <option value="2">Marzo</option><option value="3">Aprile</option>
+        <option value="4">Maggio</option><option value="5">Giugno</option>
+        <option value="6">Luglio</option><option value="7">Agosto</option>
+        <option value="8">Settembre</option><option value="9">Ottobre</option>
+        <option value="10">Novembre</option><option value="11">Dicembre</option>
+      </select>
+      <button class="btn btn-secondary" style="font-size:.8rem;" onclick="pianoMesePrev()">◀</button>
+      <button class="btn btn-secondary" style="font-size:.8rem;" onclick="pianoMeseNext()">▶</button>
+      <span style="font-size:.8rem;color:var(--muted);" id="piano-oggi-label"></span>
+    </div>
+    <div id="piano-mese-content"></div>
+    <div style="margin-top:20px;" id="piano-prossimi"></div>
+  </div>
+
+  <!-- ── RACCOLTI ── -->
+  <div id="pt-raccolti" class="piano-panel" style="display:none;">
+    <div class="card" style="margin-bottom:16px;">
+      <div style="font-size:.88rem;font-weight:600;color:var(--soil);margin-bottom:12px;">➕ Registra raccolto</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+        <div style="flex:1;min-width:140px;">
+          <div style="font-size:.78rem;color:var(--muted);margin-bottom:4px;">Pianta</div>
+          <select id="raccolto-pianta" class="prof-input">
+            <option value="">Seleziona…</option>
+          </select>
+        </div>
+        <div style="min-width:90px;">
+          <div style="font-size:.78rem;color:var(--muted);margin-bottom:4px;">Quantità (g)</div>
+          <input type="number" id="raccolto-qty" placeholder="es. 500" min="1" class="prof-input" style="width:100%;">
+        </div>
+        <div style="min-width:110px;">
+          <div style="font-size:.78rem;color:var(--muted);margin-bottom:4px;">Data</div>
+          <input type="date" id="raccolto-data" class="prof-input" style="width:100%;">
+        </div>
+        <div style="flex:1;min-width:120px;">
+          <div style="font-size:.78rem;color:var(--muted);margin-bottom:4px;">Note</div>
+          <input type="text" id="raccolto-note" placeholder="qualità, aspetto…" class="prof-input" style="width:100%;">
+        </div>
+        <button class="btn btn-primary" onclick="addRaccolto()">Aggiungi</button>
+      </div>
+    </div>
+    <div id="raccolti-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:16px;"></div>
+    <div id="raccolti-list"></div>
+  </div>
+
+  <!-- ── CONSERVAZIONE ── -->
+  <div id="pt-conserve" class="piano-panel" style="display:none;">
+    <div id="conserve-content"></div>
+  </div>
+
+  <!-- ── ROTAZIONE ── -->
+  <div id="pt-rotazione" class="piano-panel" style="display:none;">
+    <div id="rotazione-content"></div>
+  </div>
+
+  <!-- ── DIARIO ── -->
+  <div id="pt-diario" class="piano-panel" style="display:none;">
+    <div class="card diary-compose" style="margin-bottom:16px;">
+      <textarea id="diary-text" placeholder="Annotazione libera… (osservazioni, problemi, idee)"></textarea>
+      <div class="diary-compose-bar">
+        <select id="diary-cat">
+          <option>🌱 Semina</option><option>🌿 Trapianto</option>
+          <option>🍅 Raccolta</option><option>💧 Irrigazione</option>
+          <option>🐛 Parassiti</option><option>✂️ Potatura</option>
+          <option>📝 Nota</option>
+        </select>
+        <input type="date" id="diary-date">
+        <button class="btn btn-primary" onclick="addDiaryEntry()">Aggiungi nota</button>
+      </div>
+    </div>
+    <div class="diary-entries" id="diary-entries"></div>
+  </div>
+
 </div>
 </div>
 
@@ -1081,6 +1286,13 @@ let state = {
   beds: [{ name: 'Aiuola 1', wCm: 200, hCm: 120, plants: [] }],
   activeBed: 0,
   diary: [],
+  profilo: {
+    persone: 2, zona: 'nord', spazio: 'balcone_medio',
+    copertura: 'parziale', conserva: 'base',
+    pianteSel: [] // ids piante selezionate
+  },
+  raccolti: [], // [{id,pid,qty,date,note}]
+  vasoColtivazioni: {}, // {vasoid: [{anno,famiglia}]} per rotazione
 };
 let selectedPlant = null;
 let movingPlant   = null; // pianta selezionata per spostamento
@@ -1117,6 +1329,9 @@ function loadState() {
       state.beds      = loaded.beds      || state.beds;
       state.activeBed = Math.min(loaded.activeBed || 0, (loaded.beds||[]).length - 1);
       state.diary     = loaded.diary     || [];
+      state.profilo   = { ...state.profilo, ...(loaded.profilo || {}) };
+      state.raccolti  = loaded.raccolti  || [];
+      state.vasoColtivazioni = loaded.vasoColtivazioni || {};
     }
   } catch(e){}
 }
@@ -1190,7 +1405,7 @@ function showSection(id) {
   if (id === 'planner')       { renderBedSelect(); renderPalette(); renderPlanner(); }
   if (id === 'piante')        renderPlantsDB();
   if (id === 'calendario')    renderCalendar();
-  if (id === 'diario')        renderDiary();
+  if (id === 'diario')        { initPiano(); }
   if (id === 'parassiti')     renderPests();
   if (id === 'ai')            initAISection();
   if (id === 'impostazioni')  initPcloudSection();
@@ -1916,8 +2131,691 @@ function renderCalendar() {
 }
 
 // ═══════════════════════════════════════════════════════
-// DIARIO
+// PIANO SMART
 // ═══════════════════════════════════════════════════════
+
+// ── Dati fabbisogno per 2 persone (g/settimana) e semina scalare ──
+// scalare: settimane tra una semina e la successiva (0 = non scalare)
+// piantePer2: numero di piante consigliate per 2 persone
+// conservabile: true = si può conservare/surgelare facilmente
+// metodoConserva: tipo di conservazione consigliata
+const PIANO_DATA = {
+  tomato:       { piantePer2:3, scalare:0,  conservabile:true,  come:'Passata, pelati, essiccati al sole o in forno' },
+  peperone:     { piantePer2:2, scalare:0,  conservabile:true,  come:'Sott\'olio, essiccati, surgelati a pezzi' },
+  melanzana:    { piantePer2:2, scalare:0,  conservabile:true,  come:'Sott\'olio, grigliate surgelate, essiccate' },
+  zucchino:     { piantePer2:2, scalare:3,  conservabile:false, come:'Surgelati a rondelle (sbollentare 2 min prima)' },
+  zucca:        { piantePer2:1, scalare:0,  conservabile:true,  come:'Si conserva intera in luogo fresco fino a 6 mesi' },
+  cetriolo:     { piantePer2:2, scalare:3,  conservabile:true,  come:'Sottaceto con aceto bianco e aneto' },
+  mais:         { piantePer2:4, scalare:0,  conservabile:true,  come:'Surgelato (sbollentare 3 min, raffreddare, surgelare)' },
+  fagiolo:      { piantePer2:8, scalare:3,  conservabile:true,  come:'Surgelati o secchi (essicare in baccelli per 2 settimane)' },
+  fagiolinoRamp:{ piantePer2:6, scalare:3,  conservabile:true,  come:'Surgelati sbollentati o sott\'olio' },
+  cavolo:       { piantePer2:2, scalare:0,  conservabile:true,  come:'Crauti (fermentazione lattica), surgelato a foglie' },
+  cavolfiore:   { piantePer2:2, scalare:0,  conservabile:true,  come:'Surgelato a cimette sbollentate' },
+  cavoloBrux:   { piantePer2:2, scalare:0,  conservabile:true,  come:'Surgelato sbollentato — si conserva fino a 12 mesi' },
+  carciofo:     { piantePer2:2, scalare:0,  conservabile:true,  come:'Sott\'olio, cuori surgelati' },
+  cardo:        { piantePer2:1, scalare:0,  conservabile:false, come:'Consumo fresco, si conserva in frigo 1 settimana' },
+  barbabietola: { piantePer2:6, scalare:4,  conservabile:true,  come:'Sottaceto, essiccata a chips, in barattolo pastorizzata' },
+  sedano:       { piantePer2:2, scalare:0,  conservabile:true,  come:'Surgelato a pezzi (no sbollentatura), essiccato' },
+  porroInv:     { piantePer2:4, scalare:4,  conservabile:false, come:'Rimane in terra fino a 3 mesi — raccogliere al bisogno' },
+  finocchio:    { piantePer2:3, scalare:3,  conservabile:false, come:'Consumo fresco; semi secchi per tisane/aromi' },
+  valerianella: { piantePer2:1, scalare:3,  conservabile:false, come:'Solo fresca — nessuna conservazione adatta' },
+  rucola:       { piantePer2:1, scalare:2,  conservabile:false, come:'Solo fresca. Semina ogni 2 settimane per avere sempre' },
+  bietola:      { piantePer2:3, scalare:4,  conservabile:true,  come:'Surgelata sbollentata, ottima per ripieni' },
+  indivia:      { piantePer2:2, scalare:3,  conservabile:false, come:'Solo fresca — raccogliere testa per testa' },
+  aglio:        { piantePer2:10,scalare:0,  conservabile:true,  come:'Intrecciato in trecce in luogo asciutto fino a 12 mesi' },
+  cipolla:      { piantePer2:15,scalare:0,  conservabile:true,  come:'In luogo fresco e buio fino a 6 mesi; sottaceto' },
+  patata:       { piantePer2:5, scalare:0,  conservabile:true,  come:'In cassette buie e fresche fino a 6 mesi' },
+  pisello:      { piantePer2:8, scalare:3,  conservabile:true,  come:'Surgelati (i migliori) — sbollentare 1 min, surgelare subito' },
+  asparago:     { piantePer2:8, scalare:0,  conservabile:false, come:'Consumo fresco; surgelato ha qualità mediocre' },
+  fava:         { piantePer2:10,scalare:0,  conservabile:true,  come:'Secca (essicare i baccelli), surgelata fresca' },
+  ravanello:    { piantePer2:1, scalare:2,  conservabile:false, come:'Solo fresco — semina ogni 2 settimane' },
+  carota:       { piantePer2:10,scalare:4,  conservabile:true,  come:'In sabbione fresco fino a 4 mesi; surgelata a rondelle' },
+  insalata:     { piantePer2:2, scalare:2,  conservabile:false, come:'Solo fresca — semina scalare ogni 2 settimane' },
+  spinacio:     { piantePer2:2, scalare:3,  conservabile:true,  come:'Surgelato sbollentato — classico dei surgelati casalinghi' },
+  basilico:     { piantePer2:2, scalare:0,  conservabile:true,  come:'Pesto surgelato in cubetti, foglie sott\'olio, essiccato' },
+  prezzemolo:   { piantePer2:1, scalare:0,  conservabile:true,  come:'Tritato surgelato in cubetti (il metodo migliore)' },
+  rosmarino:    { piantePer2:1, scalare:0,  conservabile:true,  come:'Essiccato appeso, sott\'olio, surgelato' },
+  salvia:       { piantePer2:1, scalare:0,  conservabile:true,  come:'Essiccata o sott\'olio — si raccoglie tutto l\'anno' },
+  timo:         { piantePer2:1, scalare:0,  conservabile:true,  come:'Essiccato — mazzetti appesi in luogo arieggiato' },
+  menta:        { piantePer2:1, scalare:0,  conservabile:true,  come:'Essiccata, in sciroppo, cubetti di tisana surgelati' },
+  aneto:        { piantePer2:1, scalare:3,  conservabile:true,  come:'Semi essiccati, foglie surgelate in cubetti' },
+  fragola:      { piantePer2:6, scalare:0,  conservabile:true,  come:'Marmellata, surgelata (su vassoio poi in sacchetto)' },
+  nasturzio:    { piantePer2:2, scalare:0,  conservabile:true,  come:'Capperi di nasturzio (boccioli sottaceto) — prelibatezza!' },
+  calendula:    { piantePer2:2, scalare:0,  conservabile:true,  come:'Petali essiccati per tisane, colorante naturale' },
+};
+
+// Famiglie botaniche per rotazione
+const FAMIGLIE = {
+  Solanaceae:    ['tomato','peperone','melanzana','patata'],
+  Cucurbitaceae: ['zucchino','zucca','cetriolo'],
+  Fabaceae:      ['fagiolo','fagiolinoRamp','pisello','fava'],
+  Brassicaceae:  ['cavolo','cavolfiore','cavoloBrux','rucola','ravanello'],
+  Asteraceae:    ['insalata','carciofo','cardo','indivia','calendula'],
+  Alliaceae:     ['aglio','cipolla','porroInv'],
+  Apiaceae:      ['carota','sedano','prezzemolo','aneto'],
+  Amaranthaceae: ['spinacio','bietola','barbabietola'],
+  Lamiaceae:     ['basilico','rosmarino','salvia','timo','menta'],
+  Rosaceae:      ['fragola'],
+  Tropaeolaceae: ['nasturzio'],
+};
+function famigliaDi(pid) {
+  return Object.entries(FAMIGLIE).find(([f,ids]) => ids.includes(pid))?.[0] || 'Altro';
+}
+
+// ── Tab interni ───────────────────────────────────────
+function pianoTab(tab) {
+  document.querySelectorAll('.piano-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.piano-panel').forEach(p => p.style.display = 'none');
+  document.getElementById('pt-' + tab).style.display = 'block';
+  if (tab === 'profilo')   renderProfilo();
+  if (tab === 'piano')     renderPianoMese();
+  if (tab === 'raccolti')  renderRaccolti();
+  if (tab === 'conserve')  renderConserve();
+  if (tab === 'rotazione') renderRotazione();
+  if (tab === 'diario')    renderDiary();
+}
+
+function initPiano() {
+  renderProfilo();
+  pianoTab('profilo');
+  // Imposta mese corrente nel selettore
+  const sel = document.getElementById('piano-mese-sel');
+  if (sel) sel.value = new Date().getMonth();
+  // Imposta data oggi nel diario
+  document.getElementById('diary-date').value = new Date().toISOString().split('T')[0];
+  // Popola select raccolto
+  const rSel = document.getElementById('raccolto-pianta');
+  if (rSel) {
+    rSel.innerHTML = '<option value="">Seleziona pianta…</option>' +
+      PLANTS.map(p => `<option value="${p.id}">${p.icon} ${p.name}</option>`).join('');
+  }
+  document.getElementById('raccolto-data').value = new Date().toISOString().split('T')[0];
+}
+
+// ── PROFILO ──────────────────────────────────────────
+function renderProfilo() {
+  const p = state.profilo;
+  document.getElementById('prof-persone').value   = p.persone;
+  document.getElementById('prof-zona').value      = p.zona;
+  document.getElementById('prof-spazio').value    = p.spazio;
+  document.getElementById('prof-copertura').value = p.copertura;
+  document.getElementById('prof-conserva').value  = p.conserva;
+
+  // Griglia piante selezionabili
+  const grid = document.getElementById('prof-piante-grid');
+  grid.innerHTML = PLANTS.filter(pl => pl.cat !== 'fiori').map(pl => `
+    <div class="prof-pianta-chip${(p.pianteSel||[]).includes(pl.id)?' sel':''}"
+         onclick="togglePiantaSel('${pl.id}')" id="chip-${pl.id}">
+      ${pl.icon} ${pl.name.split('/')[0]}
+    </div>`).join('');
+}
+
+function saveProfilo() {
+  state.profilo.persone   = parseInt(document.getElementById('prof-persone').value) || 2;
+  state.profilo.zona      = document.getElementById('prof-zona').value;
+  state.profilo.spazio    = document.getElementById('prof-spazio').value;
+  state.profilo.copertura = document.getElementById('prof-copertura').value;
+  state.profilo.conserva  = document.getElementById('prof-conserva').value;
+  saveState();
+}
+
+function togglePiantaSel(pid) {
+  const sel = state.profilo.pianteSel || [];
+  const idx = sel.indexOf(pid);
+  if (idx >= 0) sel.splice(idx, 1); else sel.push(pid);
+  state.profilo.pianteSel = sel;
+  saveState();
+  const chip = document.getElementById('chip-' + pid);
+  if (chip) chip.classList.toggle('sel', sel.includes(pid));
+}
+
+function profiloSelectAll()  { state.profilo.pianteSel = PLANTS.filter(p=>p.cat!=='fiori').map(p=>p.id); saveState(); renderProfilo(); }
+function profiloSelectNone() { state.profilo.pianteSel = []; saveState(); renderProfilo(); }
+
+// ── GENERA PIANO (da profilo → imposta selezione) ────
+function generaPiano() {
+  saveProfilo();
+  pianoTab('piano');
+  toast('✅ Piano aggiornato in base al tuo profilo!');
+}
+
+// ── PIANO SEMINE ─────────────────────────────────────
+function pianoMesePrev() { const s=document.getElementById('piano-mese-sel'); s.value=(parseInt(s.value)+11)%12; renderPianoMese(); }
+function pianoMeseNext() { const s=document.getElementById('piano-mese-sel'); s.value=(parseInt(s.value)+1)%12;  renderPianoMese(); }
+
+// ── Google Calendar link builder ──────────────────────
+function gcalLink(titolo, descrizione, anno, mese, giorno) {
+  // Evento con orario: 18:00-19:00 (formato YYYYMMDDTHHmmssZ in UTC)
+  // 18:00 ora italiana = 16:00 UTC (CET) oppure 17:00 UTC (CEST estate)
+  // Usiamo l'ora locale con T180000 senza Z così Google Calendar la interpreta
+  // come ora locale dell'utente
+  const pad = n => String(n).padStart(2,'0');
+  const d   = `${anno}${pad(mese)}${pad(giorno)}`;
+  const params = new URLSearchParams({
+    action:   'TEMPLATE',
+    text:     titolo,
+    dates:    `${d}T180000/${d}T190000`,
+    details:  descrizione,
+    location: 'Balcone / Orto',
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+function gcalBtn(titolo, desc, anno, mese, giorno) {
+  const url = gcalLink(titolo, desc, anno, mese, giorno);
+  return `<a href="${url}" target="_blank" rel="noopener" class="piano-action pa-gcal" style="margin-top:8px;">
+    📅 Aggiungi a Google Calendar
+  </a>`;
+}
+
+function renderPianoMese() {
+  const sel   = document.getElementById('piano-mese-sel');
+  const mese  = parseInt(sel?.value ?? new Date().getMonth());
+  const zona  = state.profilo.zona || 'nord';
+  const coper = state.profilo.copertura || 'nessuna';
+  const pers  = state.profilo.persone || 2;
+  const pSel  = state.profilo.pianteSel || [];
+  const M     = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+  const oggi  = new Date();
+  const offsetC = 0;
+
+  document.getElementById('piano-oggi-label').textContent =
+    `Oggi: ${oggi.getDate()} ${M[oggi.getMonth()]} ${oggi.getFullYear()}`;
+
+  const cont = document.getElementById('piano-mese-content');
+  const pross = document.getElementById('piano-prossimi');
+
+  // Piante da mostrare (selezionate nel profilo, o tutte se nessuna selezionata)
+  const piante = PLANTS.filter(p => pSel.length === 0 || pSel.includes(p.id));
+  const t = (CLIMATE[zona]?.[mese] || 12) + offsetC;
+
+  // Raggruppa attività del mese
+  const semina = [], trapianto = [], raccolta = [];
+
+  piante.forEach(p => {
+    const pd = PIANO_DATA[p.id];
+    if (!pd) return;
+    const numPiante = Math.ceil((pd.piantePer2 / 2) * pers);
+
+    if (p.sow.includes(mese+1)) {
+      const tOk = t >= (p.sowMin??4) && t <= (p.sowMax??30);
+      // Copertura: se ha parziale, abbassa soglia di 3°C
+      const tEff = coper === 'parziale' ? t+3 : coper === 'completa' ? t+8 : t;
+      const okC  = tEff >= (p.sowMin??4);
+      semina.push({ p, pd, numPiante, tOk: okC });
+    }
+    if (p.plant.includes(mese+1)) {
+      const tOk = t >= (p.plantMin??8) && t <= (p.plantMax??32);
+      trapianto.push({ p, pd, numPiante, tOk });
+    }
+    if (p.harvest.includes(mese+1)) {
+      const tOk = t >= (p.harvestMin??0) && t <= (p.harvestMax??40);
+      raccolta.push({ p, pd, numPiante, tOk });
+    }
+  });
+
+  let html = `<div style="font-size:1rem;font-weight:600;color:var(--soil);margin-bottom:14px;">📅 ${M[mese]} — ${t.toFixed(1)}°C media zona ${zona}</div>`;
+
+  if (!semina.length && !trapianto.length && !raccolta.length) {
+    html += `<div class="piano-empty">😴 Nessuna attività prevista questo mese per le piante selezionate.<br>
+      <span style="font-size:.8rem;">Vai al Profilo e seleziona le piante che vuoi coltivare.</span></div>`;
+  }
+
+  // SEMINA
+  if (semina.length) {
+    html += `<div style="font-size:.82rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">🌱 Da seminare</div>`;
+    semina.forEach(({p, pd, numPiante, tOk}) => {
+      const scalInfo = pd.scalare > 0
+        ? `<span class="piano-scal-info">↗ Semina scalare ogni ${pd.scalare} settimane — non tutte insieme!</span>` : '';
+      const warn = !tOk ? `<span class="piano-warn">⚠ Temperatura borderline — usa il semenzaio al coperto</span>` : '';
+      const n1 = pd.scalare > 0 ? Math.ceil(numPiante/2) : numPiante;
+      const gcalSow = gcalBtn(
+        `🌱 Semina ${p.name} (${n1} piante)`,
+        `Seminare ${n1} piante di ${p.name} in semenzaio.\nProfondità: ${p.depth}cm · Spaziatura futura: ${p.spacing}cm\n${pd.scalare>0?`Semina scalare: altre ${Math.floor(numPiante/2)} piante tra ${pd.scalare} settimane.`:''}`,
+        new Date().getFullYear(), mese+1, 1
+      );
+      html += `<div class="piano-card">
+        <div class="piano-card-header">
+          <div class="piano-card-icon">${p.icon}</div>
+          <div>
+            <div class="piano-card-title">${p.name}</div>
+            <div class="piano-card-sub">${p.family} · Profondità ${p.depth}cm · Spaziatura ${p.spacing}cm</div>
+          </div>
+        </div>
+        <span class="piano-action pa-sow">🌱 Semina in semenzaio</span>
+        <span style="font-size:.82rem;color:var(--soil);margin-left:4px;">
+          <strong>${n1} piante</strong>
+          ${pd.scalare > 0 ? `ora + ${Math.floor(numPiante/2)} tra ${pd.scalare} settimane` : `(per ${pers} persone)`}
+        </span>
+        ${scalInfo}${warn}
+        ${pd.conservabile ? `<div style="margin-top:6px;font-size:.75rem;color:#3949ab;">🫙 Conservabile: ${pd.come}</div>` : ''}
+        ${gcalSow}
+      </div>`;
+    });
+  }
+
+  // TRAPIANTO
+  if (trapianto.length) {
+    html += `<div style="font-size:.82rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;margin-top:16px;">🌿 Da trapiantare</div>`;
+    trapianto.forEach(({p, pd, numPiante, tOk}) => {
+      const warn = !tOk ? `<span class="piano-warn">⚠ Aspetta ancora qualche giorno — temperatura troppo bassa</span>` : '';
+      const gcalPlant = gcalBtn(
+        `🌿 Trapianto ${p.name} (${numPiante} piante)`,
+        `Trapiantare ${numPiante} piante di ${p.name} in vaso.\nSpaziatura: ${p.spacing}cm · ${p.sun} · ${p.water}${!tOk?' ⚠ Controlla temperatura prima di trapiantare':''}`,
+        new Date().getFullYear(), mese+1, 1
+      );
+      html += `<div class="piano-card">
+        <div class="piano-card-header">
+          <div class="piano-card-icon">${p.icon}</div>
+          <div>
+            <div class="piano-card-title">${p.name}</div>
+            <div class="piano-card-sub">Spaziatura ${p.spacing}cm · ${p.sun}</div>
+          </div>
+        </div>
+        <span class="piano-action pa-plant">🌿 Trapianto in vaso</span>
+        <span style="font-size:.82rem;color:var(--soil);margin-left:4px;"><strong>${numPiante} piante</strong> per ${pers} persone</span>
+        ${warn}
+        ${gcalPlant}
+      </div>`;
+    });
+  }
+
+  // RACCOLTA
+  if (raccolta.length) {
+    html += `<div style="font-size:.82rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;margin-top:16px;">🍅 Raccolta prevista</div>`;
+    raccolta.forEach(({p, pd}) => {
+      const gcalHarv = gcalBtn(
+        `🍅 Raccolta ${p.name}`,
+        `Periodo di raccolta per ${p.name}.\n${pd.conservabile ? `💡 Conservazione: ${pd.come}` : '⚡ Consumo fresco — raccogliere e usare entro pochi giorni'}`,
+        new Date().getFullYear(), mese+1, 10
+      );
+      html += `<div class="piano-card">
+        <div class="piano-card-header">
+          <div class="piano-card-icon">${p.icon}</div>
+          <div>
+            <div class="piano-card-title">${p.name}</div>
+            <div class="piano-card-sub">${pd.conservabile ? '✅ Conservabile' : '⚡ Consumo fresco entro pochi giorni'}</div>
+          </div>
+        </div>
+        <span class="piano-action pa-harvest">🍅 In raccolta</span>
+        ${pd.conservabile ? `<span class="piano-action pa-conserve">🫙 ${pd.come}</span>` : ''}
+        ${gcalHarv}
+      </div>`;
+    });
+  }
+
+  cont.innerHTML = html;
+
+  // Prossimi 4 mesi
+  let prossimiHtml = `<div style="font-size:.85rem;font-weight:600;color:var(--soil);margin-bottom:10px;">📆 Prossimi mesi</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">`;
+  for (let i = 1; i <= 4; i++) {
+    const m2   = (mese + i) % 12;
+    const t2   = (CLIMATE[zona]?.[m2] || 12);
+    const att  = piante.filter(p => p.sow.includes(m2+1) || p.plant.includes(m2+1) || p.harvest.includes(m2+1));
+    prossimiHtml += `<div style="flex:1;min-width:90px;background:var(--fog);border-radius:9px;padding:10px 12px;cursor:pointer;" onclick="document.getElementById('piano-mese-sel').value=${m2};renderPianoMese()">
+      <div style="font-size:.78rem;font-weight:600;color:var(--soil);">${M[m2]}</div>
+      <div style="font-size:.72rem;color:var(--muted);">${t2.toFixed(0)}°C</div>
+      <div style="font-size:.72rem;color:var(--moss);margin-top:3px;">${att.length} attività</div>
+    </div>`;
+  }
+  prossimiHtml += '</div>';
+  pross.innerHTML = prossimiHtml;
+}
+
+// ── RACCOLTI ─────────────────────────────────────────
+function addRaccolto() {
+  const pid  = document.getElementById('raccolto-pianta').value;
+  const qty  = parseInt(document.getElementById('raccolto-qty').value);
+  const date = document.getElementById('raccolto-data').value;
+  const note = document.getElementById('raccolto-note').value.trim();
+  if (!pid) { toast('⚠️ Seleziona una pianta'); return; }
+  if (!qty || qty < 1) { toast('⚠️ Inserisci la quantità'); return; }
+  state.raccolti.unshift({ id: Date.now(), pid, qty, date, note });
+  document.getElementById('raccolto-qty').value = '';
+  document.getElementById('raccolto-note').value = '';
+  saveState();
+  renderRaccolti();
+  toast('🍅 Raccolto registrato!');
+}
+
+function deleteRaccolto(id) {
+  state.raccolti = state.raccolti.filter(r => r.id !== id);
+  saveState(); renderRaccolti();
+}
+
+function renderRaccolti() {
+  // Statistiche
+  const stats = {};
+  state.raccolti.forEach(r => {
+    if (!stats[r.pid]) stats[r.pid] = 0;
+    stats[r.pid] += r.qty;
+  });
+  const statsEl = document.getElementById('raccolti-stats');
+  statsEl.innerHTML = Object.entries(stats)
+    .sort((a,b) => b[1]-a[1]).slice(0,6)
+    .map(([pid, tot]) => {
+      const p = PLANTS.find(x => x.id === pid);
+      return `<div class="stat-pill">
+        <div class="s-val" style="font-size:1.3rem;">${(tot/1000).toFixed(1)} kg</div>
+        <div class="s-lbl">${p?.icon||''} ${p?.name.split('/')[0]||pid}</div>
+      </div>`;
+    }).join('');
+
+  // Lista
+  const el = document.getElementById('raccolti-list');
+  if (!state.raccolti.length) {
+    el.innerHTML = '<div class="empty-state"><div class="e-icon">🍅</div><div>Nessun raccolto registrato ancora</div></div>';
+    return;
+  }
+  el.innerHTML = state.raccolti.map(r => {
+    const p = PLANTS.find(x => x.id === r.pid);
+    const pd = PIANO_DATA[r.pid];
+    return `<div class="raccolto-card">
+      <div class="raccolto-icon">${p?.icon||'🌿'}</div>
+      <div class="raccolto-info">
+        <div class="raccolto-name">${p?.name||r.pid}</div>
+        <div class="raccolto-meta">${fmtDate(r.date)}${r.note?' · '+r.note:''}</div>
+        ${pd?.conservabile && r.qty > 300 ? `<div style="font-size:.72rem;color:#3949ab;margin-top:2px;">💡 ${pd.come}</div>` : ''}
+      </div>
+      <div class="raccolto-qty">${r.qty}g</div>
+      <button class="raccolto-del" onclick="deleteRaccolto(${r.id})">🗑</button>
+    </div>`;
+  }).join('');
+}
+
+// ── CONSERVAZIONE ─────────────────────────────────────
+const GUIDE_CONSERVE = [
+  { id:'surgela', tipo:'surgela', icon:'❄️', titolo:'Surgelazione',
+    difficolta:1, stagione:['estate','autunno'],
+    piante:['zucchino','fagiolinoRamp','fagiolo','pisello','spinacio','bietola','mais','cavolfiore','cavoloBrux','peperone','melanzana'],
+    desc:'Ideale per chi inizia. Mantiene quasi tutti i nutrienti e il sapore. Funziona per la maggior parte degli ortaggi.',
+    passi:[
+      'Lava e taglia gli ortaggi nella forma che userai in cucina (rondelle, cimette, pezzi)',
+      'Sbollenta in acqua bollente salata: zucchine 2 min, fagiolini 3 min, piselli 1 min, cavolfiore 3 min',
+      'Raffredda subito in acqua e ghiaccio per bloccare la cottura (passaggio fondamentale)',
+      'Asciuga bene con un canovaccio pulito',
+      'Stendi su un vassoio rivestito di carta forno e surgela per 2 ore (pre-congelamento)',
+      'Trasferisci in sacchetti da freezer, rimuovi l\'aria, etichetta con nome e data',
+      'Si conserva fino a 12 mesi a -18°C'
+    ],
+    durata:'6-12 mesi' },
+
+  { id:'sottoaceto', tipo:'sottoaceto', icon:'🥒', titolo:'Sottaceto',
+    difficolta:2, stagione:['estate','autunno'],
+    piante:['cetriolo','barbabietola','nasturzio','cipolla','carota','fagiolinoRamp'],
+    desc:'Perfetto per cetrioli, carote, cipolle e barbabietole. Aggiunge un sapore acidulo delizioso.',
+    passi:[
+      'Sterilizza i barattoli di vetro: lavali e mettili in forno a 100°C per 15 minuti',
+      'Prepara la salamoia: 500ml aceto bianco + 500ml acqua + 1 cucchiaio sale + 1 cucchiaio zucchero',
+      'Porta a ebollizione la salamoia',
+      'Taglia le verdure a rondelle o bastoncini e mettile nei barattoli con aromi (alloro, pepe, aneto)',
+      'Versa la salamoia bollente coprendo le verdure (lascia 1 cm di spazio)',
+      'Chiudi ermeticamente e capovolgi per 5 minuti (crea il vuoto)',
+      'Aspetta almeno 2 settimane prima di aprire'
+    ],
+    durata:'12 mesi (non aperto), 2 settimane in frigo (aperto)' },
+
+  { id:'essiccazione', tipo:'essiccazione', icon:'☀️', titolo:'Essiccazione',
+    difficolta:2, stagione:['estate'],
+    piante:['tomato','peperone','aglio','timo','rosmarino','salvia','menta','aneto','calendula','carota'],
+    desc:'Il metodo più antico e naturale. Concentra i sapori. Perfetto per pomodori, erbe aromatiche e peperoni.',
+    passi:[
+      'Taglia i pomodori a metà o a fette spesse 5mm; le erbe lasciale sui rametti',
+      'Forno (inverno): teglia con carta forno, 60-70°C, sportello leggermente aperto, 6-8 ore',
+      'Sole (estate): rete o griglia in pieno sole, copri con velo anti-insetti, ritira la sera, 3-5 giorni',
+      'I pomodori sono pronti quando morbidi ma non appiccicosi; le erbe quando si sbriciolano',
+      'Conserva in barattoli di vetro ermetici al buio',
+      'I pomodori essiccati puoi conservarli sott\'olio (copri completamente con olio EVO)'
+    ],
+    durata:'6-12 mesi' },
+
+  { id:'passata', tipo:'passata', icon:'🍅', titolo:'Passata di pomodoro',
+    difficolta:3, stagione:['estate'],
+    piante:['tomato'],
+    desc:'Il classico delle conserve italiane. Con 3 piante di pomodoro puoi fare passata per tutto l\'anno.',
+    passi:[
+      'Usa pomodori maturi (San Marzano o simili), lavali e taglia in quarti',
+      'Cuoci in pentola grande senza acqua aggiuntiva per 20-30 minuti finché si sfaldano',
+      'Passa con il passaverdure o frullatore a immersione',
+      'Rimetti sul fuoco, aggiungi 1 cucchiaino sale per kg, cuoci 10 minuti',
+      'Versa bollente in barattoli sterilizzati, chiudi e capovolgi',
+      'Pastorizzazione (consigliata): barattoli in pentola con acqua fino al collo, ebollizione 30 minuti',
+      'Conserva in luogo fresco e buio — fai il click test del tappo prima di aprire'
+    ],
+    durata:'12-24 mesi' },
+
+  { id:'seccatura', tipo:'secco', icon:'🫘', titolo:'Legumi secchi',
+    difficolta:1, stagione:['autunno'],
+    piante:['fagiolo','fagiolinoRamp','fava','pisello'],
+    desc:'Il modo più antico per conservare i legumi. Semplicissimo e dura anni.',
+    passi:[
+      'Lascia i baccelli sulla pianta fino a quando non diventano gialli e secchi',
+      'Raccogli i baccelli e mettili in un luogo asciutto e ventilato per 2 settimane',
+      'Sgrana i legumi e stendili su un telo per altri 7 giorni',
+      'Conserva in barattoli di vetro o sacchetti di carta, al riparo dall\'umidità',
+      'Prima di usarli: ammollo 12 ore in acqua fredda, scola e cuoci normalmente'
+    ],
+    durata:'2-3 anni' },
+
+  { id:'olio', tipo:'olio', icon:'🫒', titolo:'Sott\'olio',
+    difficolta:2, stagione:['estate','autunno'],
+    piante:['melanzana','peperone','carciofo','tomato','zucchino'],
+    desc:'Per verdure grigliate o scottate. Aggiunge sapore e si usa direttamente come condimento.',
+    passi:[
+      'Griglia o cuoci le verdure fino a cottura completa',
+      'Lascia raffreddare completamente su carta assorbente (eliminare tutta l\'acqua)',
+      'Metti nei barattoli sterilizzati a strati con aromi: aglio, basilico, peperoncino, origano',
+      'Copri completamente con olio EVO (le verdure non devono emergere)',
+      'Chiudi e conserva in frigo',
+      '⚠️ Sicurezza: consuma entro 2 settimane dall\'apertura, tieni sempre in frigo'
+    ],
+    durata:'3-6 mesi in frigo (non aperto)' },
+
+  { id:'trecce', tipo:'cantina', icon:'🧄', titolo:'Conservazione in trecce/cantina',
+    difficolta:1, stagione:['estate','autunno'],
+    piante:['aglio','cipolla','patata','zucca'],
+    desc:'Il metodo classico — nessun trattamento, solo il posto giusto.',
+    passi:[
+      'Lascia essiccare in campo: aglio e cipolle 2-3 settimane dopo l\'estrazione',
+      'Aglio: intreccia i gambi e appendi in luogo fresco, buio e ventilato',
+      'Cipolle: retina appesa o in cassetta traforata',
+      'Patate: cassette di legno al buio (luce = solanina tossica!), 10-15°C',
+      'Zucca: su scaffale al riparo dai geli, si conserva mesi senza trattamenti',
+      'Controlla periodicamente e rimuovi i pezzi che iniziano ad imputridire'
+    ],
+    durata:'3-12 mesi secondo il tipo' },
+
+  { id:'marmellata', tipo:'marmellata', icon:'🍓', titolo:'Marmellate e confetture',
+    difficolta:2, stagione:['primavera','estate'],
+    piante:['fragola','zucca'],
+    desc:'Perfetta per fragole e anche per la zucca — meno scontata ma deliziosissima.',
+    passi:[
+      'Pesa la frutta/verdura pulita: usa il 70-80% del peso in zucchero',
+      'Metti in pentola con il succo di mezzo limone (pectina naturale)',
+      'Cuoci a fuoco medio-basso mescolando spesso: 30-45 minuti fino alla giusta consistenza',
+      'Prova del piattino: metti un cucchiaino su piattino freddo, inclinalo — deve scorrere lentamente',
+      'Versa bollente nei barattoli sterilizzati, chiudi e capovolgi per 10 minuti',
+      'Si conserva fino a 2 anni in luogo fresco e buio'
+    ],
+    durata:'12-24 mesi' },
+
+  { id:'pesto', tipo:'olio', icon:'🌿', titolo:'Pesto e salse surgelate',
+    difficolta:1, stagione:['estate'],
+    piante:['basilico','prezzemolo','salvia','menta'],
+    desc:'Il modo migliore per conservare le erbe aromatiche quando sono abbondanti.',
+    passi:[
+      'Frulla le erbe con olio EVO (senza aglio né formaggio — si aggiungono freschi all\'uso)',
+      'Versa negli stampi per ghiaccio e congela',
+      'Una volta solidi, togli dagli stampi e metti in sacchetti da freezer etichettati',
+      'Ogni cubetto = 1 cucchiaio di pesto pronto — usa direttamente da surgelato'
+    ],
+    durata:'6-12 mesi' },
+
+  { id:'fermentazione', tipo:'fermentato', icon:'🫙', titolo:'Fermentazione lattica (crauti e kimchi)',
+    difficolta:3, stagione:['autunno','inverno'],
+    piante:['cavolo','carota','barbabietola','ravanello'],
+    desc:'Il metodo più salutare — i batteri lattici sono probiotici naturali. Nessun calore, nessuna attrezzatura speciale.',
+    passi:[
+      'Taglia il cavolo a striscioline sottilissime con mandolina o coltello affilato',
+      'Aggiungi 20g di sale marino per kg di cavolo, massaggia con le mani per 10 minuti',
+      'Il cavolo rilascerà liquido (salamoia naturale)',
+      'Premi compattando in un barattolo di vetro: le verdure devono essere sommerse dal loro liquido',
+      'Copri con un peso (piccolo barattolo pieno d\'acqua), lascia 2 cm di spazio dalla sommità',
+      'Tieni a temperatura ambiente (18-22°C) per 3-7 giorni, apri ogni giorno per far uscire i gas',
+      'Quando acidulo al tuo gusto, trasferisci in frigo — matura ancora lentamente'
+    ],
+    durata:'3-6 mesi in frigo' },
+];
+
+// Colori per tipo di conservazione
+const CONSERVA_TIPO = {
+  surgela:     { bg:'#1565C0', fg:'#E3F2FD', label:'❄️ Surgelazione'    },
+  sottoaceto:  { bg:'#4A235A', fg:'#F3E5F5', label:'🥒 Sottaceto'        },
+  essiccazione:{ bg:'#E65100', fg:'#FFF3E0', label:'☀️ Essiccazione'    },
+  passata:     { bg:'#B71C1C', fg:'#FFEBEE', label:'🍅 Passata/Cottura'  },
+  secco:       { bg:'#3E2723', fg:'#EFEBE9', label:'🫘 Legumi secchi'    },
+  olio:        { bg:'#1B5E20', fg:'#E8F5E9', label:'🫒 Sott\'olio/Pesto' },
+  cantina:     { bg:'#4E342E', fg:'#FBE9E7', label:'🧄 Cantina/Trecce'  },
+  marmellata:  { bg:'#880E4F', fg:'#FCE4EC', label:'🍓 Marmellata'       },
+  fermentato:  { bg:'#1A237E', fg:'#E8EAF6', label:'🧫 Fermentazione'   },
+};
+
+const DIFF_LABEL = ['','⭐ Facile','⭐⭐ Medio','⭐⭐⭐ Avanzato'];
+
+function renderConserve() {
+  const pSel  = state.profilo.pianteSel || [];
+  const el    = document.getElementById('conserve-content');
+  const filtroTipo = document.getElementById('conserve-filtro-tipo')?.value || '';
+  const filtroDiff = document.getElementById('conserve-filtro-diff')?.value || '';
+
+  // Filtri UI
+  const tipiPresenti = [...new Set(GUIDE_CONSERVE.map(g => g.tipo))];
+  let html = `
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;">
+    <select id="conserve-filtro-tipo" onchange="renderConserve()" style="padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.83rem;background:#fff;">
+      <option value="">Tutti i metodi</option>
+      ${tipiPresenti.map(t => `<option value="${t}"${filtroTipo===t?' selected':''}>${CONSERVA_TIPO[t]?.label||t}</option>`).join('')}
+    </select>
+    <select id="conserve-filtro-diff" onchange="renderConserve()" style="padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.83rem;background:#fff;">
+      <option value="">Tutte le difficoltà</option>
+      <option value="1"${filtroDiff==='1'?' selected':''}>⭐ Facile</option>
+      <option value="2"${filtroDiff==='2'?' selected':''}>⭐⭐ Medio</option>
+      <option value="3"${filtroDiff==='3'?' selected':''}>⭐⭐⭐ Avanzato</option>
+    </select>
+    <span style="font-size:.78rem;color:var(--muted);">${pSel.length ? pSel.length + ' piante selezionate nel profilo' : 'Tutte le piante'}</span>
+  </div>
+  <div style="background:var(--fog);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:.83rem;line-height:1.6;">
+    💡 Il principio base è sempre lo stesso: <strong>eliminare acqua, ossigeno e batteri</strong>.
+    Le guide sono ordinate per difficoltà crescente.
+  </div>`;
+
+  const guide = GUIDE_CONSERVE
+    .filter(g => {
+      const rilevante = pSel.length === 0 || g.piante.some(p => pSel.includes(p));
+      const tipoOk    = !filtroTipo || g.tipo === filtroTipo;
+      const diffOk    = !filtroDiff || g.difficolta === parseInt(filtroDiff);
+      return rilevante && tipoOk && diffOk;
+    })
+    .sort((a,b) => a.difficolta - b.difficolta);
+
+  if (!guide.length) {
+    html += '<div class="piano-empty"><div class="e-icon">🔍</div><div>Nessuna guida trovata per i filtri selezionati</div></div>';
+    el.innerHTML = html;
+    return;
+  }
+
+  guide.forEach(g => {
+    const tipo   = CONSERVA_TIPO[g.tipo] || { bg:'#455A64', fg:'#ECEFF1', label:g.tipo };
+    const piante = PLANTS.filter(p => g.piante.includes(p.id) && (pSel.length===0 || pSel.includes(p.id)));
+    const stagLbl = g.stagione.map(s => ({primavera:'🌸',estate:'☀️',autunno:'🍂',inverno:'❄️'}[s]+' '+s[0].toUpperCase()+s.slice(1)).join('  '));
+
+    html += `<div class="conserva-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+        <span style="font-size:1.8rem;">${g.icon}</span>
+        <div style="flex:1;">
+          <div class="conserva-title" style="margin-bottom:2px;">${g.titolo}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+            <span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:600;background:${tipo.bg};color:${tipo.fg};">${tipo.label}</span>
+            <span style="font-size:.75rem;color:var(--muted);">${DIFF_LABEL[g.difficolta]}</span>
+            <span style="font-size:.75rem;color:var(--muted);">${stagLbl}</span>
+          </div>
+        </div>
+      </div>
+      ${piante.length ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;">${piante.map(p=>`<span class="tag">${p.icon} ${p.name.split('/')[0]}</span>`).join('')}</div>` : ''}
+      <div class="conserva-desc">${g.desc}</div>
+      <details style="margin-top:8px;">
+        <summary style="cursor:pointer;font-size:.83rem;font-weight:600;color:var(--moss);padding:4px 0;">📋 Procedura passo per passo</summary>
+        <div class="conserva-step" style="margin-top:8px;"><ol style="padding-left:18px;margin:0;">${g.passi.map(s=>`<li style="margin-bottom:5px;">${s}</li>`).join('')}</ol></div>
+      </details>
+      <span class="conserva-durata">⏱ Durata: ${g.durata}</span>
+    </div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+// ── ROTAZIONE COLTURALE ───────────────────────────────
+function renderRotazione() {
+  const el   = document.getElementById('rotazione-content');
+  const beds = state.beds;
+
+  let html = `<div style="background:var(--fog);border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:.85rem;line-height:1.6;">
+    <strong>🔄 Rotazione colturale</strong><br>
+    Non coltivare la stessa <em>famiglia botanica</em> nello stesso vaso/aiuola per due anni di fila.
+    Le piante della stessa famiglia esauriscono gli stessi nutrienti e lasciano gli stessi patogeni nel suolo.
+    <strong>Regola pratica: cambia famiglia ogni anno, torna alla stessa dopo almeno 2-3 anni.</strong>
+  </div>`;
+
+  if (!beds.length) { el.innerHTML = html + '<div class="empty-state"><div class="e-icon">🔄</div><div>Crea prima un\'aiuola nel Pianificatore</div></div>'; return; }
+
+  beds.forEach(bed => {
+    const pids = [...new Set((bed.plants||[]).map(item => item.pid))];
+    if (!pids.length) return;
+    const famiglie = [...new Set(pids.map(famigliaDi))];
+    const annoCorrente = new Date().getFullYear();
+
+    // Storico rotazione per questo letto
+    const storico = state.vasoColtivazioni[bed.name] || [];
+    const annoPrecedente = storico.find(s => s.anno === annoCorrente - 1);
+
+    html += `<div class="rot-vaso">
+      <div class="rot-vaso-title">📦 ${bed.name} (${bed.wCm}×${bed.hCm}cm)</div>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Quest'anno (${annoCorrente}):</div>
+        ${famiglie.map(f => {
+          const pianteFam = pids.filter(pid => famigliaDi(pid) === f);
+          const prevFam = annoPrecedente?.famiglie || [];
+          const conflict = prevFam.includes(f);
+          return `<span class="rot-famiglia ${conflict?'rot-bad':'rot-ok'}" title="${conflict?'⚠ Stessa famiglia dell\'anno scorso!':'✅ OK, famiglia diversa'}">
+            ${conflict?'⚠':'✅'} ${f} (${pianteFam.map(p=>PLANTS.find(x=>x.id===p)?.name.split('/')[0]).join(', ')})
+          </span>`;
+        }).join('')}
+      </div>
+      ${annoPrecedente ? `<div style="font-size:.75rem;color:var(--muted);">Anno scorso: ${annoPrecedente.famiglie.join(', ')}</div>` : '<div style="font-size:.75rem;color:var(--muted);">Nessuno storico — primo anno registrato</div>'}
+      <button class="btn btn-secondary" style="font-size:.75rem;margin-top:8px;" onclick="salvaRotazioneAnno('${bed.name}')">💾 Salva come anno corrente</button>
+    </div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+function salvaRotazioneAnno(bedName) {
+  const bed  = state.beds.find(b => b.name === bedName);
+  if (!bed) return;
+  const pids = [...new Set((bed.plants||[]).map(item => item.pid))];
+  const famiglie = [...new Set(pids.map(famigliaDi))];
+  const anno = new Date().getFullYear();
+  if (!state.vasoColtivazioni[bedName]) state.vasoColtivazioni[bedName] = [];
+  // Sostituisci se esiste già per quest'anno
+  state.vasoColtivazioni[bedName] = state.vasoColtivazioni[bedName].filter(s => s.anno !== anno);
+  state.vasoColtivazioni[bedName].push({ anno, famiglie });
+  saveState();
+  renderRotazione();
+  toast('✅ Rotazione salvata per ' + bedName);
+}
+
+
 function addDiaryEntry() {
   const text = document.getElementById('diary-text').value.trim();
   if (!text) { toast('⚠️ Scrivi qualcosa prima di aggiungere!'); return; }
