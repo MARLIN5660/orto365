@@ -624,8 +624,19 @@
       <input type="number" id="climate-offset" value="0" min="-5" max="5" step="0.5"
         style="width:62px;padding:5px 7px;border:1px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;"
         oninput="renderCalendar()">
-      <span style="font-size:.75rem;color:var(--muted)">(es. +2 se in città, −2 se in quota)</span>
+      <span style="font-size:.75rem;color:var(--muted)">(+2 città / −2 quota)</span>
     </label>
+    <input type="search" id="cal-search" placeholder="🔍 Cerca pianta…"
+      style="padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.83rem;"
+      oninput="renderCalendar()">
+    <select id="cal-cat" onchange="renderCalendar()"
+      style="padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.83rem;background:#fff;">
+      <option value="">Tutte le categorie</option>
+      <option value="ortaggi">🥕 Ortaggi</option>
+      <option value="erbe">🌿 Erbe aromatiche</option>
+      <option value="fiori">🌸 Fiori ausiliari</option>
+      <option value="frutti">🍓 Frutti</option>
+    </select>
   </div>
   <div id="cal-temp-bar" style="display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap;"></div>
   <div class="card">
@@ -1259,6 +1270,62 @@ const PLANTS = [
     good:['aglio','spinacio','insalata','borragine'],
     bad:['cavolo','finocchio'],
     notes:'Rinnovare le piante ogni 3 anni. Rimuovere gli stoloni eccedenti.' },
+
+  // ── ERBE AROMATICHE MANCANTI ─────────────────────────────────────────────
+  { id:'origano',   name:'Origano',           icon:'🌿', cat:'erbe',    color:'#8d6e63', family:'Lamiaceae',    size:1, spacing:25,  nord:true,  depth:'0.3', sun:'☀️ Pieno sole',  water:'💧 Bassissima',   season:'estate',
+    sow:[3,4],      plant:[4,5],   harvest:[6,7,8,9,10,11],
+    good:['tomato','peperone','melanzana','cavolo'],
+    bad:[],
+    notes:'Pianta perenne molto rustica. Raccogliere prima della fioritura per aroma massimo. Essicca perfettamente. Ottimo al Nord.' },
+
+  { id:'erbaCipollina', name:'Erba cipollina', icon:'🌱', cat:'erbe',   color:'#66bb6a', family:'Alliaceae',    size:1, spacing:20,  nord:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧 Media',        season:'primavera',
+    sow:[3,4,8],    plant:[4,5],   harvest:[4,5,6,7,8,9,10],
+    good:['carota','insalata','tomato','pomodoro'],
+    bad:['fagiolo','pisello'],
+    notes:'Perenne in vaso. Si raccoglie tagliando a 3 cm dal suolo — ricresce. Ottimo per insalate, frittate, formaggi.' },
+
+  { id:'maggiorana', name:'Maggiorana',        icon:'🌿', cat:'erbe',    color:'#a5d6a7', family:'Lamiaceae',    size:1, spacing:25,  nord:true,  depth:'0.3', sun:'☀️ Pieno sole',  water:'💧 Bassa',        season:'estate',
+    sow:[3,4],      plant:[5],     harvest:[6,7,8,9],
+    good:['tomato','carota','pisello','zucca'],
+    bad:[],
+    notes:'Simile all\'origano ma più delicata. Annuale al Nord (non regge il gelo). Ottima fresca o essiccata.' },
+
+  { id:'melissa',   name:'Melissa (erba limone)', icon:'🍃', cat:'erbe', color:'#c5e1a5', family:'Lamiaceae',  size:1, spacing:40,  nord:true,  depth:'0.3', sun:'🌤 Parziale',    water:'💧 Media',        season:'estate',
+    sow:[3,4],      plant:[4,5],   harvest:[5,6,7,8,9],
+    good:['pomodoro','cavolo','insalata'],
+    bad:[],
+    notes:'Perenne, diventa invasiva — meglio in vaso. Foglie con profumo di limone. Ottima in tisane, pestati e insalate. Attira le api.' },
+
+  { id:'dragoncello', name:'Dragoncello',      icon:'🌿', cat:'erbe',    color:'#81c784', family:'Asteraceae',  size:1, spacing:30,  nord:true,  depth:'0.3', sun:'☀️ Sole',        water:'💧 Bassa',        season:'estate',
+    sow:[3,4],      plant:[4,5],   harvest:[5,6,7,8,9],
+    good:['insalata','carota','melanzana'],
+    bad:[],
+    notes:'Perenne. Aroma erbaceo e anisato, fondamentale nella cucina francese. Ottimo con pollo, pesce, aceto aromatico.' },
+
+  // ── ORTAGGI MANCANTI ─────────────────────────────────────────────────────
+  { id:'cavoloNero', name:'Cavolo nero',       icon:'🥬', cat:'ortaggi', color:'#1b5e20', family:'Brassicaceae', size:2, spacing:50, nord:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧💧 Alta',       season:'autunno',
+    sow:[6,7],      plant:[8,9],   harvest:[10,11,12,1,2],
+    good:['insalata','sedano','rosmarino','cipolle'],
+    bad:['tomato','fragola','fagiolo'],
+    notes:'Tipico toscano ma ottimo al Nord. Migliora dopo il gelo. Ideale per ribollita e minestre. Resistentissimo all\'inverno lombardo.' },
+
+  { id:'cimeDiRapa', name:'Cime di rapa',      icon:'🥦', cat:'ortaggi', color:'#388e3c', family:'Brassicaceae', size:1, spacing:20, nord:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧💧 Alta',       season:'autunno',
+    sow:[7,8,9],    plant:[],      harvest:[10,11,12,1],
+    good:['insalata','aglio','cipolla'],
+    bad:['tomato','patata'],
+    notes:'Coltura invernale rapida (60 giorni). Si mangia tutta la pianta. Perfetta per il balcone in autunno-inverno al Nord.' },
+
+  { id:'cipollotto', name:'Cipollotto / Scalogno', icon:'🧅', cat:'ortaggi', color:'#ce93d8', family:'Alliaceae', size:1, spacing:10, nord:true,  depth:'2',   sun:'☀️ Sole',        water:'💧 Media',        season:'primavera',
+    sow:[2,3,8,9],  plant:[3,4,9], harvest:[4,5,6,10,11],
+    good:['carota','insalata','tomato'],
+    bad:['fagiolo','pisello'],
+    notes:'Ciclo breve (60-90 giorni). Ottimo sia fresco che cotto. Si può coltivare anche riciclando i cipollotti del supermercato.' },
+
+  { id:'cavoloRomano', name:'Cavolo Romano/Romanesco', icon:'🥦', cat:'ortaggi', color:'#00695c', family:'Brassicaceae', size:4, spacing:50, nord:true, depth:'0.5', sun:'☀️ Sole', water:'💧💧 Alta', season:'autunno',
+    sow:[6,7],      plant:[8,9],   harvest:[10,11,12],
+    good:['insalata','sedano','aneto','cipolle'],
+    bad:['tomato','fragola','fagiolo'],
+    notes:'Incrocio tra cavolo e cavolfiore. Forma piramidale caratteristica. Ciclo lungo (90-120 giorni) — seminare in giugno.' },
 ];
 
 // ═══════════════════════════════════════════════════════
@@ -1965,19 +2032,19 @@ const THRESHOLDS = {
   mais:         { sowMin:12, sowMax:30, plantMin:12, plantMax:34, harvestMin:16, harvestMax:36 },
   fagiolo:      { sowMin:14, sowMax:30, plantMin:12, plantMax:32, harvestMin:14, harvestMax:34 },
   fagiolinoRamp:{ sowMin:14, sowMax:30, plantMin:12, plantMax:32, harvestMin:14, harvestMax:34 },
-  cavolo:       { sowMin: 8, sowMax:24, plantMin: 5, plantMax:22, harvestMin:-2, harvestMax:20 },
-  cavolfiore:   { sowMin: 8, sowMax:24, plantMin: 7, plantMax:22, harvestMin: 2, harvestMax:20 },
-  cavoloBrux:   { sowMin: 8, sowMax:24, plantMin: 7, plantMax:22, harvestMin:-4, harvestMax:18 },
+  cavolo:       { sowMin: 8, sowMax:28, plantMin: 5, plantMax:30, harvestMin:-2, harvestMax:20 },
+  cavolfiore:   { sowMin: 8, sowMax:28, plantMin: 7, plantMax:30, harvestMin: 2, harvestMax:20 },
+  cavoloBrux:   { sowMin: 8, sowMax:28, plantMin: 7, plantMax:30, harvestMin:-4, harvestMax:18 },
   carciofo:     { sowMin:10, sowMax:26, plantMin: 8, plantMax:26, harvestMin: 8, harvestMax:28 },
   cardo:        { sowMin:10, sowMax:26, plantMin: 9, plantMax:26, harvestMin: 4, harvestMax:22 },
   barbabietola: { sowMin: 8, sowMax:26, plantMin: 7, plantMax:28, harvestMin: 4, harvestMax:28 },
-  sedano:       { sowMin:10, sowMax:22, plantMin: 8, plantMax:22, harvestMin: 4, harvestMax:22 },
-  porroInv:     { sowMin: 8, sowMax:24, plantMin: 7, plantMax:24, harvestMin:-3, harvestMax:22 },
-  finocchio:    { sowMin: 8, sowMax:22, plantMin: 7, plantMax:22, harvestMin: 2, harvestMax:20 },
+  sedano:       { sowMin:10, sowMax:26, plantMin: 8, plantMax:30, harvestMin: 4, harvestMax:26 },
+  porroInv:     { sowMin: 8, sowMax:28, plantMin: 7, plantMax:30, harvestMin:-3, harvestMax:26 },
+  finocchio:    { sowMin: 8, sowMax:26, plantMin: 7, plantMax:28, harvestMin: 2, harvestMax:22 },
   valerianella: { sowMin: 4, sowMax:20, plantMin: 3, plantMax:18, harvestMin:-8, harvestMax:16 },
   rucola:       { sowMin: 5, sowMax:22, plantMin: 4, plantMax:20, harvestMin: 0, harvestMax:22 },
   bietola:      { sowMin: 8, sowMax:26, plantMin: 6, plantMax:26, harvestMin: 0, harvestMax:28 },
-  indivia:      { sowMin: 8, sowMax:24, plantMin: 7, plantMax:22, harvestMin:-2, harvestMax:20 },
+  indivia:      { sowMin: 8, sowMax:28, plantMin: 7, plantMax:30, harvestMin:-2, harvestMax:20 },
   aglio:        { sowMin: 0, sowMax:20, plantMin: 2, plantMax:18, harvestMin:14, harvestMax:32 },
   cipolla:      { sowMin: 6, sowMax:24, plantMin: 5, plantMax:24, harvestMin:16, harvestMax:32 },
   patata:       { sowMin: 0, sowMax:20, plantMin: 6, plantMax:22, harvestMin:14, harvestMax:28 },
@@ -2005,6 +2072,17 @@ const THRESHOLDS = {
   camomilla:    { sowMin: 8, sowMax:22, plantMin: 6, plantMax:22, harvestMin:10, harvestMax:26 },
   // Frutti
   fragola:      { sowMin: 0, sowMax:20, plantMin: 4, plantMax:22, harvestMin:10, harvestMax:28 },
+  // Nuove erbe
+  origano:      { sowMin:10, sowMax:28, plantMin: 8, plantMax:30, harvestMin: 0, harvestMax:35 },
+  erbaCipollina:{ sowMin: 6, sowMax:24, plantMin: 5, plantMax:26, harvestMin: 4, harvestMax:30 },
+  maggiorana:   { sowMin:12, sowMax:28, plantMin:10, plantMax:30, harvestMin:12, harvestMax:32 },
+  melissa:      { sowMin:10, sowMax:26, plantMin: 8, plantMax:28, harvestMin: 8, harvestMax:30 },
+  dragoncello:  { sowMin:10, sowMax:26, plantMin: 8, plantMax:28, harvestMin: 8, harvestMax:30 },
+  // Nuovi ortaggi
+  cavoloNero:   { sowMin: 8, sowMax:28, plantMin: 5, plantMax:30, harvestMin:-6, harvestMax:18 },
+  cimeDiRapa:   { sowMin: 8, sowMax:28, plantMin: 6, plantMax:28, harvestMin: 0, harvestMax:18 },
+  cipollotto:   { sowMin: 5, sowMax:24, plantMin: 4, plantMax:24, harvestMin: 4, harvestMax:28 },
+  cavoloRomano: { sowMin: 8, sowMax:28, plantMin: 5, plantMax:30, harvestMin: 2, harvestMax:20 },
 };
 
 // Applica le soglie al database piante
@@ -2082,7 +2160,14 @@ function renderCalendar() {
   thead += '</tr></thead>';
 
   // TBODY — logica termica per ogni pianta × mese
-  const plants = PLANTS.filter(p => p.sow.length || p.plant.length || p.harvest.length);
+  const search = (document.getElementById('cal-search')?.value || '').toLowerCase();
+  const cat    = document.getElementById('cal-cat')?.value || '';
+  const plants = PLANTS.filter(p => {
+    if (!p.sow.length && !p.plant.length && !p.harvest.length) return false;
+    if (search && !p.name.toLowerCase().includes(search)) return false;
+    if (cat && p.cat !== cat) return false;
+    return true;
+  });
   let tbody = '<tbody>';
 
   plants.forEach(p => {
@@ -2180,6 +2265,15 @@ const PIANO_DATA = {
   menta:        { piantePer2:1, scalare:0,  conservabile:true,  come:'Essiccata, in sciroppo, cubetti di tisana surgelati' },
   aneto:        { piantePer2:1, scalare:3,  conservabile:true,  come:'Semi essiccati, foglie surgelate in cubetti' },
   fragola:      { piantePer2:6, scalare:0,  conservabile:true,  come:'Marmellata, surgelata (su vassoio poi in sacchetto)' },
+  origano:      { piantePer2:1, scalare:0,  conservabile:true,  come:'Essiccato appeso — il metodo migliore, concentra l\'aroma' },
+  erbaCipollina:{ piantePer2:1, scalare:0,  conservabile:true,  come:'Tritata e surgelata in cubetti di olio' },
+  maggiorana:   { piantePer2:1, scalare:0,  conservabile:true,  come:'Essiccata o surgelata — perde poco aroma' },
+  melissa:      { piantePer2:1, scalare:0,  conservabile:true,  come:'Essiccata per tisane, cubetti surgelati per cocktail' },
+  dragoncello:  { piantePer2:1, scalare:0,  conservabile:true,  come:'Aceto al dragoncello (rami in aceto bianco 2 settimane), surgelato' },
+  cavoloNero:   { piantePer2:3, scalare:0,  conservabile:true,  come:'Surgelato sbollentato, chips essiccate al forno' },
+  cimeDiRapa:   { piantePer2:2, scalare:3,  conservabile:false, come:'Solo fresco — consumare entro 3 giorni dalla raccolta' },
+  cipollotto:   { piantePer2:6, scalare:3,  conservabile:false, come:'Fresco o sottaceto; anche essiccato a rondelle' },
+  cavoloRomano: { piantePer2:2, scalare:0,  conservabile:true,  come:'Surgelato a cimette sbollentate' },
   nasturzio:    { piantePer2:2, scalare:0,  conservabile:true,  come:'Capperi di nasturzio (boccioli sottaceto) — prelibatezza!' },
   calendula:    { piantePer2:2, scalare:0,  conservabile:true,  come:'Petali essiccati per tisane, colorante naturale' },
 };
@@ -2338,15 +2432,17 @@ function renderPianoMese() {
     const numPiante = Math.ceil((pd.piantePer2 / 2) * pers);
 
     if (p.sow.includes(mese+1)) {
-      const tOk = t >= (p.sowMin??4) && t <= (p.sowMax??30);
-      // Copertura: se ha parziale, abbassa soglia di 3°C
-      const tEff = coper === 'parziale' ? t+3 : coper === 'completa' ? t+8 : t;
-      const okC  = tEff >= (p.sowMin??4);
-      semina.push({ p, pd, numPiante, tOk: okC });
+      const tEff    = coper === 'parziale' ? t+3 : coper === 'completa' ? t+8 : t;
+      const tooHot  = tEff > (p.sowMax ?? 30);
+      const tooCold = tEff < (p.sowMin ?? 4);
+      const tOk     = !tooHot && !tooCold;
+      semina.push({ p, pd, numPiante, tOk, tooHot, tooCold });
     }
     if (p.plant.includes(mese+1)) {
-      const tOk = t >= (p.plantMin??8) && t <= (p.plantMax??32);
-      trapianto.push({ p, pd, numPiante, tOk });
+      const tooHot  = t > (p.plantMax ?? 32);
+      const tooCold = t < (p.plantMin ?? 8);
+      const tOk     = !tooHot && !tooCold;
+      trapianto.push({ p, pd, numPiante, tOk, tooHot, tooCold });
     }
     if (p.harvest.includes(mese+1)) {
       const tOk = t >= (p.harvestMin??0) && t <= (p.harvestMax??40);
@@ -2364,10 +2460,14 @@ function renderPianoMese() {
   // SEMINA
   if (semina.length) {
     html += `<div style="font-size:.82rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">🌱 Da seminare</div>`;
-    semina.forEach(({p, pd, numPiante, tOk}) => {
+    semina.forEach(({p, pd, numPiante, tOk, tooHot, tooCold}) => {
       const scalInfo = pd.scalare > 0
         ? `<span class="piano-scal-info">↗ Semina scalare ogni ${pd.scalare} settimane — non tutte insieme!</span>` : '';
-      const warn = !tOk ? `<span class="piano-warn">⚠ Temperatura borderline — usa il semenzaio al coperto</span>` : '';
+      const warn = tooHot
+        ? `<span class="piano-warn">🌡 Troppo caldo (${t.toFixed(0)}°C) — aspetta che scendano le temperature</span>`
+        : tooCold
+        ? `<span class="piano-warn">🥶 Troppo freddo (${t.toFixed(0)}°C) — usa semenzaio riscaldato al coperto</span>`
+        : '';
       const n1 = pd.scalare > 0 ? Math.ceil(numPiante/2) : numPiante;
       const gcalSow = gcalBtn(
         `🌱 Semina ${p.name} (${n1} piante)`,
@@ -2397,8 +2497,12 @@ function renderPianoMese() {
   // TRAPIANTO
   if (trapianto.length) {
     html += `<div style="font-size:.82rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;margin-top:16px;">🌿 Da trapiantare</div>`;
-    trapianto.forEach(({p, pd, numPiante, tOk}) => {
-      const warn = !tOk ? `<span class="piano-warn">⚠ Aspetta ancora qualche giorno — temperatura troppo bassa</span>` : '';
+    trapianto.forEach(({p, pd, numPiante, tOk, tooHot, tooCold}) => {
+      const warn = tooHot
+        ? `<span class="piano-warn">🌡 Troppo caldo (${t.toFixed(0)}°C) — aspetta fine agosto o trapianta la sera</span>`
+        : tooCold
+        ? `<span class="piano-warn">🥶 Troppo freddo (${t.toFixed(0)}°C) — aspetta qualche giorno o proteggi con telo</span>`
+        : '';
       const gcalPlant = gcalBtn(
         `🌿 Trapianto ${p.name} (${numPiante} piante)`,
         `Trapiantare ${numPiante} piante di ${p.name} in vaso.\nSpaziatura: ${p.spacing}cm · ${p.sun} · ${p.water}${!tOk?' ⚠ Controlla temperatura prima di trapiantare':''}`,
