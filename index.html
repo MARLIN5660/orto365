@@ -165,6 +165,7 @@
   /* Celle dati */
   .cal-table tbody td { height: 30px; width: 36px; min-width: 36px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
   .cal-table tbody td.sow     { background: #d4e8d0; }
+  .cal-table tbody td.direct  { background: #ff8f00; }
   .cal-table tbody td.plant   { background: #5aac52; }
   .cal-table tbody td.harvest { background: #e8c547; }
   .cal-table tbody td.blocked { background: #e8eaf6; border-color: #c5cae9; }
@@ -644,10 +645,16 @@
       <table class="cal-table" id="cal-grid"></table>
     </div>
     <div class="cal-legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#d4e8d0"></div> Semina in semenzaio/vaso</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#5aac52"></div> Trapianto o semina diretta</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#e8c547"></div> Raccolta</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#e8eaf6;border:1px solid #9fa8da"></div> Fuori finestra termica</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#d4e8d0"></div> 🌱 Semina in semenzaio al coperto</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ff8f00"></div> ⬇ Semina diretta in vaso/terra</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#5aac52"></div> 🌿 Trapianto in vaso dall'esterno</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#e8c547"></div> 🍅 Periodo di raccolta</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#e8eaf6;border:1px solid #9fa8da"></div> ⛔ Fuori finestra termica</div>
+    </div>
+    <div style="margin-top:10px;font-size:.76rem;color:var(--muted);background:var(--fog);border-radius:7px;padding:8px 12px;line-height:1.6;">
+      <strong>↗ semenzaio</strong> = si semina prima al coperto, poi si trapianta &nbsp;|&nbsp;
+      <strong>⬇ diretta</strong> = si semina direttamente nel vaso finale (no trapianto) &nbsp;|&nbsp;
+      Tieni premuto su una cella per vedere la temperatura e il dettaglio
     </div>
   </div>
 </div>
@@ -994,7 +1001,7 @@ const PLANTS = [
     bad:['fagiolo','pisello','cavolo'],
     notes:'Piantare gli spicchi in autunno per raccolta estiva. Allontana molti parassiti. Ottimo al Nord.' },
 
-  { id:'aneto',      name:'Aneto',            icon:'🌼', cat:'erbe',    color:'#f1c40f', family:'Apiaceae',     size:1, spacing:20,  nord:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧 Media',        season:'estate',
+  { id:'aneto',      name:'Aneto',            icon:'🌼', cat:'erbe',    color:'#f1c40f', family:'Apiaceae',     size:1, spacing:20,  nord:true,  directSow:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧 Media',        season:'estate',
     sow:[4,5,6],    plant:[],      harvest:[6,7,8],
     good:['cetriolo','insalata','cipolla','cavolo'],
     bad:['carota','finocchio','pomodoro'],
@@ -1006,7 +1013,7 @@ const PLANTS = [
     bad:['cipolla','aglio','finocchio'],
     notes:'Perenne produttivo 15-20 anni. Non raccogliere il 1° anno. Eccellente al Nord.' },
 
-  { id:'barbabietola', name:'Barbabietola rossa', icon:'❤️', cat:'ortaggi', color:'#922b21', family:'Amaranthaceae', size:1, spacing:15, nord:true, depth:'2', sun:'☀️ Sole', water:'💧 Media', season:'autunno',
+  { id:'barbabietola', name:'Barbabietola rossa', icon:'❤️', cat:'ortaggi', color:'#922b21', family:'Amaranthaceae', size:1, spacing:15, nord:true,  directSow:true, depth:'2', sun:'☀️ Sole', water:'💧 Media', season:'autunno',
     sow:[4,5,7,8],  plant:[],      harvest:[7,8,10,11],
     good:['insalata','cipolla','cavolina'],
     bad:['mais','spinacio','fagiolo'],
@@ -1018,25 +1025,25 @@ const PLANTS = [
     bad:['salvia','finocchio'],
     notes:'Non bagnare le foglie. Recidere le infiorescenze per prolungare la raccolta. Ottimo in vaso.' },
 
-  { id:'bietola',    name:'Bietola da costa', icon:'🥬', cat:'ortaggi', color:'#27ae60', family:'Amaranthaceae', size:1, spacing:30,  nord:true,  depth:'1',   sun:'🌤 Parziale',    water:'💧💧 Media',      season:'autunno',
+  { id:'bietola',    name:'Bietola da costa', icon:'🥬', cat:'ortaggi', color:'#27ae60', family:'Amaranthaceae', size:1, spacing:30,  nord:true,  directSow:true,  depth:'1',   sun:'🌤 Parziale',    water:'💧💧 Media',      season:'autunno',
     sow:[3,4,7,8],  plant:[],      harvest:[5,6,7,10,11],
     good:['insalata','fagiolino','carota'],
     bad:[],
     notes:'Molto rustica, tollera il gelo. Sia estiva che autunnale. Raccogliere le foglie esterne scalarmante.' },
 
-  { id:'borragine',  name:'Borragine',        icon:'💙', cat:'fiori',   color:'#3498db', family:'Boraginaceae', size:2, spacing:40,  nord:true,  depth:'1',   sun:'☀️ Sole',        water:'💧 Bassa',        season:'estate',
+  { id:'borragine',  name:'Borragine',        icon:'💙', cat:'fiori',   color:'#3498db', family:'Boraginaceae', size:2, spacing:40,  nord:true,  directSow:true,  depth:'1',   sun:'☀️ Sole',        water:'💧 Bassa',        season:'estate',
     sow:[4,5],      plant:[],      harvest:[6,7,8,9],
     good:['tomato','zucchino','fragola','cetriolo'],
     bad:[],
     notes:'Attira bombi utili per impollinare zucchine. Fiori edibili. Si risemina spontaneamente.' },
 
-  { id:'calendula',  name:'Calendula',        icon:'🌼', cat:'fiori',   color:'#f39c12', family:'Asteraceae',   size:1, spacing:20,  nord:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧 Bassa',        season:'estate',
+  { id:'calendula',  name:'Calendula',        icon:'🌼', cat:'fiori',   color:'#f39c12', family:'Asteraceae',   size:1, spacing:20,  nord:true,  directSow:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧 Bassa',        season:'estate',
     sow:[3,4,5],    plant:[],      harvest:[6,7,8,9,10],
     good:['tomato','carota','peperone','asparago'],
     bad:[],
     notes:'Respinge nematodi e parassiti. Attira impollinatori. Fiori edibili. Rustica al Nord.' },
 
-  { id:'camomilla',  name:'Camomilla',        icon:'🌼', cat:'fiori',   color:'#f9e54a', family:'Asteraceae',   size:1, spacing:20,  nord:true,  depth:'0.3', sun:'☀️ Sole',        water:'💧 Bassa',        season:'primavera',
+  { id:'camomilla',  name:'Camomilla',        icon:'🌼', cat:'fiori',   color:'#f9e54a', family:'Asteraceae',   size:1, spacing:20,  nord:true,  directSow:true,  depth:'0.3', sun:'☀️ Sole',        water:'💧 Bassa',        season:'primavera',
     sow:[3,4],      plant:[],      harvest:[5,6,7],
     good:['cipolla','cavolo','insalata','carota'],
     bad:[],
@@ -1054,7 +1061,7 @@ const PLANTS = [
     bad:['aglio'],
     notes:'Parente del carciofo. Resistente al freddo. Imbianchire le coste legandole per 2-3 settimane prima del raccolto.' },
 
-  { id:'carota',     name:'Carota',           icon:'🥕', cat:'ortaggi', color:'#e67e22', family:'Apiaceae',     size:1, spacing:7,   nord:true,  depth:'1',   sun:'☀️ Sole',        water:'💧 Regolare',     season:'primavera',
+  { id:'carota',     name:'Carota',           icon:'🥕', cat:'ortaggi', color:'#e67e22', family:'Apiaceae',     size:1, spacing:7,   nord:true,  directSow:true,  depth:'1',   sun:'☀️ Sole',        water:'💧 Regolare',     season:'primavera',
     sow:[3,4,8],    plant:[],      harvest:[6,7,10,11],
     good:['tomato','insalata','cipolla','rosmarino','pisello'],
     bad:['finocchio','aneto','sedano'],
@@ -1096,7 +1103,7 @@ const PLANTS = [
     bad:['salvia','patata','zucca'],
     notes:'Ottimo su rete verticale per risparmiare spazio. Irrigare regolarmente.' },
 
-  { id:'cimeDiRapa', name:'Cime di rapa',      icon:'🥦', cat:'ortaggi', color:'#388e3c', family:'Brassicaceae', size:1, spacing:20, nord:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧💧 Alta',       season:'autunno',
+  { id:'cimeDiRapa', name:'Cime di rapa',      icon:'🥦', cat:'ortaggi', color:'#388e3c', family:'Brassicaceae', size:1, spacing:20, nord:true,  directSow:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧💧 Alta',       season:'autunno',
     sow:[7,8,9],    plant:[],      harvest:[10,11,12,1],
     good:['insalata','aglio','cipolla'],
     bad:['tomato','patata'],
@@ -1114,7 +1121,7 @@ const PLANTS = [
     bad:['fagiolo','pisello'],
     notes:'Ciclo breve (60-90 giorni). Ottimo sia fresco che cotto. Si può coltivare anche riciclando i cipollotti del supermercato.' },
 
-  { id:'coriandolo', name:'Coriandolo',       icon:'🌿', cat:'erbe',    color:'#a2c11c', family:'Apiaceae',     size:1, spacing:15,  nord:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧 Media',        season:'primavera',
+  { id:'coriandolo', name:'Coriandolo',       icon:'🌿', cat:'erbe',    color:'#a2c11c', family:'Apiaceae',     size:1, spacing:15,  nord:true,  directSow:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧 Media',        season:'primavera',
     sow:[3,4,8,9],  plant:[],      harvest:[5,6,9,10],
     good:['spinacio','pisello','insalata'],
     bad:['finocchio'],
@@ -1132,19 +1139,19 @@ const PLANTS = [
     bad:['fagiolo','pisello'],
     notes:'Perenne in vaso. Si raccoglie tagliando a 3 cm dal suolo — ricresce. Ottimo per insalate, frittate, formaggi.' },
 
-  { id:'fagiolo',    name:'Fagiolo',         icon:'🫘', cat:'ortaggi', color:'#8e44ad', family:'Fabaceae',      size:1, spacing:20,  nord:true,  depth:'3',   sun:'☀️ Sole',        water:'💧 Media',        season:'estate',
+  { id:'fagiolo',    name:'Fagiolo',         icon:'🫘', cat:'ortaggi', color:'#8e44ad', family:'Fabaceae',      size:1, spacing:20,  nord:true,  directSow:true,  depth:'3',   sun:'☀️ Sole',        water:'💧 Media',        season:'estate',
     sow:[4,5,6],    plant:[],      harvest:[7,8,9],
     good:['zucchino','mais','carota','cetriolo','zucca'],
     bad:['aglio','cipolla','finocchio'],
     notes:'Fissa l\'azoto nel suolo. Ottimo per terreni poveri. Non bagnare durante la fioritura.' },
 
-  { id:'fagiolinoRamp', name:'Fagiolo rampicante', icon:'🌱', cat:'ortaggi', color:'#6d3f99', family:'Fabaceae', size:1, spacing:25, nord:true, depth:'3', sun:'☀️ Sole', water:'💧 Media', season:'estate',
+  { id:'fagiolinoRamp', name:'Fagiolo rampicante', icon:'🌱', cat:'ortaggi', color:'#6d3f99', family:'Fabaceae', size:1, spacing:25, nord:true,  directSow:true, depth:'3', sun:'☀️ Sole', water:'💧 Media', season:'estate',
     sow:[4,5],      plant:[],      harvest:[7,8,9],
     good:['mais','zucca','carota','cetriolo'],
     bad:['aglio','cipolla','finocchio'],
     notes:'Necessita di sostegno (rete, canne). Produzione abbondante e scalare. Ottimo al Nord.' },
 
-  { id:'fava',       name:'Fava',             icon:'🫘', cat:'ortaggi', color:'#52be80', family:'Fabaceae',     size:1, spacing:25,  nord:true,  depth:'5',   sun:'☀️ Sole',        water:'💧 Media',        season:'primavera',
+  { id:'fava',       name:'Fava',             icon:'🫘', cat:'ortaggi', color:'#52be80', family:'Fabaceae',     size:1, spacing:25,  nord:true,  directSow:true,  depth:'5',   sun:'☀️ Sole',        water:'💧 Media',        season:'primavera',
     sow:[10,11,2,3],plant:[],      harvest:[5,6,7],
     good:['carota','spinacio','insalata','cavolo'],
     bad:['aglio','cipolla','finocchio'],
@@ -1186,7 +1193,7 @@ const PLANTS = [
     bad:[],
     notes:'Simile all\'origano ma più delicata. Annuale al Nord (non regge il gelo). Ottima fresca o essiccata.' },
 
-  { id:'mais',       name:'Mais',            icon:'🌽', cat:'ortaggi', color:'#f1c40f', family:'Poaceae',       size:2, spacing:35,  nord:true,  depth:'4',   sun:'☀️ Pieno sole',  water:'💧💧 Media',      season:'estate',
+  { id:'mais',       name:'Mais',            icon:'🌽', cat:'ortaggi', color:'#f1c40f', family:'Poaceae',       size:2, spacing:35,  nord:true,  directSow:true,  depth:'4',   sun:'☀️ Pieno sole',  water:'💧💧 Media',      season:'estate',
     sow:[4,5],      plant:[],      harvest:[8,9],
     good:['fagiolo','zucchino','zucca','cetriolo'],
     bad:['tomato','barbabietola'],
@@ -1210,7 +1217,7 @@ const PLANTS = [
     bad:[],
     notes:'Invasiva: coltivare in vasi interrati o contenitori. Ottimo repellente per lumache e formiche.' },
 
-  { id:'nasturzio',  name:'Nasturzio',        icon:'🌸', cat:'fiori',   color:'#e67e22', family:'Tropaeolaceae', size:1, spacing:25, nord:true,  depth:'1',   sun:'☀️ Sole',        water:'💧 Bassa',        season:'estate',
+  { id:'nasturzio',  name:'Nasturzio',        icon:'🌸', cat:'fiori',   color:'#e67e22', family:'Tropaeolaceae', size:1, spacing:25, nord:true,  directSow:true,  depth:'1',   sun:'☀️ Sole',        water:'💧 Bassa',        season:'estate',
     sow:[3,4,5],    plant:[],      harvest:[6,7,8,9,10],
     good:['zucchino','cetriolo','tomato','fagiolo','zucca'],
     bad:[],
@@ -1234,7 +1241,7 @@ const PLANTS = [
     bad:['finocchio','pisello'],
     notes:'Sensibile al freddo, predilige il Sud. Al Nord richiede posizione riparata e calda, meglio in tunnel o vaso grande.' },
 
-  { id:'pisello',    name:'Pisello',          icon:'🫛', cat:'ortaggi', color:'#82e0aa', family:'Fabaceae',     size:1, spacing:10,  nord:true,  depth:'3',   sun:'🌤 Parziale',    water:'💧 Media',        season:'primavera',
+  { id:'pisello',    name:'Pisello',          icon:'🫛', cat:'ortaggi', color:'#82e0aa', family:'Fabaceae',     size:1, spacing:10,  nord:true,  directSow:true,  depth:'3',   sun:'🌤 Parziale',    water:'💧 Media',        season:'primavera',
     sow:[2,3,9,10], plant:[],      harvest:[4,5,6,11,12],
     good:['carota','ravanello','insalata','spinacio','menta'],
     bad:['aglio','cipolla','finocchio'],
@@ -1252,13 +1259,13 @@ const PLANTS = [
     bad:['fagiolo','pisello'],
     notes:'Eccellente al Nord: regge gelate forti. Rincalzare per sbiancare il fusto. Ottimo in inverno.' },
 
-  { id:'prezzemolo', name:'Prezzemolo',       icon:'🌿', cat:'erbe',    color:'#52be80', family:'Apiaceae',     size:1, spacing:15,  nord:true,  depth:'0.5', sun:'🌤 Parziale',    water:'💧 Media',        season:'primavera',
+  { id:'prezzemolo', name:'Prezzemolo',       icon:'🌿', cat:'erbe',    color:'#52be80', family:'Apiaceae',     size:1, spacing:15,  nord:true,  directSow:true,  depth:'0.5', sun:'🌤 Parziale',    water:'💧 Media',        season:'primavera',
     sow:[3,4,8],    plant:[],      harvest:[5,6,7,8,9,10],
     good:['tomato','asparago','carota','pomodoro'],
     bad:['insalata','cipolla'],
     notes:'Germinazione lenta (3-4 sett.). Biennale. Resiste al freddo con leggera protezione.' },
 
-  { id:'ravanello',  name:'Ravanello',        icon:'🔴', cat:'ortaggi', color:'#e91e63', family:'Brassicaceae', size:1, spacing:5,   nord:true,  depth:'1',   sun:'☀️ Sole',        water:'💧 Regolare',     season:'primavera',
+  { id:'ravanello',  name:'Ravanello',        icon:'🔴', cat:'ortaggi', color:'#e91e63', family:'Brassicaceae', size:1, spacing:5,   nord:true,  directSow:true,  depth:'1',   sun:'☀️ Sole',        water:'💧 Regolare',     season:'primavera',
     sow:[2,3,4,8,9],plant:[],      harvest:[3,4,5,9,10],
     good:['insalata','carota','spinacio','nasturzio'],
     bad:['cavolo','aneto'],
@@ -1270,7 +1277,7 @@ const PLANTS = [
     bad:['patata','cetriolo'],
     notes:'Pianta perenne. Ama terreni ben drenati. Resiste al freddo invernale del Nord.' },
 
-  { id:'rucola',     name:'Rucola',           icon:'🌿', cat:'ortaggi', color:'#3d9970', family:'Brassicaceae', size:1, spacing:15,  nord:true,  depth:'0.5', sun:'🌤 Parziale',    water:'💧 Media',        season:'autunno',
+  { id:'rucola',     name:'Rucola',           icon:'🌿', cat:'ortaggi', color:'#3d9970', family:'Brassicaceae', size:1, spacing:15,  nord:true,  directSow:true,  depth:'0.5', sun:'🌤 Parziale',    water:'💧 Media',        season:'autunno',
     sow:[3,4,8,9],  plant:[],      harvest:[4,5,9,10,11],
     good:['insalata','spinacio','carota'],
     bad:['cavolo'],
@@ -1288,7 +1295,7 @@ const PLANTS = [
     bad:['carota','prezzemolo','mais'],
     notes:'Esige molta acqua e terreno ricco. Al Nord seminare al coperto a febbraio. Ottimo compagno del cavolo.' },
 
-  { id:'spinacio',   name:'Spinacio',         icon:'🥬', cat:'ortaggi', color:'#196f3d', family:'Amaranthaceae', size:1, spacing:10, nord:true,  depth:'2',   sun:'🌤 Parziale',    water:'💧💧 Media',      season:'autunno',
+  { id:'spinacio',   name:'Spinacio',         icon:'🥬', cat:'ortaggi', color:'#196f3d', family:'Amaranthaceae', size:1, spacing:10, nord:true,  directSow:true,  depth:'2',   sun:'🌤 Parziale',    water:'💧💧 Media',      season:'autunno',
     sow:[2,3,8,9],  plant:[],      harvest:[4,5,10,11],
     good:['fragola','fagiolo','insalata','bietola'],
     bad:['barbabietola'],
@@ -1300,7 +1307,7 @@ const PLANTS = [
     bad:[],
     notes:'Perenne, molto rustico. Eccellente repellente per afidi e parassiti. Ottimo al Nord.' },
 
-  { id:'valerianella', name:'Valerianella (Songino)', icon:'🥗', cat:'ortaggi', color:'#52be80', family:'Valerianaceae', size:1, spacing:10, nord:true, depth:'0.5', sun:'🌤 Parziale', water:'💧 Media', season:'inverno',
+  { id:'valerianella', name:'Valerianella (Songino)', icon:'🥗', cat:'ortaggi', color:'#52be80', family:'Valerianaceae', size:1, spacing:10, nord:true,  directSow:true, depth:'0.5', sun:'🌤 Parziale', water:'💧 Media', season:'inverno',
     sow:[8,9,10],   plant:[],      harvest:[11,12,1,2,3],
     good:['spinacio','ravanello','insalata'],
     bad:[],
@@ -2162,40 +2169,44 @@ function renderCalendar() {
   let tbody = '<tbody>';
 
   plants.forEach(p => {
-    tbody += `<tr><td title="${p.name} — ${p.sun} — ${p.water}">${p.icon} ${p.name.split('/')[0]}</td>`;
+    const isDirect = !!p.directSow;
+    tbody += `<tr>
+      <td title="${p.name} — ${isDirect ? 'Semina diretta in vaso/terra' : 'Semenzaio → trapianto'} — ${p.sun}"
+          style="font-size:.76rem;">
+        ${p.icon} ${p.name.split('/')[0]}
+        <span style="font-size:.6rem;color:var(--muted);margin-left:3px;">${isDirect ? '⬇' : '↗'}</span>
+      </td>`;
 
     for (let m = 1; m <= 12; m++) {
-      const mi   = m - 1; // 0-based
-      const t    = zoneTemp(zone, mi, offsetC);
-      let cls    = '';
-      let title  = '';
-      let active = false;
+      const mi  = m - 1;
+      const t   = zoneTemp(zone, mi, offsetC);
+      let cls   = '';
+      let title = '';
 
-      // 1. Semina in semenzaio (protetto) — usa soglie sow
-      if (p.sow.includes(m)) {
-        const ok = t >= (p.sowMin ?? 4) && t <= (p.sowMax ?? 30);
-        if (ok) { cls = 'sow'; title = `Semina semenzaio (${t.toFixed(1)}°C)`; active = true; }
-      }
-
-      // 2. Trapianto / semina diretta — usa soglie plant
-      if (!active && p.plant.includes(m)) {
-        const ok = t >= (p.plantMin ?? 8) && t <= (p.plantMax ?? 32);
-        if (ok) { cls = 'plant'; title = `Trapianto/semina diretta (${t.toFixed(1)}°C)`; active = true; }
-      }
-
-      // 3. Raccolta — la temperatura è indicativa (pianta già in campo)
-      if (!active && p.harvest.includes(m)) {
-        const hMin = p.harvestMin ?? 0;
-        const hMax = p.harvestMax ?? 40;
-        const ok   = t >= hMin && t <= hMax;
-        if (ok) { cls = 'harvest'; title = `Raccolta (${t.toFixed(1)}°C)`; active = true; }
-      }
-
-      // 4. Attività prevista nel db tradizionale ma fuori finestra termica
-      const inDb = p.sow.includes(m) || p.plant.includes(m) || p.harvest.includes(m);
-      if (!active && inDb) {
-        cls   = 'blocked';
-        title = `Previsto ma temp. inadatta (${t.toFixed(1)}°C)`;
+      if (isDirect) {
+        // Pianta a semina diretta: sow = semina diretta in vaso/terra
+        if (p.sow.includes(m)) {
+          const ok = t >= (p.sowMin ?? 4) && t <= (p.sowMax ?? 30);
+          if (ok) { cls = 'direct'; title = `Semina diretta in vaso/terra (${t.toFixed(1)}°C)`; }
+          else    { cls = 'blocked'; title = `Semina diretta prevista ma temp. inadatta (${t.toFixed(1)}°C)`; }
+        } else if (p.harvest.includes(m)) {
+          const ok = t >= (p.harvestMin ?? 0) && t <= (p.harvestMax ?? 40);
+          if (ok) { cls = 'harvest'; title = `Raccolta (${t.toFixed(1)}°C)`; }
+        }
+      } else {
+        // Pianta da semenzaio + trapianto
+        if (p.sow.includes(m)) {
+          const ok = t >= (p.sowMin ?? 4) && t <= (p.sowMax ?? 30);
+          if (ok) { cls = 'sow'; title = `Semina in semenzaio al coperto (${t.toFixed(1)}°C)`; }
+          else    { cls = 'blocked'; title = `Semenzaio previsto ma temp. inadatta (${t.toFixed(1)}°C)`; }
+        } else if (p.plant.includes(m)) {
+          const ok = t >= (p.plantMin ?? 8) && t <= (p.plantMax ?? 32);
+          if (ok) { cls = 'plant'; title = `Trapianto in vaso (${t.toFixed(1)}°C)`; }
+          else    { cls = 'blocked'; title = `Trapianto previsto ma temp. inadatta (${t.toFixed(1)}°C)`; }
+        } else if (p.harvest.includes(m)) {
+          const ok = t >= (p.harvestMin ?? 0) && t <= (p.harvestMax ?? 40);
+          if (ok) { cls = 'harvest'; title = `Raccolta (${t.toFixed(1)}°C)`; }
+        }
       }
 
       tbody += `<td class="${cls}" title="${title}"></td>`;
