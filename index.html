@@ -2640,6 +2640,23 @@ function zoneTemp(zone, monthIdx, offsetC) {
 // ═══════════════════════════════════════════════════════
 // CALENDARIO — renderCalendar con logica termica
 // ═══════════════════════════════════════════════════════
+// Trova, tra i mesi di origine (semina o trapianto), quello più vicino
+// che precede il mese di raccolta indicato — con avvolgimento sull'anno.
+// Serve per collegare causalmente ogni raccolta alla sua semina/trapianto
+// di riferimento, invece di validarle in modo indipendente l'una dall'altra.
+function nearestOriginMonth(originMonths, harvestMonth, maxLookback = 8) {
+  if (!originMonths || !originMonths.length) return null;
+  let best = null, bestGap = Infinity;
+  originMonths.forEach(om => {
+    let gap = harvestMonth - om;
+    if (gap < 0) gap += 12; // avvolgimento sull'anno
+    if (gap >= 0 && gap <= maxLookback && gap < bestGap) {
+      bestGap = gap; best = om;
+    }
+  });
+  return best;
+}
+
 function renderCalendar() {
   const zone    = document.getElementById('climate-zone').value || 'sud';
   const offsetC = parseFloat(document.getElementById('climate-offset').value) || 0;
@@ -2685,6 +2702,13 @@ function renderCalendar() {
         <span style="font-size:.6rem;color:var(--muted);margin-left:3px;">${isDirect ? '⬇' : '↗'}</span>
       </td>`;
 
+    // Mesi di origine per il collegamento causale con la raccolta:
+    // per le piante a semina diretta è la semina stessa; per le altre
+    // è il trapianto (evento più prossimo alla raccolta), o la semina
+    // se non c'è un trapianto distinto in elenco.
+    const originMonths = isDirect ? p.sow : (p.plant.length ? p.plant : p.sow);
+    const originIsSow  = isDirect || !p.plant.length; // determina quali soglie usare
+
     for (let m = 1; m <= 12; m++) {
       const mi  = m - 1;
       const t   = zoneTemp(zone, mi, offsetC);
@@ -2699,7 +2723,19 @@ function renderCalendar() {
           else    { cls = 'blocked'; title = `Semina diretta prevista ma temp. inadatta (${t.toFixed(1)}°C)`; }
         } else if (p.harvest.includes(m)) {
           const ok = t >= (p.harvestMin ?? 0) && t <= (p.harvestMax ?? 40);
-          if (ok) { cls = 'harvest'; title = `Raccolta (${t.toFixed(1)}°C)`; }
+          if (ok) {
+            // Controllo causale: la raccolta è valida solo se esiste una
+            // semina di riferimento (nei mesi precedenti) a sua volta fattibile
+            const origin = nearestOriginMonth(originMonths, m);
+            if (origin != null) {
+              const tOrigin   = zoneTemp(zone, origin - 1, offsetC);
+              const originOk  = tOrigin >= (p.sowMin ?? 4) && tOrigin <= (p.sowMax ?? 30);
+              if (originOk) { cls = 'harvest'; title = `Raccolta (${t.toFixed(1)}°C)`; }
+              else { cls = 'blocked'; title = `Raccolta prevista ma la semina di riferimento (${M[origin-1]}) non è fattibile nella tua zona (${tOrigin.toFixed(1)}°C) — ciclo non completabile`; }
+            } else {
+              cls = 'harvest'; title = `Raccolta (${t.toFixed(1)}°C)`; // nessun'origine nota, non blocchiamo artificialmente
+            }
+          }
         }
       } else {
         // Pianta da semenzaio + trapianto
@@ -2713,7 +2749,21 @@ function renderCalendar() {
           else    { cls = 'blocked'; title = `Trapianto previsto ma temp. inadatta (${t.toFixed(1)}°C)`; }
         } else if (p.harvest.includes(m)) {
           const ok = t >= (p.harvestMin ?? 0) && t <= (p.harvestMax ?? 40);
-          if (ok) { cls = 'harvest'; title = `Raccolta (${t.toFixed(1)}°C)`; }
+          if (ok) {
+            // Controllo causale: la raccolta è valida solo se esiste un
+            // trapianto (o semina, se manca il trapianto) di riferimento fattibile
+            const origin = nearestOriginMonth(originMonths, m);
+            if (origin != null) {
+              const tOrigin  = zoneTemp(zone, origin - 1, offsetC);
+              const originOk = originIsSow
+                ? (tOrigin >= (p.sowMin ?? 4)   && tOrigin <= (p.sowMax ?? 30))
+                : (tOrigin >= (p.plantMin ?? 8) && tOrigin <= (p.plantMax ?? 32));
+              if (originOk) { cls = 'harvest'; title = `Raccolta (${t.toFixed(1)}°C)`; }
+              else { cls = 'blocked'; title = `Raccolta prevista ma il ${originIsSow?'semenzaio':'trapianto'} di riferimento (${M[origin-1]}) non è fattibile nella tua zona (${tOrigin.toFixed(1)}°C) — ciclo non completabile`; }
+            } else {
+              cls = 'harvest'; title = `Raccolta (${t.toFixed(1)}°C)`;
+            }
+          }
         }
       }
 
