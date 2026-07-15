@@ -289,6 +289,7 @@
   .piano-tab { background:var(--fog); border:1px solid var(--border); border-radius:7px; padding:7px 14px; font-family:'DM Sans',sans-serif; font-size:.82rem; font-weight:500; cursor:pointer; color:var(--muted); transition:all .15s; }
   .piano-tab.active { background:var(--moss); color:#fff; border-color:var(--moss); }
   .piano-tab:hover:not(.active) { background:var(--border); color:var(--soil); }
+  #plant-context-menu button:hover { background:var(--fog) !important; }
   .piano-panel { }
   .prof-label { font-size:.82rem; color:var(--muted); display:flex; flex-direction:column; gap:4px; }
   .prof-input { padding:8px 10px; border:1px solid var(--border); border-radius:7px; font-family:'DM Sans',sans-serif; font-size:.85rem; background:#fff; width:100%; }
@@ -380,6 +381,20 @@
 
 <!-- TOAST -->
 <div id="toast"></div>
+
+<!-- MENU CONTESTUALE PIANTA (long-press / click destro) -->
+<div id="plant-context-menu" style="display:none;position:fixed;z-index:400;background:#fff;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.25);padding:6px;min-width:170px;border:1px solid var(--border);">
+  <div id="ctx-menu-title" style="padding:8px 12px 6px;font-size:.85rem;font-weight:600;color:var(--soil);border-bottom:1px solid var(--border);margin-bottom:4px;"></div>
+  <button onclick="menuActionMove()" style="width:100%;text-align:left;background:none;border:none;padding:9px 12px;font-size:.85rem;font-family:'DM Sans',sans-serif;color:var(--text);cursor:pointer;border-radius:7px;display:flex;align-items:center;gap:8px;">
+    🌿 Sposta
+  </button>
+  <button onclick="menuActionDelete()" style="width:100%;text-align:left;background:none;border:none;padding:9px 12px;font-size:.85rem;font-family:'DM Sans',sans-serif;color:var(--red);cursor:pointer;border-radius:7px;display:flex;align-items:center;gap:8px;">
+    🗑 Elimina
+  </button>
+  <button onclick="menuActionCancel()" style="width:100%;text-align:left;background:none;border:none;padding:9px 12px;font-size:.85rem;font-family:'DM Sans',sans-serif;color:var(--muted);cursor:pointer;border-radius:7px;display:flex;align-items:center;gap:8px;">
+    ✕ Annulla
+  </button>
+</div>
 
 <!-- MODAL UNIVERSALE (sostituisce confirm/prompt) -->
 <div id="dialog-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;">
@@ -528,12 +543,13 @@
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <label style="font-size:.83rem;color:var(--muted)">Larghezza:
-          <input type="number" id="bed-w-cm" value="200" min="50" max="2000" step="10" style="width:68px;padding:5px 7px;border:1px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;"> cm
+          <input type="number" id="bed-w-cm" value="200" min="15" max="2000" step="5" style="width:68px;padding:5px 7px;border:1px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;"> cm
         </label>
         <label style="font-size:.83rem;color:var(--muted)">Profondità:
-          <input type="number" id="bed-h-cm" value="120" min="50" max="2000" step="10" style="width:68px;padding:5px 7px;border:1px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;"> cm
+          <input type="number" id="bed-h-cm" value="120" min="15" max="2000" step="5" style="width:68px;padding:5px 7px;border:1px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;"> cm
         </label>
         <button class="btn btn-secondary" onclick="applyBedSize()">Applica</button>
+        <button class="btn btn-secondary" onclick="undoLastPlant()" title="Rimuovi l'ultima pianta piazzata">↩ Ultima</button>
         <button class="btn btn-danger"    onclick="openBedModal('clear')">Svuota</button>
       </div>
     </div>
@@ -560,18 +576,37 @@
 
       <!-- CANVAS SVG -->
       <div class="garden-canvas-wrap">
-        <div style="margin-bottom:8px;font-size:.78rem;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+        <div style="margin-bottom:8px;font-size:.78rem;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
           <span id="scale-info"></span>
+          <button id="snap-toggle-btn" onclick="toggleSnap()"
+            style="background:var(--moss);color:#fff;border:none;border-radius:6px;padding:5px 11px;font-size:.76rem;font-weight:500;cursor:pointer;">
+            🧲 Aggancio griglia: ON
+          </button>
           <span>
             <span style="display:inline-block;width:10px;height:10px;background:#d4e8d0;border:1px solid var(--moss);border-radius:2px;vertical-align:middle;"></span> buone consociate &nbsp;
             <span style="display:inline-block;width:10px;height:10px;background:rgba(192,57,43,.18);border:1px solid var(--red);border-radius:2px;vertical-align:middle;"></span> incompatibili
           </span>
         </div>
+
+        <!-- Barra azione: appare solo quando una pianta è selezionata per lo spostamento -->
+        <div id="selected-action-bar" style="display:none;align-items:center;gap:10px;background:#FEF3C7;border:2px solid #E8C547;border-radius:10px;padding:9px 14px;margin-bottom:10px;flex-wrap:wrap;">
+          <span id="selected-action-label" style="font-size:.85rem;font-weight:600;color:#6b4e00;flex:1;min-width:140px;"></span>
+          <button onclick="deleteMov()" style="background:var(--red);color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;">
+            🗑 Elimina
+          </button>
+          <button onclick="cancelMove()" style="background:#fff;color:#6b4e00;border:1.5px solid #E8C547;border-radius:7px;padding:8px 14px;font-size:.85rem;font-weight:500;cursor:pointer;">
+            ✕ Annulla
+          </button>
+        </div>
+
         <div class="garden-grid-container" id="svg-container" style="overflow:auto;border:2px solid var(--bark);border-radius:10px;background:#f0ebe0;min-height:200px;cursor:crosshair;">
           <svg id="garden-svg" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
         <div style="margin-top:8px;font-size:.78rem;color:var(--muted);line-height:1.6;">
-          💡 Seleziona una pianta a sinistra → clicca sulla tela per posizionarla nella posizione esatta. Clicca su una pianta già piazzata per rimuoverla. Ogni rettangolo è in scala reale (1 px = 1 cm).
+          💡 <strong>Piazza più piante uguali:</strong> seleziona una pianta a sinistra → resta selezionata, tocca la tela più volte per piazzarne tante di seguito (es. 20 cipolle).
+          <strong>Correggi l'ultima o una qualsiasi già piazzata:</strong> toccala direttamente — esce automaticamente dalla modalità inserimento e la seleziona per spostarla.
+          <strong>Menu Sposta/Elimina:</strong> tieni premuto (o clic destro) su una pianta piazzata.
+          Muovi il dito/cursore per vedere le coordinate esatte in cm.
         </div>
       </div>
     </div>
@@ -1133,6 +1168,12 @@ const PLANTS = [
     bad:[],
     notes:'Perenne. Aroma erbaceo e anisato, fondamentale nella cucina francese. Ottimo con pollo, pesce, aceto aromatico.' },
 
+  { id:'echinacea',  name:'Echinacea',        icon:'🌸', cat:'erbe',    color:'#e91e63', family:'Asteraceae',   size:2, spacing:35,  nord:true,  depth:'0.3', sun:'☀️ Pieno sole',  water:'💧 Media',        season:'estate',
+    sow:[3,4],      plant:[5,6],   harvest:[7,8,9],
+    good:['calendula','borragine','lavanda'],
+    bad:[],
+    notes:'Perenne, fiori viola-rosa vistosi. Le radici (dal 2°-3° anno) e i fiori si usano per tisane immunostimolanti. Attira molto le api.' },
+
   { id:'erbaCipollina', name:'Erba cipollina', icon:'🌱', cat:'erbe',   color:'#66bb6a', family:'Alliaceae',    size:1, spacing:20,  nord:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧 Media',        season:'primavera',
     sow:[3,4,8],    plant:[4,5],   harvest:[4,5,6,7,8,9,10],
     good:['carota','insalata','tomato','pomodoro'],
@@ -1163,6 +1204,12 @@ const PLANTS = [
     bad:['carota','tomato','zucchino','fagiolo','cetriolo','aglio'],
     notes:'Eccellente in autunno. Inibisce la crescita di molte piante: coltivarlo in zona isolata.' },
 
+  { id:'erbaLuigia', name:'Erba Luigia (Verbena odorosa)', icon:'🍋', cat:'erbe', color:'#aed581', family:'Verbenaceae', size:2, spacing:40, nord:true, depth:'0.3', sun:'☀️ Sole', water:'💧 Media', season:'estate',
+    sow:[4,5],      plant:[5,6],   harvest:[6,7,8,9],
+    good:['pomodoro','insalata'],
+    bad:[],
+    notes:'Arbusto perenne (in vaso al Nord va riparato d\'inverno). Foglie intensamente profumate di limone, ottime in tisane rilassanti dopo cena.' },
+
   { id:'fragola',    name:'Fragola',          icon:'🍓', cat:'frutti',  color:'#c0392b', family:'Rosaceae',     size:1, spacing:30,  nord:true,  depth:'0',   sun:'☀️ Sole',        water:'💧💧 Alta',       season:'primavera',
     sow:[],         plant:[3,4,9,10], harvest:[5,6,7],
     good:['aglio','spinacio','insalata','borragine'],
@@ -1187,6 +1234,12 @@ const PLANTS = [
     bad:['basilico'],
     notes:'Respinge insetti dannosi. Attira api e farfalle. Rustica al Nord.' },
 
+  { id:'liquirizia', name:'Liquirizia',       icon:'🌿', cat:'erbe',    color:'#6d4c41', family:'Fabaceae',     size:4, spacing:80,  nord:true,  depth:'5',   sun:'☀️ Sole',        water:'💧💧 Media',      season:'estate',
+    sow:[],         plant:[4,5],   harvest:[],
+    good:[],
+    bad:[],
+    notes:'⚠️ Pianta perenne molto particolare: serve un vaso MOLTO profondo (almeno 50cm) perché sviluppa radici lunghe e legnose. Le radici si raccolgono solo dopo 3-4 anni di crescita, in autunno. Si propaga da rizoma, non da seme. Impegnativa ma gratificante per chi ha spazio e pazienza.' },
+
   { id:'maggiorana', name:'Maggiorana',        icon:'🌿', cat:'erbe',    color:'#a5d6a7', family:'Lamiaceae',    size:1, spacing:25,  nord:true,  depth:'0.3', sun:'☀️ Pieno sole',  water:'💧 Bassa',        season:'estate',
     sow:[3,4],      plant:[5],     harvest:[6,7,8,9],
     good:['tomato','carota','pisello','zucca'],
@@ -1204,6 +1257,12 @@ const PLANTS = [
     good:['basilico','fagiolo','peperone','timo'],
     bad:['finocchio','patata'],
     notes:'Vuole molto caldo. Al Nord seminare in febbraio sotto copertura riscaldata.' },
+
+  { id:'malva',      name:'Malva',            icon:'🌸', cat:'erbe',    color:'#ce93d8', family:'Malvaceae',    size:2, spacing:35,  nord:true,  directSow:true, depth:'0.5', sun:'🌤 Parziale',    water:'💧 Media',        season:'primavera',
+    sow:[3,4,9],    plant:[],      harvest:[5,6,7,8,9],
+    good:['insalata','carota'],
+    bad:[],
+    notes:'Spontanea e facilissima, si semina direttamente. Fiori e foglie si usano per tisane emollienti (ottime per gola e digestione). Fiorisce a lungo, attira impollinatori.' },
 
   { id:'melissa',   name:'Melissa (erba limone)', icon:'🍃', cat:'erbe', color:'#c5e1a5', family:'Lamiaceae',  size:1, spacing:40,  nord:true,  depth:'0.3', sun:'🌤 Parziale',    water:'💧 Media',        season:'estate',
     sow:[3,4],      plant:[4,5],   harvest:[5,6,7,8,9],
@@ -1301,11 +1360,23 @@ const PLANTS = [
     bad:['barbabietola'],
     notes:'Non teme leggere gelate. Ottimo riempie-spazi. Al Nord resistente fino a fine novembre.' },
 
+  { id:'tarassaco',  name:'Tarassaco (Dente di leone)', icon:'🌼', cat:'erbe', color:'#f9a825', family:'Asteraceae', size:1, spacing:20, nord:true, directSow:true, depth:'0.5', sun:'☀️ Sole', water:'💧 Media', season:'primavera',
+    sow:[3,4,9],    plant:[],      harvest:[4,5,6,9,10],
+    good:['insalata','carota','cavolo'],
+    bad:[],
+    notes:'Spesso considerato erbaccia ma ottimo per tisane depurative da foglie e radice. Facilissimo, quasi infestante — tienilo in vaso separato. Le foglie giovani si mangiano anche in insalata.' },
+
   { id:'timo',       name:'Timo',             icon:'🌿', cat:'erbe',    color:'#7dbd8e', family:'Lamiaceae',    size:1, spacing:25,  nord:true,  depth:'0.3', sun:'☀️ Pieno sole',  water:'💧 Bassissima',   season:'tuttoanno',
     sow:[3,4],      plant:[5],     harvest:[0,1,2,3,4,5,6,7,8,9,10,11],
     good:['cavolo','melanzana','pomodoro','brassicacee'],
     bad:[],
     notes:'Perenne, molto rustico. Eccellente repellente per afidi e parassiti. Ottimo al Nord.' },
+
+  { id:'valerianaOff', name:'Valeriana officinale', icon:'🌿', cat:'erbe', color:'#b39ddb', family:'Caprifoliaceae', size:2, spacing:35, nord:true, depth:'0.5', sun:'🌤 Parziale', water:'💧💧 Media', season:'primavera',
+    sow:[3,4],      plant:[5,6],   harvest:[9,10],
+    good:[],
+    bad:[],
+    notes:'Da non confondere con la valerianella (insalatina) — questa è la pianta medicinale per tisane rilassanti/sonno, si usa la radice raccolta in autunno al 2° anno.' },
 
   { id:'valerianella', name:'Valerianella (Songino)', icon:'🥗', cat:'ortaggi', color:'#52be80', family:'Valerianaceae', size:1, spacing:10, nord:true,  directSow:true, depth:'0.5', sun:'🌤 Parziale', water:'💧 Media', season:'inverno',
     sow:[8,9,10],   plant:[],      harvest:[11,12,1,2,3],
@@ -1361,6 +1432,7 @@ let state = {
 };
 let selectedPlant = null;
 let movingPlant   = null; // pianta selezionata per spostamento
+let contextMenuTarget = null; // pianta target del menu contestuale (long-press / click destro)
 
 // ── Indicatore salvataggio ────────────────────────────
 let saveIndicatorTimer;
@@ -1644,21 +1716,44 @@ function renderPalette() {
     </div>`).join('');
 }
 
-function selectPlantFromPalette(pid) {
-  movingPlant = null; // annulla eventuale spostamento in corso
-  if (selectedPlant === pid) {
-    selectedPlant = null;
-    document.getElementById('palette-hint').classList.remove('visible');
-    document.getElementById('svg-container').style.cursor = 'crosshair';
+let pausedSelectedPlant = null; // ricorda la pianta in piazzamento quando viene interrotta da uno spostamento
+
+// Aggiorna hint, cursore e palette in base allo stato corrente di selectedPlant
+function updatePlacementUI() {
+  const hint = document.getElementById('palette-hint');
+  const container = document.getElementById('svg-container');
+  if (selectedPlant) {
+    const p = PLANTS.find(x => x.id === selectedPlant);
+    hint.innerHTML = `✅ <strong>${p?.icon} ${p?.name}</strong> (${p?.spacing}cm) — clicca sulla tela`;
+    hint.classList.add('visible');
+    container.style.cursor = 'cell';
   } else {
-    selectedPlant = pid;
-    const p = PLANTS.find(x => x.id === pid);
-    document.getElementById('palette-hint').innerHTML =
-      `✅ <strong>${p?.icon} ${p?.name}</strong> (${p?.spacing}cm) — clicca sulla tela`;
-    document.getElementById('palette-hint').classList.add('visible');
-    document.getElementById('svg-container').style.cursor = 'cell';
+    hint.classList.remove('visible');
+    container.style.cursor = 'crosshair';
   }
   renderPalette();
+}
+
+// Se il piazzamento era stato messo in pausa per gestire uno spostamento,
+// lo ripristina automaticamente appena lo spostamento è concluso —
+// così puoi continuare a mettere più piante uguali senza riselezionarle.
+function resumePlacementIfPaused() {
+  if (pausedSelectedPlant) {
+    selectedPlant = pausedSelectedPlant;
+    pausedSelectedPlant = null;
+  }
+  updatePlacementUI();
+}
+
+function selectPlantFromPalette(pid) {
+  movingPlant = null; // annulla eventuale spostamento in corso
+  pausedSelectedPlant = null; // scelta esplicita dell'utente: niente da ripristinare
+  if (selectedPlant === pid) {
+    selectedPlant = null;
+  } else {
+    selectedPlant = pid;
+  }
+  updatePlacementUI();
   renderPlanner();
 }
 
@@ -1669,12 +1764,28 @@ function selectPlantFromPalette(pid) {
 // ═══════════════════════════════════════════════════════
 
 // SCALE: il canvas viene scalato per adattarsi alla larghezza disponibile
-const PADDING = 20; // cm di margine attorno all'aiuola
+const PADDING = 24; // cm di margine attorno all'aiuola (spazio per righello)
+const GRID_STEP = 5; // cm — passo della griglia di riferimento e aggancio
+let snapEnabled = true; // aggancio alla griglia attivo di default
+
+function toggleSnap() {
+  snapEnabled = !snapEnabled;
+  const btn = document.getElementById('snap-toggle-btn');
+  if (btn) {
+    btn.textContent = snapEnabled ? '🧲 Aggancio griglia: ON' : '🧲 Aggancio griglia: OFF';
+    btn.style.background = snapEnabled ? 'var(--moss)' : 'var(--fog)';
+    btn.style.color = snapEnabled ? '#fff' : 'var(--text)';
+  }
+}
+
+function snapToGrid(val) {
+  return snapEnabled ? Math.round(val / GRID_STEP) * GRID_STEP : val;
+}
 
 function applyBedSize() {
   const bed = getActiveBed();
-  bed.wCm = Math.max(50, Math.min(2000, parseInt(document.getElementById('bed-w-cm').value) || 200));
-  bed.hCm = Math.max(50, Math.min(2000, parseInt(document.getElementById('bed-h-cm').value) || 120));
+  bed.wCm = Math.max(15, Math.min(2000, parseInt(document.getElementById('bed-w-cm').value) || 200));
+  bed.hCm = Math.max(15, Math.min(2000, parseInt(document.getElementById('bed-h-cm').value) || 120));
   saveState();
   renderPlanner();
 }
@@ -1690,9 +1801,14 @@ function renderPlanner() {
 
   const container = document.getElementById('svg-container');
   const availW    = Math.max(300, container.clientWidth - 20);
+  const availH    = Math.max(280, window.innerHeight * 0.55); // limite altezza ragionevole
   const svgW_cm   = bed.wCm + PADDING * 2;
   const svgH_cm   = bed.hCm + PADDING * 2;
-  const scale     = Math.min(1, availW / svgW_cm);
+  // Scala adattiva: ingrandisce aiuole piccole, rimpicciolisce quelle grandi.
+  // Riempie sempre lo spazio disponibile (sia larghezza che altezza), con un tetto massimo di 6px/cm.
+  const scaleW    = availW / svgW_cm;
+  const scaleH    = availH / svgH_cm;
+  const scale     = Math.min(6, Math.max(0.15, Math.min(scaleW, scaleH)));
   const svgW_px   = svgW_cm * scale;
   const svgH_px   = svgH_cm * scale;
 
@@ -1709,26 +1825,54 @@ function renderPlanner() {
   // ── Sfondo
   svg.appendChild(svgEl('rect', { x:0, y:0, width:svgW_cm, height:svgH_cm, fill:'#f0ebe0' }));
 
-  // ── Griglia ogni 25cm
-  for (let x = 0; x <= bed.wCm; x += 25) {
+  // ── Griglia di aggancio (snap) sottile ogni GRID_STEP cm — solo linee, no numeri
+  for (let x = GRID_STEP; x < bed.wCm; x += GRID_STEP) {
+    if (x % 10 === 0) continue; // le tacche da 10cm sono disegnate a parte, più marcate
     svg.appendChild(svgEl('line', {
       x1:PADDING+x, y1:PADDING, x2:PADDING+x, y2:PADDING+bed.hCm,
-      stroke:'#cfc7b5', 'stroke-width':0.4,
-      'stroke-dasharray': x % 100 === 0 ? '' : '3,3'
+      stroke:'#dcd5c5', 'stroke-width':0.25, 'stroke-dasharray':'1,3'
     }));
-    if (x > 0 && x < bed.wCm) {
-      const t = svgEl('text', { x:PADDING+x, y:PADDING-3, 'text-anchor':'middle', 'font-size':6, fill:'#b0a898', 'font-family':'DM Sans,sans-serif' });
-      t.textContent = x+'cm'; svg.appendChild(t);
-    }
   }
-  for (let y = 0; y <= bed.hCm; y += 25) {
+  for (let y = GRID_STEP; y < bed.hCm; y += GRID_STEP) {
+    if (y % 10 === 0) continue;
     svg.appendChild(svgEl('line', {
       x1:PADDING, y1:PADDING+y, x2:PADDING+bed.wCm, y2:PADDING+y,
-      stroke:'#cfc7b5', 'stroke-width':0.4,
-      'stroke-dasharray': y % 100 === 0 ? '' : '3,3'
+      stroke:'#dcd5c5', 'stroke-width':0.25, 'stroke-dasharray':'1,3'
     }));
-    if (y > 0 && y < bed.hCm) {
-      const t = svgEl('text', { x:PADDING-3, y:PADDING+y+2, 'text-anchor':'end', 'font-size':6, fill:'#b0a898', 'font-family':'DM Sans,sans-serif' });
+  }
+
+  // ── Righello stile design tool: tacche ogni 10cm, marcate ogni 50cm con numero
+  for (let x = 0; x <= bed.wCm; x += 10) {
+    const isMajor = x % 50 === 0;
+    svg.appendChild(svgEl('line', {
+      x1:PADDING+x, y1:PADDING, x2:PADDING+x, y2:PADDING+bed.hCm,
+      stroke: isMajor ? '#a89a80' : '#cfc7b5',
+      'stroke-width': isMajor ? 0.6 : 0.35
+    }));
+    // Tacca sul bordo superiore (stile righello)
+    svg.appendChild(svgEl('line', {
+      x1:PADDING+x, y1:PADDING-(isMajor?7:4), x2:PADDING+x, y2:PADDING,
+      stroke:'#6B4C2A', 'stroke-width': isMajor ? 0.7 : 0.4
+    }));
+    if (isMajor) {
+      const t = svgEl('text', { x:PADDING+x, y:PADDING-9, 'text-anchor':'middle', 'font-size':7, fill:'#5C3D1E', 'font-family':'DM Sans,sans-serif', 'font-weight':'600' });
+      t.textContent = x; svg.appendChild(t);
+    }
+  }
+  for (let y = 0; y <= bed.hCm; y += 10) {
+    const isMajor = y % 50 === 0;
+    svg.appendChild(svgEl('line', {
+      x1:PADDING, y1:PADDING+y, x2:PADDING+bed.wCm, y2:PADDING+y,
+      stroke: isMajor ? '#a89a80' : '#cfc7b5',
+      'stroke-width': isMajor ? 0.6 : 0.35
+    }));
+    // Tacca sul bordo sinistro
+    svg.appendChild(svgEl('line', {
+      x1:PADDING-(isMajor?7:4), y1:PADDING+y, x2:PADDING, y2:PADDING+y,
+      stroke:'#6B4C2A', 'stroke-width': isMajor ? 0.7 : 0.4
+    }));
+    if (isMajor) {
+      const t = svgEl('text', { x:PADDING-9, y:PADDING+y+2, 'text-anchor':'end', 'font-size':7, fill:'#5C3D1E', 'font-family':'DM Sans,sans-serif', 'font-weight':'600' });
       t.textContent = y; svg.appendChild(t);
     }
   }
@@ -1738,6 +1882,16 @@ function renderPlanner() {
     x:PADDING, y:PADDING, width:bed.wCm, height:bed.hCm,
     fill:'none', stroke:'#6B4C2A', 'stroke-width':2, rx:4
   }));
+
+  // ── Gruppo crosshair (aggiornato dinamicamente da onSVGMove) — vuoto all'inizio
+  const crosshair = svgEl('g', { id:'crosshair-group', style:'pointer-events:none;display:none;' });
+  crosshair.appendChild(svgEl('line', { id:'crosshair-v', stroke:'#2D5A27', 'stroke-width':0.4, 'stroke-dasharray':'2,2' }));
+  crosshair.appendChild(svgEl('line', { id:'crosshair-h', stroke:'#2D5A27', 'stroke-width':0.4, 'stroke-dasharray':'2,2' }));
+  const coordBg = svgEl('rect', { id:'crosshair-bg', fill:'#2D5A27', rx:3 });
+  const coordTxt = svgEl('text', { id:'crosshair-txt', 'font-size':6.5, fill:'#fff', 'font-family':'DM Sans,sans-serif', 'font-weight':'600', 'text-anchor':'middle' });
+  crosshair.appendChild(coordBg);
+  crosshair.appendChild(coordTxt);
+  svg.appendChild(crosshair);
 
   // ── Piante
   (bed.plants).forEach(item => {
@@ -1773,10 +1927,26 @@ function renderPlanner() {
                                    : p.color + '28';
     const strokeW    = isMoving ? 3 : 2;
 
-    const g = svgEl('g', { style:'cursor:pointer' });
+    const g = svgEl('g', { style:'cursor:pointer', 'data-plant-id': item.id });
+
+    // Area di tocco invisibile più grande del cerchio visivo, per facilitare il tap
+    // su schermi touch (soprattutto per piante piccole come carota, cipolla, ravanello).
+    // Il raggio minimo garantito è 14px/scala, MA non deve mai superare la metà della
+    // distanza dalla pianta più vicina, altrimenti le zone di tocco si sovrappongono
+    // e solo l'ultima piazzata risulta selezionabile (bug con piante fitte come le cipolle).
+    const minHitR = 14 / scale;
+    let nearestDist = Infinity;
+    bed.plants.forEach(other => {
+      if (other.id === item.id) return;
+      const d = Math.hypot(item.cx - other.cx, item.cy - other.cy);
+      if (d < nearestDist) nearestDist = d;
+    });
+    const maxHitR = nearestDist === Infinity ? minHitR : Math.max(r, nearestDist / 2 - 0.5);
+    const hitR    = Math.max(r, Math.min(minHitR, maxHitR));
+    g.appendChild(svgEl('circle', { cx, cy, r:hitR, fill:'transparent', stroke:'none', 'pointer-events':'all' }));
 
     // Cerchio principale
-    g.appendChild(svgEl('circle', { cx, cy, r, fill:fillColor, stroke:ringColor, 'stroke-width':strokeW }));
+    g.appendChild(svgEl('circle', { cx, cy, r, fill:fillColor, stroke:ringColor, 'stroke-width':strokeW, style:'pointer-events:none' }));
 
     // Icona centrata
     const iconSize = Math.max(7, Math.min(r * 0.85, 22));
@@ -1811,31 +1981,18 @@ function renderPlanner() {
       g.appendChild(badge);
     }
 
-    // ── Gestione click: se ho una pianta selezionata dalla palette → ignora (il click
-    //    sul svg la piazzerà); altrimenti → entra in modalità spostamento
-    g.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (selectedPlant) return; // modalità piazzamento: ignora
-      if (movingPlant && movingPlant.id === item.id) {
-        // Secondo click sulla stessa pianta → cancella selezione spostamento
-        movingPlant = null;
-        renderPlanner();
-        return;
-      }
-      // Seleziona per spostamento
-      movingPlant = { ...item };
-      renderPlanner();
-    });
-
     svg.appendChild(g);
   });
 
-  // ── Tooltip di stato
-  const hint = document.getElementById('palette-hint');
+  // ── Barra azione pianta selezionata (posizione chiara sopra la tela)
+  const actionBar = document.getElementById('selected-action-bar');
   if (movingPlant) {
     const mp = PLANTS.find(x => x.id === movingPlant.pid);
-    hint.innerHTML = `🟡 <strong>${mp?.icon} ${mp?.name}</strong> selezionata — clicca dove spostarla o <button onclick="deleteMov()" style="font-size:.78rem;padding:2px 8px;background:var(--red);color:#fff;border:none;border-radius:4px;cursor:pointer;margin-left:6px">🗑 Elimina</button>`;
-    hint.classList.add('visible');
+    document.getElementById('selected-action-label').innerHTML =
+      `🟡 <strong>${mp?.icon || ''} ${mp?.name || ''}</strong> selezionata — tocca la tela per spostarla`;
+    actionBar.style.display = 'flex';
+  } else {
+    actionBar.style.display = 'none';
   }
 
   // ── Click sulla tela: piazza o sposta
@@ -1849,15 +2006,236 @@ function renderPlanner() {
 }
 
 // ── Handler click tela — assegnato UNA sola volta dopo il DOM ready
-function onSVGClick(e) {
+// ── Handler movimento cursore/dito — mostra crosshair con coordinate live
+function onSVGMove(e) {
+  const svg     = document.getElementById('garden-svg');
+  const bed     = getActiveBed();
+  const svgW_cm = parseFloat(svg.dataset.svgWcm) || (bed.wCm + PADDING*2);
+  const svgH_cm = parseFloat(svg.dataset.svgHcm) || (bed.hCm + PADDING*2);
+
+  const point = e.touches ? e.touches[0] : e;
+  const rect  = svg.getBoundingClientRect();
+  let cmX = (point.clientX - rect.left) / rect.width  * svgW_cm - PADDING;
+  let cmY = (point.clientY - rect.top)  / rect.height * svgH_cm - PADDING;
+
+  // Fuori dall'aiuola → nascondi crosshair
+  if (cmX < 0 || cmY < 0 || cmX > bed.wCm || cmY > bed.hCm) {
+    const g = document.getElementById('crosshair-group');
+    if (g) g.style.display = 'none';
+    return;
+  }
+
+  // Applica snap se attivo, per mostrare dove il click andrebbe ad agganciarsi
+  const showX = snapToGrid(cmX);
+  const showY = snapToGrid(cmY);
+
+  const g  = document.getElementById('crosshair-group');
+  const v  = document.getElementById('crosshair-v');
+  const h  = document.getElementById('crosshair-h');
+  const bg = document.getElementById('crosshair-bg');
+  const tx = document.getElementById('crosshair-txt');
+  if (!g) return;
+  g.style.display = 'block';
+
+  const px = PADDING + showX, py = PADDING + showY;
+  v.setAttribute('x1', px); v.setAttribute('x2', px);
+  v.setAttribute('y1', PADDING); v.setAttribute('y2', PADDING + bed.hCm);
+  h.setAttribute('y1', py); h.setAttribute('y2', py);
+  h.setAttribute('x1', PADDING); h.setAttribute('x2', PADDING + bed.wCm);
+
+  const label = `${Math.round(showX)}, ${Math.round(showY)} cm`;
+  tx.textContent = label;
+  const labelW = label.length * 3.6 + 6;
+  // Posiziona l'etichetta vicino al punto, ma dentro i bordi della tela
+  let lx = px + 6, ly = py - 6;
+  if (lx + labelW > PADDING + bed.wCm) lx = px - labelW - 6;
+  if (ly < PADDING + 8) ly = py + 12;
+  bg.setAttribute('x', lx); bg.setAttribute('y', ly - 6);
+  bg.setAttribute('width', labelW); bg.setAttribute('height', 9);
+  tx.setAttribute('x', lx + labelW/2); tx.setAttribute('y', ly);
+}
+
+function onSVGLeave() {
+  const g = document.getElementById('crosshair-group');
+  if (g) g.style.display = 'none';
+}
+
+// ── Handler interazione piante: tap normale, long-press, click destro ─────
+// - Tap breve su pianta esistente → seleziona per spostamento (comportamento rapido)
+// - Long-press (600ms) su pianta → apre menu contestuale Sposta/Elimina/Annulla
+// - Click destro (desktop) → stesso menu contestuale, blocca il menu nativo browser
+// - Tap sulla tela vuota → piazza pianta selezionata o sposta quella in movimento
+let pointerStart   = null;  // {x, y, time, targetId}
+let longPressTimer = null;
+let longPressFired = false;
+const TAP_MOVE_THRESHOLD  = 10;  // px — oltre questo è uno scroll, non un tap
+const TAP_TIME_THRESHOLD  = 600; // ms — oltre questo (senza long-press) è ignorato
+const LONG_PRESS_DELAY    = 550; // ms — soglia per attivare il menu contestuale
+
+function onSVGPointerDown(e) {
+  const point = e.touches ? e.touches[0] : e;
+  const targetG = e.target.closest ? e.target.closest('[data-plant-id]') : null;
+  pointerStart = { x: point.clientX, y: point.clientY, time: Date.now(), targetId: targetG?.dataset.plantId || null };
+  longPressFired = false;
+
+  if (targetG) {
+    clearTimeout(longPressTimer);
+    longPressTimer = setTimeout(() => {
+      longPressFired = true;
+      openPlantMenu(targetG.dataset.plantId, point.clientX, point.clientY);
+    }, LONG_PRESS_DELAY);
+  }
+}
+
+function onSVGPointerMove(e) {
+  // Se il dito si muove troppo durante la pressione, annulla il long-press (probabile scroll)
+  if (!pointerStart || longPressFired) return;
+  const point = e.touches ? e.touches[0] : e;
+  const dist = Math.hypot(point.clientX - pointerStart.x, point.clientY - pointerStart.y);
+  if (dist > TAP_MOVE_THRESHOLD) clearTimeout(longPressTimer);
+}
+
+function onSVGPointerUp(e) {
+  clearTimeout(longPressTimer);
+  if (!pointerStart) return;
+  const wasLongPress = longPressFired;
+  const point = e.changedTouches ? e.changedTouches[0] : e;
+  const dx = point.clientX - pointerStart.x;
+  const dy = point.clientY - pointerStart.y;
+  const dist = Math.hypot(dx, dy);
+  const dt   = Date.now() - pointerStart.time;
+  pointerStart = null;
+  longPressFired = false;
+
+  if (wasLongPress) return; // il long-press ha già aperto il menu, non fare altro
+
+  // Movimento troppo ampio → era uno scroll della tela, ignora come tap
+  if (dist > TAP_MOVE_THRESHOLD || dt > TAP_TIME_THRESHOLD) return;
+
+  const targetG = e.target.closest ? e.target.closest('[data-plant-id]') : null;
+  if (targetG) {
+    handlePlantTap(targetG.dataset.plantId);
+  } else {
+    handleCanvasTap(point);
+  }
+}
+
+// Click destro (desktop) → apre lo stesso menu contestuale, blocca il menu nativo
+function onSVGContextMenu(e) {
+  const targetG = e.target.closest ? e.target.closest('[data-plant-id]') : null;
+  if (targetG) {
+    e.preventDefault();
+    openPlantMenu(targetG.dataset.plantId, e.clientX, e.clientY);
+  }
+}
+
+// ── Menu contestuale Sposta/Elimina/Annulla ───────────────────────────
+function openPlantMenu(plantIdRaw, clientX, clientY) {
+  const plantId = parseFloat(plantIdRaw);
+  const bed = getActiveBed();
+  const item = bed.plants.find(x => x.id === plantId);
+  if (!item) return;
+  const p = PLANTS.find(x => x.id === item.pid);
+
+  contextMenuTarget = { ...item };
+
+  const menu = document.getElementById('plant-context-menu');
+  document.getElementById('ctx-menu-title').innerHTML = `${p?.icon || ''} ${p?.name || ''}`;
+
+  // Posiziona il menu vicino al punto di tocco, ma dentro lo schermo
+  const menuW = 190, menuH = 150;
+  let left = clientX, top = clientY;
+  if (left + menuW > window.innerWidth)  left = window.innerWidth  - menuW - 10;
+  if (top  + menuH > window.innerHeight) top  = window.innerHeight - menuH - 10;
+  menu.style.left = Math.max(10, left) + 'px';
+  menu.style.top  = Math.max(10, top)  + 'px';
+  menu.style.display = 'block';
+
+  // Chiudi il menu se si tocca fuori
+  setTimeout(() => document.addEventListener('pointerdown', closeMenuOnOutsideClick), 50);
+}
+
+function closeMenuOnOutsideClick(e) {
+  const menu = document.getElementById('plant-context-menu');
+  if (menu && !menu.contains(e.target)) closePlantMenu();
+}
+
+function closePlantMenu() {
+  document.getElementById('plant-context-menu').style.display = 'none';
+  document.removeEventListener('pointerdown', closeMenuOnOutsideClick);
+}
+
+function menuActionMove() {
+  if (!contextMenuTarget) return;
+  // Mette in pausa la modalità inserimento se attiva (invece di cancellarla)
+  if (selectedPlant) pausedSelectedPlant = selectedPlant;
+  selectedPlant = null;
+  updatePlacementUI();
+  movingPlant = { ...contextMenuTarget };
+  closePlantMenu();
+  renderPlanner();
+  toast('🟡 Tocca la tela dove vuoi spostarla');
+}
+
+function menuActionDelete() {
+  if (!contextMenuTarget) return;
+  const bed = getActiveBed();
+  const p = PLANTS.find(x => x.id === contextMenuTarget.pid);
+  bed.plants = bed.plants.filter(x => x.id !== contextMenuTarget.id);
+  closePlantMenu();
+  saveState();
+  resumePlacementIfPaused();
+  renderPlanner(); updatePlannerStats();
+  toast(`🗑 ${p?.icon || ''} ${p?.name || 'Pianta'} rimossa`);
+}
+
+function menuActionCancel() {
+  closePlantMenu();
+}
+
+function handlePlantTap(plantIdRaw) {
+  const plantId = parseFloat(plantIdRaw);
+  const bed = getActiveBed();
+  const item = bed.plants.find(x => x.id === plantId);
+  if (!item) return;
+
+  if (selectedPlant) {
+    // Toccare una pianta già piazzata mentre sei in modalità inserimento
+    // METTE IN PAUSA quella modalità (non la cancella) e seleziona la pianta
+    // toccata per spostamento. Appena finisci lo spostamento, la modalità
+    // di piazzamento riprende automaticamente da dove l'avevi lasciata.
+    pausedSelectedPlant = selectedPlant;
+    selectedPlant = null;
+    updatePlacementUI();
+    movingPlant = { ...item };
+    renderPlanner();
+    return;
+  }
+
+  if (movingPlant && movingPlant.id === item.id) {
+    // Secondo tap sulla stessa pianta → annulla selezione spostamento
+    movingPlant = null;
+    resumePlacementIfPaused();
+    renderPlanner();
+    return;
+  }
+  // Tap rapido: seleziona subito per spostamento (scorciatoia, oltre al menu)
+  movingPlant = { ...item };
+  renderPlanner();
+}
+
+function handleCanvasTap(point) {
   const svg     = document.getElementById('garden-svg');
   const bed     = getActiveBed();
   const svgW_cm = parseFloat(svg.dataset.svgWcm) || (bed.wCm + PADDING*2);
   const svgH_cm = parseFloat(svg.dataset.svgHcm) || (bed.hCm + PADDING*2);
 
   const rect = svg.getBoundingClientRect();
-  const cmX  = (e.clientX - rect.left)  / rect.width  * svgW_cm - PADDING;
-  const cmY  = (e.clientY - rect.top)   / rect.height * svgH_cm - PADDING;
+  let cmX  = (point.clientX - rect.left)  / rect.width  * svgW_cm - PADDING;
+  let cmY  = (point.clientY - rect.top)   / rect.height * svgH_cm - PADDING;
+  // Aggancio alla griglia (snap) — arrotonda al multiplo di GRID_STEP più vicino
+  cmX = snapToGrid(cmX);
+  cmY = snapToGrid(cmY);
 
   if (movingPlant) {
     // MODALITÀ SPOSTAMENTO: riposiziona la pianta
@@ -1881,7 +2259,9 @@ function onSVGClick(e) {
     const idx = bed.plants.findIndex(x => x.id === movingPlant.id);
     if (idx >= 0) { bed.plants[idx].cx = cx; bed.plants[idx].cy = cy; }
     movingPlant = null;
-    saveState(); renderPlanner();
+    saveState();
+    resumePlacementIfPaused(); // riprende il piazzamento se era stato messo in pausa
+    renderPlanner();
     return;
   }
 
@@ -1913,8 +2293,31 @@ function deleteMov() {
   const bed = getActiveBed();
   bed.plants = bed.plants.filter(x => x.id !== movingPlant.id);
   movingPlant = null;
-  saveState(); renderPlanner(); updatePlannerStats();
+  saveState();
+  resumePlacementIfPaused();
+  renderPlanner(); updatePlannerStats();
   toast('🗑 Pianta rimossa');
+}
+
+// Annulla la selezione corrente senza spostare né eliminare nulla
+function cancelMove() {
+  movingPlant = null;
+  resumePlacementIfPaused();
+  renderPlanner();
+}
+
+// Rimuove l'ultima pianta piazzata nell'aiuola (utile quando è difficile
+// selezionare con precisione una pianta specifica in gruppi molto fitti,
+// come tante cipolle o carote vicine).
+function undoLastPlant() {
+  const bed = getActiveBed();
+  if (!bed.plants || !bed.plants.length) { toast('⚠️ Nessuna pianta da rimuovere'); return; }
+  const removed = bed.plants[bed.plants.length - 1];
+  const p = PLANTS.find(x => x.id === removed.pid);
+  bed.plants = bed.plants.slice(0, -1);
+  movingPlant = null;
+  saveState(); renderPlanner(); updatePlannerStats();
+  toast(`↩ Rimossa: ${p?.icon || ''} ${p?.name || removed.pid}`);
 }
 
 function renderSVGCompat() { renderPlanner(); }
@@ -2081,6 +2484,13 @@ const THRESHOLDS = {
   cimeDiRapa:   { sowMin: 8, sowMax:28, plantMin: 6, plantMax:28, harvestMin: 0, harvestMax:18 },
   cipollotto:   { sowMin: 5, sowMax:24, plantMin: 4, plantMax:24, harvestMin: 4, harvestMax:28 },
   cavoloRomano: { sowMin: 8, sowMax:28, plantMin: 5, plantMax:30, harvestMin: 2, harvestMax:20 },
+  // Erbe da tisana
+  tarassaco:    { sowMin: 5, sowMax:26, plantMin: 4, plantMax:26, harvestMin: 2, harvestMax:28 },
+  liquirizia:   { sowMin: 0, sowMax:20, plantMin:12, plantMax:28, harvestMin: 5, harvestMax:26 },
+  malva:        { sowMin: 8, sowMax:26, plantMin: 6, plantMax:26, harvestMin: 8, harvestMax:30 },
+  echinacea:    { sowMin:10, sowMax:26, plantMin: 8, plantMax:28, harvestMin:12, harvestMax:30 },
+  erbaLuigia:   { sowMin:14, sowMax:28, plantMin:12, plantMax:30, harvestMin:12, harvestMax:32 },
+  valerianaOff: { sowMin: 8, sowMax:24, plantMin: 6, plantMax:26, harvestMin: 4, harvestMax:24 },
 };
 
 // Applica le soglie al database piante
@@ -2276,6 +2686,13 @@ const PIANO_DATA = {
   cimeDiRapa:   { piantePer2:2, scalare:3,  conservabile:false, come:'Solo fresco — consumare entro 3 giorni dalla raccolta' },
   cipollotto:   { piantePer2:6, scalare:3,  conservabile:false, come:'Fresco o sottaceto; anche essiccato a rondelle' },
   cavoloRomano: { piantePer2:2, scalare:0,  conservabile:true,  come:'Surgelato a cimette sbollentate' },
+  // Erbe da tisana
+  tarassaco:    { piantePer2:2, scalare:0,  conservabile:true,  come:'Foglie e radice essiccate per tisane depurative' },
+  liquirizia:   { piantePer2:1, scalare:0,  conservabile:true,  come:'Radice essiccata (dopo 3-4 anni) per tisane e decotti' },
+  malva:        { piantePer2:1, scalare:0,  conservabile:true,  come:'Fiori e foglie essiccati per tisane emollienti' },
+  echinacea:    { piantePer2:1, scalare:0,  conservabile:true,  come:'Fiori e radice essiccati per tisane immunostimolanti' },
+  erbaLuigia:   { piantePer2:1, scalare:0,  conservabile:true,  come:'Foglie essiccate per tisane digestive al limone' },
+  valerianaOff: { piantePer2:1, scalare:0,  conservabile:true,  come:'Radice essiccata (raccolta al 2° anno) per tisane rilassanti' },
   nasturzio:    { piantePer2:2, scalare:0,  conservabile:true,  come:'Capperi di nasturzio (boccioli sottaceto) — prelibatezza!' },
   calendula:    { piantePer2:2, scalare:0,  conservabile:true,  come:'Petali essiccati per tisane, colorante naturale' },
 };
@@ -2284,15 +2701,18 @@ const PIANO_DATA = {
 const FAMIGLIE = {
   Solanaceae:    ['tomato','peperone','melanzana','patata'],
   Cucurbitaceae: ['zucchino','zucca','cetriolo'],
-  Fabaceae:      ['fagiolo','fagiolinoRamp','pisello','fava'],
-  Brassicaceae:  ['cavolo','cavolfiore','cavoloBrux','rucola','ravanello'],
-  Asteraceae:    ['insalata','carciofo','cardo','indivia','calendula'],
-  Alliaceae:     ['aglio','cipolla','porroInv'],
+  Fabaceae:      ['fagiolo','fagiolinoRamp','pisello','fava','liquirizia'],
+  Brassicaceae:  ['cavolo','cavolfiore','cavoloBrux','rucola','ravanello','cavoloNero','cimeDiRapa','cavoloRomano'],
+  Asteraceae:    ['insalata','carciofo','cardo','indivia','calendula','echinacea','tarassaco'],
+  Alliaceae:     ['aglio','cipolla','porroInv','cipollotto'],
   Apiaceae:      ['carota','sedano','prezzemolo','aneto'],
   Amaranthaceae: ['spinacio','bietola','barbabietola'],
-  Lamiaceae:     ['basilico','rosmarino','salvia','timo','menta'],
+  Lamiaceae:     ['basilico','rosmarino','salvia','timo','menta','origano','maggiorana','melissa'],
   Rosaceae:      ['fragola'],
   Tropaeolaceae: ['nasturzio'],
+  Malvaceae:     ['malva'],
+  Verbenaceae:   ['erbaLuigia'],
+  Caprifoliaceae:['valerianaOff'],
 };
 function famigliaDi(pid) {
   return Object.entries(FAMIGLIE).find(([f,ids]) => ids.includes(pid))?.[0] || 'Altro';
@@ -2634,22 +3054,24 @@ function renderRaccolti() {
 const GUIDE_CONSERVE = [
   { id:'surgela', tipo:'surgela', icon:'❄️', titolo:'Surgelazione',
     difficolta:1, stagione:['estate','autunno'],
-    piante:['zucchino','fagiolinoRamp','fagiolo','pisello','spinacio','bietola','mais','cavolfiore','cavoloBrux','peperone','melanzana'],
+    piante:['zucchino','fagiolinoRamp','fagiolo','pisello','spinacio','bietola','mais','cavolfiore','cavoloBrux','peperone','melanzana','cavoloNero','cavoloRomano','cimeDiRapa','asparago','sedano','porroInv','finocchio','cardo','indivia','rucola','borragine'],
     desc:'Ideale per chi inizia. Mantiene quasi tutti i nutrienti e il sapore. Funziona per la maggior parte degli ortaggi.',
     passi:[
       'Lava e taglia gli ortaggi nella forma che userai in cucina (rondelle, cimette, pezzi)',
-      'Sbollenta in acqua bollente salata: zucchine 2 min, fagiolini 3 min, piselli 1 min, cavolfiore 3 min',
+      'Sbollenta in acqua bollente salata: zucchine 2 min, fagiolini 3 min, piselli 1 min, cavolfiore 3 min, cavolo nero/cime di rapa 2 min, asparagi 2-3 min, finocchio 3 min, cardo 5 min (con succo di limone nell\'acqua per non annerire)',
+      'Foglie delicate (indivia, rucola, borragine): sbollenta solo 30-40 secondi, strizza bene — perfette poi per minestre, torte salate, ripieni (non per insalata cruda)',
       'Raffredda subito in acqua e ghiaccio per bloccare la cottura (passaggio fondamentale)',
       'Asciuga bene con un canovaccio pulito',
       'Stendi su un vassoio rivestito di carta forno e surgela per 2 ore (pre-congelamento)',
       'Trasferisci in sacchetti da freezer, rimuovi l\'aria, etichetta con nome e data',
-      'Si conserva fino a 12 mesi a -18°C'
+      'Sedano e porro si possono surgelare anche crudi a pezzetti, senza sbollentatura, solo per uso in soffritti e minestre',
+      'Si conserva fino a 12 mesi a -18°C (le foglie delicate meglio entro 3-4 mesi)'
     ],
-    durata:'6-12 mesi' },
+    durata:'3-12 mesi secondo l\'ortaggio' },
 
   { id:'sottoaceto', tipo:'sottoaceto', icon:'🥒', titolo:'Sottaceto',
     difficolta:2, stagione:['estate','autunno'],
-    piante:['cetriolo','barbabietola','nasturzio','cipolla','carota','fagiolinoRamp'],
+    piante:['cetriolo','barbabietola','nasturzio','cipolla','carota','fagiolinoRamp','cipollotto'],
     desc:'Perfetto per cetrioli, carote, cipolle e barbabietole. Aggiunge un sapore acidulo delizioso.',
     passi:[
       'Sterilizza i barattoli di vetro: lavali e mettili in forno a 100°C per 15 minuti',
@@ -2664,7 +3086,7 @@ const GUIDE_CONSERVE = [
 
   { id:'essiccazione', tipo:'essiccazione', icon:'☀️', titolo:'Essiccazione',
     difficolta:2, stagione:['estate'],
-    piante:['tomato','peperone','aglio','timo','rosmarino','salvia','menta','aneto','calendula','carota'],
+    piante:['tomato','peperone','aglio','timo','rosmarino','salvia','menta','aneto','calendula','carota','origano','maggiorana','erbaCipollina','coriandolo','dragoncello','lavanda'],
     desc:'Il metodo più antico e naturale. Concentra i sapori. Perfetto per pomodori, erbe aromatiche e peperoni.',
     passi:[
       'Taglia i pomodori a metà o a fette spesse 5mm; le erbe lasciale sui rametti',
@@ -2706,7 +3128,7 @@ const GUIDE_CONSERVE = [
 
   { id:'olio', tipo:'olio', icon:'🫒', titolo:'Sott\'olio',
     difficolta:2, stagione:['estate','autunno'],
-    piante:['melanzana','peperone','carciofo','tomato','zucchino'],
+    piante:['melanzana','peperone','carciofo','tomato','zucchino','cardo'],
     desc:'Per verdure grigliate o scottate. Aggiunge sapore e si usa direttamente come condimento.',
     passi:[
       'Griglia o cuoci le verdure fino a cottura completa',
@@ -2772,6 +3194,37 @@ const GUIDE_CONSERVE = [
       'Quando acidulo al tuo gusto, trasferisci in frigo — matura ancora lentamente'
     ],
     durata:'3-6 mesi in frigo' },
+
+  { id:'tisana', tipo:'tisana', icon:'🍵', titolo:'Essiccazione per tisane',
+    difficolta:1, stagione:['primavera','estate','autunno'],
+    piante:['camomilla','melissa','menta','tarassaco','malva','echinacea','erbaLuigia','valerianaOff','calendula','timo','salvia','rosmarino','liquirizia'],
+    desc:'Il metodo specifico per preparare le tue erbe officinali essiccate, pronte per l\'infusione. Diverso dall\'essiccazione da cucina: qui l\'obiettivo è preservare i principi attivi, non solo il sapore.',
+    passi:[
+      'Raccogli al mattino dopo la rugiada, in giornata secca e soleggiata — è quando gli oli essenziali sono più concentrati',
+      'Fiori (camomilla, malva, calendula, echinacea): raccogli appena sbocciati, staccando solo il capolino',
+      'Foglie (menta, melissa, erba luigia, tarassaco): raccogli prima della fioritura per il massimo aroma',
+      'Radici (tarassaco, valeriana, liquirizia, echinacea): si raccolgono in autunno, si lavano e si tagliano a pezzetti',
+      'Stendi in strato sottile su un canovaccio o rete, in luogo ombreggiato, arieggiato, mai al sole diretto (distrugge i principi attivi)',
+      'Essiccazione naturale: 1-2 settimane; in forno a 35-40°C con sportello aperto: 3-5 ore',
+      'Pronta quando si sbriciola facilmente al tatto senza piegarsi',
+      'Conserva in barattoli di vetro scuro o sacchetti di carta, mai plastica, al riparo dalla luce',
+      'Etichetta sempre con pianta e data raccolta — le tisane essiccate si usano meglio entro 1 anno'
+    ],
+    durata:'12 mesi in luogo buio e asciutto' },
+
+  { id:'fresco', tipo:'fresco', icon:'🥗', titolo:'Conservazione a fresco (insalate delicate)',
+    difficolta:1, stagione:['primavera','estate','autunno','inverno'],
+    piante:['insalata','valerianella'],
+    desc:'Alcune foglie sono troppo delicate per congelamento o essiccazione — perdono completamente struttura e diventano immangiabili crude. Per queste l\'unica vera "conservazione" è prolungare la freschezza in frigo il più possibile.',
+    passi:[
+      'Non lavare le foglie prima di riporle — l\'umidità in eccesso le fa marcire prima (lava solo al momento di mangiarle)',
+      'Avvolgi le foglie in un canovaccio di cotone o carta assorbente leggermente umida',
+      'Metti il tutto in un sacchetto o contenitore forato nel cassetto frigo dedicato a frutta/verdura',
+      'Tieni lontano da mele, banane e pomodori — producono etilene che accelera il deterioramento delle foglie',
+      'Controlla ogni 2-3 giorni e rimuovi subito le foglie che iniziano a scurire',
+      'Se hai un eccesso importante: puoi comunque sbollentare 30 secondi e surgelare per uso cotto (minestre, torte salate) — non sarà più adatta come insalata cruda ma eviti lo spreco'
+    ],
+    durata:'5-10 giorni in frigo (non congelabile per uso crudo)' },
 ];
 
 // Colori per tipo di conservazione
@@ -2785,6 +3238,8 @@ const CONSERVA_TIPO = {
   cantina:     { bg:'#4E342E', fg:'#FBE9E7', label:'🧄 Cantina/Trecce'  },
   marmellata:  { bg:'#880E4F', fg:'#FCE4EC', label:'🍓 Marmellata'       },
   fermentato:  { bg:'#1A237E', fg:'#E8EAF6', label:'🧫 Fermentazione'   },
+  tisana:      { bg:'#00695C', fg:'#E0F2F1', label:'🍵 Tisane'          },
+  fresco:      { bg:'#558B2F', fg:'#F1F8E9', label:'🥗 Fresco/Frigo'    },
 };
 
 const DIFF_LABEL = ['','⭐ Facile','⭐⭐ Medio','⭐⭐⭐ Avanzato'];
@@ -3654,7 +4109,13 @@ function updateSyncLabel(dateStr) {
   // Controlla se torniamo da un redirect OAuth pCloud con un token
   const cameFromOAuth = pcloudCheckOAuthReturn();
   document.getElementById('diary-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('garden-svg').addEventListener('click', onSVGClick);
+  document.getElementById('garden-svg').addEventListener('pointerdown', onSVGPointerDown);
+  document.getElementById('garden-svg').addEventListener('pointerup', onSVGPointerUp);
+  document.getElementById('garden-svg').addEventListener('pointermove', onSVGPointerMove);
+  document.getElementById('garden-svg').addEventListener('contextmenu', onSVGContextMenu);
+  document.getElementById('garden-svg').addEventListener('mousemove', onSVGMove);
+  document.getElementById('garden-svg').addEventListener('touchmove', onSVGMove, { passive:true });
+  document.getElementById('garden-svg').addEventListener('mouseleave', onSVGLeave);
   if (pcloudToken) {
     const btn = document.getElementById('pcloud-btn');
     if (btn) btn.style.color = 'rgba(168,196,154,.8)';
