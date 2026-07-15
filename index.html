@@ -2358,19 +2358,23 @@ function renderPlantsDB() {
     grid.innerHTML = '<div class="empty-state"><div class="e-icon">🔍</div><div>Nessuna pianta trovata</div></div>';
     return;
   }
-  grid.innerHTML = list.map(p => `
+  grid.innerHTML = list.map(p => {
+    const info = PLANT_INFO[p.id] || {};
+    return `
     <div class="plant-card" onclick="openPlantModal('${p.id}')">
       <div class="plant-icon">${p.icon}</div>
       <h3>${p.name}</h3>
       <div class="plant-family">${p.family}</div>
       <div class="tags">
         <span class="tag cat">${catLabel(p.cat)}</span>
-        <span class="tag" style="background:#e8f4fd;color:#2980b9" title="Occupa ${SIZE_LABEL[p.size]||'1×1'} celle">${SIZE_LABEL[p.size]||'1×1'}</span>
+        <span class="tag" style="background:#e8f4fd;color:#2980b9" title="Distanza tra piante">${p.spacing}cm</span>
+        ${info.support ? `<span class="tag" style="background:#fef3c7;color:#92400e" title="${info.support.tipo}">🧗 Tutore</span>` : ''}
         ${p.nord ? '<span class="tag" style="background:#eaf4e8;color:#27ae60">🏔 Nord ✓</span>' : '<span class="tag" style="background:#fef9e7;color:#e67e22">☀️ Sud/Centro</span>'}
         ${p.good.slice(0,1).map(g=>`<span class="tag good">✔ ${plantName(g)}</span>`).join('')}
         ${p.bad.slice(0,1).map(b=>`<span class="tag bad">✘ ${plantName(b)}</span>`).join('')}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function filterPlants() { renderPlantsDB(); }
@@ -2381,21 +2385,47 @@ function plantName(id) { const p = PLANTS.find(x => x.id === id); return p ? p.n
 function openPlantModal(id) {
   const p = PLANTS.find(x => x.id === id);
   if (!p) return;
+  const info = PLANT_INFO[id] || {};
   const M = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
   const monthList = (arr) => arr.length ? arr.map(m => M[((m-1)+12)%12]).join(', ') : '—';
   const seasonLabel = {primavera:'🌸 Primavera',estate:'☀️ Estate',autunno:'🍂 Autunno',inverno:'❄️ Inverno',tuttoanno:'🔄 Tutto l\'anno'}[p.season]||p.season||'—';
+
+  const heightHtml = info.heightCm
+    ? `${info.heightCm[0]}–${info.heightCm[1]} cm`
+    : '—';
+
+  const supportHtml = info.support
+    ? `🪵 <strong>${info.support.tipo}</strong>`
+    : '✅ Nessun supporto necessario';
+
+  const cov = info.coverage || {};
+  const coverageRows = [
+    cov.rete ? `<div class="modal-stat" style="margin-bottom:6px"><div class="label">🦟 Rete anti-insetti</div><div class="value" style="font-size:.85rem">${cov.rete}</div></div>` : '',
+    cov.serra ? `<div class="modal-stat" style="margin-bottom:6px"><div class="label">🏠 Serra/copertura invernale</div><div class="value" style="font-size:.85rem">${cov.serra}</div></div>` : '',
+    cov.ombra ? `<div class="modal-stat" style="margin-bottom:6px"><div class="label">☂️ Ombreggio estivo</div><div class="value" style="font-size:.85rem">${cov.ombra}</div></div>` : '',
+  ].filter(Boolean).join('');
+
   document.getElementById('modal-content').innerHTML = `
     <div class="modal-icon">${p.icon}</div>
     <h2>${p.name}</h2>
     <div style="font-size:.8rem;color:var(--muted);margin-bottom:14px;font-style:italic">${p.family}</div>
     <div class="modal-grid">
-      <div class="modal-stat"><div class="label">Spaziatura</div><div class="value">${p.spacing} cm</div></div>
-      <div class="modal-stat"><div class="label">Slot in griglia</div><div class="value">${SIZE_LABEL[p.size]||'1×1'} celle</div></div>
+      <div class="modal-stat"><div class="label">Distanza tra piante</div><div class="value">${p.spacing} cm</div></div>
+      <div class="modal-stat"><div class="label">Diametro vaso singolo</div><div class="value">≥ ${Math.max(18, p.spacing)} cm</div></div>
+      <div class="modal-stat"><div class="label">Altezza da adulta</div><div class="value">${heightHtml}</div></div>
       <div class="modal-stat"><div class="label">Sole</div><div class="value">${p.sun}</div></div>
       <div class="modal-stat"><div class="label">Irrigazione</div><div class="value">${p.water}</div></div>
       <div class="modal-stat"><div class="label">Stagione</div><div class="value">${seasonLabel}</div></div>
       <div class="modal-stat"><div class="label">Al Nord Italia</div><div class="value">${p.nord ? '🏔 Sì, coltivabile' : '⚠️ Difficile, preferisce Sud/Centro'}</div></div>
     </div>
+
+    <div class="modal-stat" style="margin:14px 0 8px;background:${info.support ? '#FEF3C7' : '#E8F5E9'};"><div class="label">🧗 Supporto / tutori</div><div class="value" style="font-size:.85rem">${supportHtml}${info.support?.note ? `<div style="font-size:.78rem;color:var(--muted);margin-top:4px;font-weight:400;">${info.support.note}</div>` : ''}</div></div>
+
+    ${coverageRows ? `<div style="margin-bottom:14px;">
+      <div style="font-size:.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">🛡 Coperture e protezioni</div>
+      ${coverageRows}
+    </div>` : ''}
+
     <div class="modal-stat" style="margin-bottom:8px"><div class="label">Profondità semina</div><div class="value">${p.depth} cm</div></div>
     <div class="modal-stat" style="margin-bottom:8px"><div class="label">Semina in semenzaio</div><div class="value">${monthList(p.sow)}</div></div>
     <div class="modal-stat" style="margin-bottom:8px"><div class="label">Trapianto / semina diretta</div><div class="value">${monthList(p.plant)}</div></div>
@@ -2413,8 +2443,76 @@ function openPlantModal(id) {
 function closePlantModal() { document.getElementById('plant-modal').classList.remove('open'); }
 
 // ═══════════════════════════════════════════════════════
-// CALENDARIO
+// INFO PRATICHE: altezza, supporti, coperture
+// heightCm: [min,max] altezza tipica da adulta in cm
+// support: null oppure {tipo, note} se serve tutore/rete/gabbia
+// coverage: { rete: nota rete anti-insetti, serra: 'consigliata'|'utile'|'non necessaria', ombra: nota ombreggio estivo }
 // ═══════════════════════════════════════════════════════
+const PLANT_INFO = {
+  aglio:        { heightCm:[40,60],  support:null, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  aneto:        { heightCm:[60,100], support:null, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  asparago:     { heightCm:[100,150],support:{tipo:'tutore leggero',note:'i turioni no, ma le felci estive alte beneficiano di un sostegno o rete laterale contro il vento'}, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  barbabietola: { heightCm:[25,35],  support:null, coverage:{ rete:'contro afidi', serra:'non necessaria', ombra:null } },
+  basilico:     { heightCm:[30,50],  support:null, coverage:{ rete:null, serra:'utile in autunno per prolungare la raccolta', ombra:'leggero ombreggio nelle ore più calde di luglio-agosto, utile non essenziale' } },
+  bietola:      { heightCm:[30,50],  support:null, coverage:{ rete:'contro afidi', serra:'utile in inverno', ombra:null } },
+  borragine:    { heightCm:[60,80],  support:null, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  calendula:    { heightCm:[30,50],  support:null, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  camomilla:    { heightCm:[30,50],  support:null, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  carciofo:     { heightCm:[100,150],support:null, coverage:{ rete:null, serra:'consigliata in zone con gelate intense', ombra:null } },
+  cardo:        { heightCm:[80,120], support:{tipo:'legatura leggera',note:'verso fine ciclo si legano le foglie per l\'imbianchimento (tecnica tradizionale)'}, coverage:{ rete:null, serra:'consigliata in autunno inoltrato', ombra:null } },
+  carota:       { heightCm:[25,35],  support:null, coverage:{ rete:'contro la mosca della carota (Psila rosae) — fondamentale', serra:'non necessaria', ombra:null } },
+  cavolfiore:   { heightCm:[40,60],  support:null, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'utile in inverno', ombra:null } },
+  cavoloBrux:   { heightCm:[60,90],  support:{tipo:'tutore leggero',note:'piante alte e cariche, un paletto laterale evita che si pieghino col vento'}, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'utile in inverno', ombra:null } },
+  cavolo:       { heightCm:[30,50],  support:null, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'utile in inverno', ombra:null } },
+  cavoloNero:   { heightCm:[60,120], support:{tipo:'tutore leggero',note:'nel secondo anno diventa alto e può necessitare un sostegno'}, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'non necessaria, resiste bene al freddo', ombra:null } },
+  cavoloRomano: { heightCm:[50,70],  support:null, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'utile in inverno', ombra:null } },
+  cetriolo:     { heightCm:[150,200],support:{tipo:'rete verticale o tutore alto',note:'da coltivare sempre su rete/traliccio verticale: risparmia spazio e frutti più dritti e puliti'}, coverage:{ rete:'anti-afidi e mosca bianca, soprattutto se in coltura protetta', serra:'utile per anticipare la semina', ombra:null } },
+  cimeDiRapa:   { heightCm:[20,30],  support:null, coverage:{ rete:'anti-insetti contro la cavolaia', serra:'non necessaria', ombra:null } },
+  cipolla:      { heightCm:[30,50],  support:null, coverage:{ rete:'contro la mosca della cipolla', serra:'non necessaria', ombra:null } },
+  cipollotto:   { heightCm:[25,35],  support:null, coverage:{ rete:'contro la mosca della cipolla', serra:'non necessaria', ombra:null } },
+  coriandolo:   { heightCm:[30,50],  support:null, coverage:{ rete:null, serra:'non necessaria', ombra:'in estate tende ad andare a seme rapidamente, un leggero ombreggio rallenta la fioritura' } },
+  dragoncello:  { heightCm:[40,60],  support:null, coverage:{ rete:null, serra:'consigliata in inverno (non ama il gelo intenso)', ombra:null } },
+  echinacea:    { heightCm:[50,80],  support:null, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  erbaCipollina:{ heightCm:[20,30],  support:null, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  erbaLuigia:   { heightCm:[100,150],support:{tipo:'tutore leggero se in vaso alto',note:'arbusto che può diventare alto; in vaso conviene potarla per contenerla a 60-80cm'}, coverage:{ rete:null, serra:'necessaria in inverno al Nord — non resiste a gelate forti', ombra:null } },
+  fagiolo:      { heightCm:[30,50],  support:null, coverage:{ rete:'contro afidi', serra:'non necessaria', ombra:null } },
+  fagiolinoRamp:{ heightCm:[200,300],support:{tipo:'pali/tutori alti 2-3m',note:'indispensabile: senza supporto la pianta non si arrampica e non produce bene. Struttura a tepee (pali incrociati) o rete verticale'}, coverage:{ rete:'contro afidi', serra:'non necessaria', ombra:null } },
+  fava:         { heightCm:[60,100], support:{tipo:'tutore leggero',note:'in zone ventose un filo di sostegno laterale evita che si pieghino'}, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  finocchio:    { heightCm:[30,50],  support:null, coverage:{ rete:null, serra:'utile in autunno inoltrato', ombra:null } },
+  fragola:      { heightCm:[15,25],  support:null, coverage:{ rete:'anti-uccelli quando iniziano a maturare i frutti — molto utile', serra:'utile per anticipare la produzione', ombra:null } },
+  indivia:      { heightCm:[20,30],  support:null, coverage:{ rete:null, serra:'utile in inverno', ombra:'in piena estate tende ad amareggiare, un leggero ombreggio migliora il sapore' } },
+  insalata:     { heightCm:[15,25],  support:null, coverage:{ rete:'anti-afidi', serra:'utile in inverno', ombra:'fondamentale in estate: senza ombra va rapidamente a seme e diventa amara' } },
+  lavanda:      { heightCm:[40,60],  support:null, coverage:{ rete:null, serra:'non necessaria, pianta rustica', ombra:null } },
+  liquirizia:   { heightCm:[100,150],support:{tipo:'tutore leggero',note:'pianta alta e cespugliosa da adulta, un sostegno centrale aiuta a mantenerla ordinata'}, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  maggiorana:   { heightCm:[20,30],  support:null, coverage:{ rete:null, serra:'consigliata in inverno (annuale al Nord, non resiste al gelo)', ombra:null } },
+  mais:         { heightCm:[150,250],support:{tipo:'nessuno, ma proteggere dal vento',note:'piantare a blocchi (non in fila unica) per resistere meglio al vento e favorire l\'impollinazione'}, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  malva:        { heightCm:[40,80],  support:null, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  melanzana:    { heightCm:[60,100], support:{tipo:'tutore leggero',note:'consigliato quando la pianta è carica di frutti, per evitare che si pieghi'}, coverage:{ rete:'anti-afidi e dorifora', serra:'utile per anticipare il trapianto', ombra:null } },
+  melissa:      { heightCm:[40,60],  support:null, coverage:{ rete:null, serra:'utile in inverno', ombra:null } },
+  menta:        { heightCm:[30,50],  support:null, coverage:{ rete:null, serra:'non necessaria, molto rustica', ombra:'gradisce un po\' d\'ombra nelle ore più calde, non tollera bene il sole a picco tutto il giorno' } },
+  nasturzio:    { heightCm:[20,30],  support:{tipo:'rete leggera (opzionale)',note:'le varietà rampicanti arrivano a 100-150cm se guidate su rete; le varietà nane restano basse senza bisogno di supporto'}, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  origano:      { heightCm:[20,40],  support:null, coverage:{ rete:null, serra:'non necessaria, molto rustico', ombra:null } },
+  patata:       { heightCm:[40,60],  support:null, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  peperone:     { heightCm:[40,80],  support:{tipo:'tutore leggero',note:'consigliato se la pianta è molto carica di frutti pesanti'}, coverage:{ rete:'anti-afidi e mosca bianca', serra:'utile per anticipare il trapianto', ombra:null } },
+  pisello:      { heightCm:[60,150], support:{tipo:'rete o rametti 100-150cm',note:'le varietà nane (60cm) reggono da sole, le rampicanti hanno bisogno di una rete o di rametti su cui arrampicarsi'}, coverage:{ rete:'contro afidi', serra:'non necessaria', ombra:null } },
+  tomato:       { heightCm:[100,200],support:{tipo:'tutore/gabbia alto 150-200cm',note:'indispensabile per quasi tutte le varietà (specialmente indeterminate): tutore singolo, gabbia o rete verticale'}, coverage:{ rete:'anti-afidi e mosca bianca, molto utile in coltura protetta', serra:'utile per anticipare trapianto e prolungare la raccolta', ombra:null } },
+  porroInv:     { heightCm:[40,60],  support:null, coverage:{ rete:'contro la mosca della cipolla', serra:'utile in inverno per proteggere dal gelo intenso', ombra:null } },
+  prezzemolo:   { heightCm:[20,30],  support:null, coverage:{ rete:null, serra:'utile in inverno', ombra:null } },
+  ravanello:    { heightCm:[15,20],  support:null, coverage:{ rete:'contro la mosca del cavolo (stessa famiglia)', serra:'non necessaria', ombra:null } },
+  rosmarino:    { heightCm:[50,100], support:null, coverage:{ rete:null, serra:'non necessaria, molto rustico', ombra:null } },
+  rucola:       { heightCm:[15,25],  support:null, coverage:{ rete:'anti-insetti contro l\'altica (piccoli fori nelle foglie)', serra:'utile in inverno', ombra:'in estate va rapidamente a seme, un leggero ombreggio la mantiene tenera più a lungo' } },
+  salvia:       { heightCm:[40,60],  support:null, coverage:{ rete:null, serra:'non necessaria, molto rustica', ombra:null } },
+  sedano:       { heightCm:[40,60],  support:{tipo:'legatura leggera (opzionale)',note:'legare le costole con carta o spago nelle ultime settimane migliora l\'imbianchimento'}, coverage:{ rete:null, serra:'utile in autunno inoltrato', ombra:null } },
+  spinacio:     { heightCm:[15,25],  support:null, coverage:{ rete:null, serra:'utile in inverno per prolungare la raccolta', ombra:'in primavera-estate tende ad andare a seme rapidamente col caldo, ombreggio utile' } },
+  tarassaco:    { heightCm:[15,25],  support:null, coverage:{ rete:null, serra:'non necessaria, molto rustico', ombra:null } },
+  timo:         { heightCm:[15,25],  support:null, coverage:{ rete:null, serra:'non necessaria, molto rustico', ombra:null } },
+  valerianaOff: { heightCm:[60,100], support:{tipo:'tutore leggero',note:'può appoggiarsi se cresce molto rigogliosa'}, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  valerianella: { heightCm:[10,15],  support:null, coverage:{ rete:null, serra:'utile in inverno, resiste bene anche sotto neve leggera', ombra:null } },
+  zucca:        { heightCm:[30,50],  support:{tipo:'rete/traliccio robusto (opzionale)',note:'normalmente striscia sul terreno occupando molto spazio; su rete robusta può arrampicarsi risparmiando spazio, ma i frutti pesanti vanno sostenuti con reticelle'}, coverage:{ rete:'anti-afidi e mosca bianca', serra:'non necessaria', ombra:null } },
+  zucchino:     { heightCm:[40,60],  support:null, coverage:{ rete:'anti-afidi e mosca bianca, utile soprattutto da giovane', serra:'utile per anticipare il trapianto', ombra:null } },
+};
+
+
 // ═══════════════════════════════════════════════════════
 // SOGLIE TERMICHE PER PIANTA (°C, medie mensili)
 // sowMin/sowMax   : semenzaio al coperto
