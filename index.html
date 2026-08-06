@@ -1031,7 +1031,7 @@
 // nord: true = coltivabile bene anche al Nord Italia
 const PLANTS = [
   { id:'aglio',      name:'Aglio',            icon:'🧄', cat:'ortaggi', color:'#d5dbdb', family:'Alliaceae',    size:1, spacing:10,  nord:true,  depth:'5',   sun:'☀️ Sole',        water:'💧 Bassa',        season:'inverno',
-    sow:[],         plant:[10,11,2,3], harvest:[6,7],
+    sow:[],         plant:[10,11,12,1,2,3], harvest:[6,7],
     good:['rosa','carota','tomato','fragola','insalata'],
     bad:['fagiolo','pisello','cavolo'],
     notes:'Piantare gli spicchi in autunno per raccolta estiva. Allontana molti parassiti. Ottimo al Nord.' },
@@ -1043,7 +1043,7 @@ const PLANTS = [
     notes:'Attira insetti utili (parassitoidi). Non consociare con carota o finocchio (ibridazione).' },
 
   { id:'asparago',   name:'Asparago',         icon:'🌾', cat:'ortaggi', color:'#27ae60', family:'Asparagaceae', size:4, spacing:40,  nord:true,  depth:'15',  sun:'☀️ Sole',        water:'💧 Media',        season:'primavera',
-    sow:[],         plant:[3,4],   harvest:[4,5,6],
+    sow:[],         plant:[3,4,10,11], harvest:[4,5,6],
     good:['tomato','basilico','prezzemolo','calendula','pomodoro'],
     bad:['cipolla','aglio','finocchio'],
     notes:'Perenne produttivo 15-20 anni. Non raccogliere il 1° anno. Eccellente al Nord.' },
@@ -1085,7 +1085,7 @@ const PLANTS = [
     notes:'Ottimo repellente per afidi. Migliora la crescita delle piante vicine. Rustica al Nord.' },
 
   { id:'carciofo',   name:'Carciofo',         icon:'🌿', cat:'ortaggi', color:'#5d8a3c', family:'Asteraceae',   size:6, spacing:100, nord:false, depth:'5',   sun:'☀️ Pieno sole',  water:'💧💧 Media',      season:'primavera',
-    sow:[],         plant:[3,4],   harvest:[4,5,6,10,11],
+    sow:[],         plant:[1,2,3,4], harvest:[4,5,6,10,11],
     good:['fagiolo','pisello','insalata'],
     bad:['aglio','cipolla'],
     notes:'Perenne. Al Nord soffre il gelo intenso: coprire la base con pacciame. Preferisce climi miti.' },
@@ -1126,6 +1126,12 @@ const PLANTS = [
     bad:['tomato','fragola','fagiolo'],
     notes:'Tipico toscano ma ottimo al Nord. Migliora dopo il gelo. Ideale per ribollita e minestre. Resistentissimo all\'inverno lombardo.' },
 
+  { id:'cavoloRosso', name:'Cavolo rosso',      icon:'🟣', cat:'ortaggi', color:'#6a1b4d', family:'Brassicaceae', size:4, spacing:50, nord:true, depth:'0.5', sun:'☀️ Sole',        water:'💧💧 Alta',       season:'autunno',
+    sow:[6,7],      plant:[8,9],   harvest:[10,11,12,1],
+    good:['insalata','rosmarino','sedano','cipolle','aneto'],
+    bad:['tomato','fragola','fagiolo','aglio'],
+    notes:'Simile al cavolo cappuccio ma testa viola-rossa, ricco di antociani. Ottimo crudo in insalata o per crauti rossi. Il colore si intensifica con il freddo autunnale.' },
+
   { id:'cavoloRomano', name:'Cavolo Romano/Romanesco', icon:'🥦', cat:'ortaggi', color:'#00695c', family:'Brassicaceae', size:4, spacing:50, nord:true, depth:'0.5', sun:'☀️ Sole', water:'💧💧 Alta', season:'autunno',
     sow:[6,7],      plant:[8,9],   harvest:[10,11,12],
     good:['insalata','sedano','aneto','cipolle'],
@@ -1145,7 +1151,7 @@ const PLANTS = [
     notes:'Coltura invernale rapida (60 giorni). Si mangia tutta la pianta. Perfetta per il balcone in autunno-inverno al Nord.' },
 
   { id:'cipolla',    name:'Cipolla',          icon:'🧅', cat:'ortaggi', color:'#c39bd3', family:'Alliaceae',    size:1, spacing:15,  nord:true,  depth:'2',   sun:'☀️ Sole',        water:'💧 Media',        season:'primavera',
-    sow:[1,2,3],    plant:[3,4],   harvest:[7,8],
+    sow:[1,2,3],    plant:[3,4,10,11], harvest:[6,7,8],
     good:['carota','insalata','tomato','camomilla'],
     bad:['fagiolo','pisello','aglio'],
     notes:'Smettere di irrigare quando i collari ingialliscono. Per la cipolla invernale (bianca) seminare in agosto.' },
@@ -1193,13 +1199,13 @@ const PLANTS = [
     notes:'Necessita di sostegno (rete, canne). Produzione abbondante e scalare. Ottimo al Nord.' },
 
   { id:'fava',       name:'Fava',             icon:'🫘', cat:'ortaggi', color:'#52be80', family:'Fabaceae',     size:1, spacing:25,  nord:true,  directSow:true,  depth:'5',   sun:'☀️ Sole',        water:'💧 Media',        season:'primavera',
-    sow:[10,11,2,3],plant:[],      harvest:[5,6,7],
+    sow:[10,11,12,2,3], plant:[], harvest:[4,5,6,7],
     good:['carota','spinacio','insalata','cavolo'],
     bad:['aglio','cipolla','finocchio'],
     notes:'Resistente al freddo. Si può seminare in ottobre (al Nord in febbraio). Fissa azoto nel suolo.' },
 
   { id:'finocchio',  name:'Finocchio',        icon:'🌿', cat:'ortaggi', color:'#b7d7a8', family:'Apiaceae',     size:2, spacing:30,  nord:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧💧 Alta',       season:'autunno',
-    sow:[6,7,8],    plant:[8,9],   harvest:[10,11,12],
+    sow:[6,7,8],    plant:[8,9,10], harvest:[10,11,12,1],
     good:['insalata','pomodoro','pisello'],
     bad:['carota','tomato','zucchino','fagiolo','cetriolo','aglio'],
     notes:'Eccellente in autunno. Inibisce la crescita di molte piante: coltivarlo in zona isolata.' },
@@ -1223,7 +1229,7 @@ const PLANTS = [
     notes:'Eccellente pianta autunno-invernale. Coprire con telo per imbianchire e ridurre l\'amaro.' },
 
   { id:'insalata',   name:'Lattuga',          icon:'🥗', cat:'ortaggi', color:'#a8d8a8', family:'Asteraceae',   size:1, spacing:25,  nord:true,  depth:'0.5', sun:'🌤 Parziale',    water:'💧💧 Alta',       season:'primavera',
-    sow:[2,3,8,9],  plant:[3,4,9,10], harvest:[4,5,6,10,11],
+    sow:[2,3,8,9,10,11], plant:[3,4,9,10,11], harvest:[4,5,6,10,11,12,1],
     good:['carota','ravanello','fragola','cavolo','cipolla'],
     bad:['sedano','prezzemolo'],
     notes:'Soffre il caldo estivo: fare semine scalari. Al Nord coltivabile quasi tutto l\'anno.' },
@@ -1289,7 +1295,7 @@ const PLANTS = [
     notes:'Pianta perenne molto rustica. Raccogliere prima della fioritura per aroma massimo. Essicca perfettamente. Ottimo al Nord.' },
 
   { id:'patata',     name:'Patata',           icon:'🥔', cat:'ortaggi', color:'#d4ac6e', family:'Solanaceae',   size:2, spacing:35,  nord:true,  depth:'10',  sun:'☀️ Sole',        water:'💧💧 Media',      season:'primavera',
-    sow:[],         plant:[3,4],   harvest:[7,8],
+    sow:[],         plant:[2,3,4], harvest:[6,7,8],
     good:['fagiolo','cavolo','mais','nasturzio'],
     bad:['tomato','zucchino','finocchio','melanzana'],
     notes:'Rincalzare a 20 cm. Evitare rotazione con solanacee. Molto adatta al Nord.' },
@@ -1313,7 +1319,7 @@ const PLANTS = [
     notes:'Legare i germogli. Rimuovere i succhioni. Teme i ristagni. Al Nord seminare in febbraio in semenzaio riscaldato.' },
 
   { id:'porroInv',   name:'Porro',            icon:'🧅', cat:'ortaggi', color:'#a8d8a8', family:'Alliaceae',    size:1, spacing:15,  nord:true,  depth:'2',   sun:'☀️ Sole',        water:'💧 Media',        season:'autunno',
-    sow:[1,2,3],    plant:[5,6],   harvest:[9,10,11,12,1,2],
+    sow:[1,2,3],    plant:[5,6,7], harvest:[9,10,11,12,1,2],
     good:['carota','sedano','insalata'],
     bad:['fagiolo','pisello'],
     notes:'Eccellente al Nord: regge gelate forti. Rincalzare per sbiancare il fusto. Ottimo in inverno.' },
@@ -1337,7 +1343,7 @@ const PLANTS = [
     notes:'Pianta perenne. Ama terreni ben drenati. Resiste al freddo invernale del Nord.' },
 
   { id:'rucola',     name:'Rucola',           icon:'🌿', cat:'ortaggi', color:'#3d9970', family:'Brassicaceae', size:1, spacing:15,  nord:true,  directSow:true,  depth:'0.5', sun:'🌤 Parziale',    water:'💧 Media',        season:'autunno',
-    sow:[3,4,8,9],  plant:[],      harvest:[4,5,9,10,11],
+    sow:[2,3,4,8,9,10,11,12], plant:[], harvest:[4,5,9,10,11,12,1],
     good:['insalata','spinacio','carota'],
     bad:['cavolo'],
     notes:'Coltivabile anche in vaso. In autunno-inverno al Nord in tunnel freddo. Raccogliere le foglie esterne.' },
@@ -1355,7 +1361,7 @@ const PLANTS = [
     notes:'Esige molta acqua e terreno ricco. Al Nord seminare al coperto a febbraio. Ottimo compagno del cavolo.' },
 
   { id:'spinacio',   name:'Spinacio',         icon:'🥬', cat:'ortaggi', color:'#196f3d', family:'Amaranthaceae', size:1, spacing:10, nord:true,  directSow:true,  depth:'2',   sun:'🌤 Parziale',    water:'💧💧 Media',      season:'autunno',
-    sow:[2,3,8,9],  plant:[],      harvest:[4,5,10,11],
+    sow:[2,3,8,9,10,11], plant:[], harvest:[4,5,10,11,12,1],
     good:['fragola','fagiolo','insalata','bietola'],
     bad:['barbabietola'],
     notes:'Non teme leggere gelate. Ottimo riempie-spazi. Al Nord resistente fino a fine novembre.' },
@@ -1379,7 +1385,7 @@ const PLANTS = [
     notes:'Da non confondere con la valerianella (insalatina) — questa è la pianta medicinale per tisane rilassanti/sonno, si usa la radice raccolta in autunno al 2° anno.' },
 
   { id:'valerianella', name:'Valerianella (Songino)', icon:'🥗', cat:'ortaggi', color:'#52be80', family:'Valerianaceae', size:1, spacing:10, nord:true,  directSow:true, depth:'0.5', sun:'🌤 Parziale', water:'💧 Media', season:'inverno',
-    sow:[8,9,10],   plant:[],      harvest:[11,12,1,2,3],
+    sow:[8,9,10,11,12,1], plant:[], harvest:[11,12,1,2,3],
     good:['spinacio','ravanello','insalata'],
     bad:[],
     notes:'Resistente al gelo: arriva a -15°C. Coltura invernale per eccellenza al Nord. Semina scalare ogni 2 settimane.' },
@@ -2464,6 +2470,7 @@ const PLANT_INFO = {
   cavolfiore:   { heightCm:[40,60],  support:null, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'utile in inverno', ombra:null } },
   cavoloBrux:   { heightCm:[60,90],  support:{tipo:'tutore leggero',note:'piante alte e cariche, un paletto laterale evita che si pieghino col vento'}, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'utile in inverno', ombra:null } },
   cavolo:       { heightCm:[30,50],  support:null, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'utile in inverno', ombra:null } },
+  cavoloRosso:  { heightCm:[30,50],  support:null, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'utile in inverno', ombra:null } },
   cavoloNero:   { heightCm:[60,120], support:{tipo:'tutore leggero',note:'nel secondo anno diventa alto e può necessitare un sostegno'}, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'non necessaria, resiste bene al freddo', ombra:null } },
   cavoloRomano: { heightCm:[50,70],  support:null, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'utile in inverno', ombra:null } },
   cetriolo:     { heightCm:[150,200],support:{tipo:'rete verticale o tutore alto',note:'da coltivare sempre su rete/traliccio verticale: risparmia spazio e frutti più dritti e puliti'}, coverage:{ rete:'anti-afidi e mosca bianca, soprattutto se in coltura protetta', serra:'utile per anticipare la semina', ombra:null } },
@@ -2532,6 +2539,7 @@ const THRESHOLDS = {
   fagiolo:      { sowMin:14, sowMax:30, plantMin:12, plantMax:32, harvestMin:14, harvestMax:34 },
   fagiolinoRamp:{ sowMin:14, sowMax:30, plantMin:12, plantMax:32, harvestMin:14, harvestMax:34 },
   cavolo:       { sowMin: 8, sowMax:28, plantMin: 5, plantMax:30, harvestMin:-2, harvestMax:20 },
+  cavoloRosso:  { sowMin: 8, sowMax:28, plantMin: 5, plantMax:30, harvestMin:-2, harvestMax:20 },
   cavolfiore:   { sowMin: 8, sowMax:28, plantMin: 7, plantMax:30, harvestMin: 2, harvestMax:20 },
   cavoloBrux:   { sowMin: 8, sowMax:28, plantMin: 7, plantMax:30, harvestMin:-4, harvestMax:18 },
   carciofo:     { sowMin:10, sowMax:26, plantMin: 8, plantMax:26, harvestMin: 8, harvestMax:28 },
@@ -2795,6 +2803,7 @@ const PIANO_DATA = {
   fagiolo:      { piantePer2:8, scalare:3,  conservabile:true,  come:'Surgelati o secchi (essicare in baccelli per 2 settimane)' },
   fagiolinoRamp:{ piantePer2:6, scalare:3,  conservabile:true,  come:'Surgelati sbollentati o sott\'olio' },
   cavolo:       { piantePer2:2, scalare:0,  conservabile:true,  come:'Crauti (fermentazione lattica), surgelato a foglie' },
+  cavoloRosso:  { piantePer2:2, scalare:0,  conservabile:true,  come:'Crauti rossi (fermentazione lattica), sottaceto, surgelato a foglie' },
   cavolfiore:   { piantePer2:2, scalare:0,  conservabile:true,  come:'Surgelato a cimette sbollentate' },
   cavoloBrux:   { piantePer2:2, scalare:0,  conservabile:true,  come:'Surgelato sbollentato — si conserva fino a 12 mesi' },
   carciofo:     { piantePer2:2, scalare:0,  conservabile:true,  come:'Sott\'olio, cuori surgelati' },
@@ -2842,6 +2851,10 @@ const PIANO_DATA = {
   erbaLuigia:   { piantePer2:1, scalare:0,  conservabile:true,  come:'Foglie essiccate per tisane digestive al limone' },
   valerianaOff: { piantePer2:1, scalare:0,  conservabile:true,  come:'Radice essiccata (raccolta al 2° anno) per tisane rilassanti' },
   nasturzio:    { piantePer2:2, scalare:0,  conservabile:true,  come:'Capperi di nasturzio (boccioli sottaceto) — prelibatezza!' },
+  borragine:    { piantePer2:1, scalare:0,  conservabile:true,  come:'Fiori congelati in cubetti di ghiaccio per decorazione, foglie sbollentate e surgelate' },
+  camomilla:    { piantePer2:1, scalare:0,  conservabile:true,  come:'Fiori essiccati per tisane — il classico infuso rilassante' },
+  coriandolo:   { piantePer2:1, scalare:2,  conservabile:true,  come:'Semi essiccati (coriandolo in grani), foglie surgelate in cubetti' },
+  lavanda:      { piantePer2:1, scalare:0,  conservabile:true,  come:'Fiori essiccati per sacchetti profumati e tisane rilassanti' },
   calendula:    { piantePer2:2, scalare:0,  conservabile:true,  come:'Petali essiccati per tisane, colorante naturale' },
 };
 
@@ -2850,7 +2863,7 @@ const FAMIGLIE = {
   Solanaceae:    ['tomato','peperone','melanzana','patata'],
   Cucurbitaceae: ['zucchino','zucca','cetriolo'],
   Fabaceae:      ['fagiolo','fagiolinoRamp','pisello','fava','liquirizia'],
-  Brassicaceae:  ['cavolo','cavolfiore','cavoloBrux','rucola','ravanello','cavoloNero','cimeDiRapa','cavoloRomano'],
+  Brassicaceae:  ['cavolo','cavolfiore','cavoloBrux','rucola','ravanello','cavoloNero','cimeDiRapa','cavoloRomano','cavoloRosso'],
   Asteraceae:    ['insalata','carciofo','cardo','indivia','calendula','echinacea','tarassaco'],
   Alliaceae:     ['aglio','cipolla','porroInv','cipollotto'],
   Apiaceae:      ['carota','sedano','prezzemolo','aneto'],
@@ -3202,7 +3215,7 @@ function renderRaccolti() {
 const GUIDE_CONSERVE = [
   { id:'surgela', tipo:'surgela', icon:'❄️', titolo:'Surgelazione',
     difficolta:1, stagione:['estate','autunno'],
-    piante:['zucchino','fagiolinoRamp','fagiolo','pisello','spinacio','bietola','mais','cavolfiore','cavoloBrux','peperone','melanzana','cavoloNero','cavoloRomano','cimeDiRapa','asparago','sedano','porroInv','finocchio','cardo','indivia','rucola','borragine'],
+    piante:['zucchino','fagiolinoRamp','fagiolo','pisello','spinacio','bietola','mais','cavolfiore','cavoloBrux','peperone','melanzana','cavoloNero','cavoloRomano','cavoloRosso','cimeDiRapa','asparago','sedano','porroInv','finocchio','cardo','indivia','rucola','borragine'],
     desc:'Ideale per chi inizia. Mantiene quasi tutti i nutrienti e il sapore. Funziona per la maggior parte degli ortaggi.',
     passi:[
       'Lava e taglia gli ortaggi nella forma che userai in cucina (rondelle, cimette, pezzi)',
@@ -3330,7 +3343,7 @@ const GUIDE_CONSERVE = [
 
   { id:'fermentazione', tipo:'fermentato', icon:'🫙', titolo:'Fermentazione lattica (crauti e kimchi)',
     difficolta:3, stagione:['autunno','inverno'],
-    piante:['cavolo','carota','barbabietola','ravanello'],
+    piante:['cavolo','cavoloRosso','carota','barbabietola','ravanello'],
     desc:'Il metodo più salutare — i batteri lattici sono probiotici naturali. Nessun calore, nessuna attrezzatura speciale.',
     passi:[
       'Taglia il cavolo a striscioline sottilissime con mandolina o coltello affilato',
