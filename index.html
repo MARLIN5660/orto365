@@ -10,24 +10,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Orto365 — Il tuo giardino bio digitale</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=Caveat:wght@500;600;700&family=DM+Sans:wght@300;400;500&display=swap');
 
   :root {
-    --soil:   #3B2A1A;
-    --bark:   #6B4C2A;
-    --moss:   #4A6741;
+    --soil:   #1B3D2A;
+    --bark:   #3F6B45;
+    --moss:   #4A7A43;
     --sage:   #7A9B6F;
-    --leaf:   #A8C49A;
+    --leaf:   #A8D9A0;
     --sun:    #E8C547;
-    --cream:  #F5F0E8;
-    --fog:    #EAE5DC;
+    --cream:  #F3F7EF;
+    --fog:    #E9F0E4;
     --red:    #C0392B;
-    --text:   #1E1A14;
-    --muted:  #7A7060;
+    --text:   #17241A;
+    --muted:  #5F7A5A;
     --card:   #FFFFFF;
-    --border: #D8D0C4;
+    --border: #D3E0CC;
     --radius: 10px;
-    --shadow: 0 2px 12px rgba(59,42,26,.10);
+    --shadow: 0 2px 12px rgba(27,61,42,.10);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -60,7 +60,7 @@
   #home-section.active { display: flex; }
   #home-section h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 6vw, 3.8rem); color: var(--leaf); line-height: 1.15; margin-bottom: 16px; }
   #home-section h1 em { font-style: italic; color: var(--sun); }
-  #home-section > p { color: rgba(255,255,255,.75); font-size: 1.05rem; max-width: 560px; line-height: 1.7; margin-bottom: 32px; }
+  #home-section > p { font-family: 'Caveat', cursive; font-weight: 600; color: var(--leaf); font-size: 1.5rem; max-width: 560px; line-height: 1.5; margin-bottom: 32px; }
   .home-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; max-width: 900px; }
   .home-card { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); border-radius: 14px; padding: 22px 20px; width: 190px; cursor: pointer; transition: all .2s; text-align: left; }
   .home-card:hover { background: rgba(255,255,255,.16); transform: translateY(-3px); }
@@ -71,7 +71,7 @@
   /* LAYOUT */
   .page-inner { max-width: 1100px; margin: 0 auto; padding: 28px 20px; }
   .page-title { font-family: 'Fraunces', serif; font-size: 1.7rem; color: var(--soil); margin-bottom: 4px; }
-  .page-sub { color: var(--muted); font-size: .88rem; margin-bottom: 24px; }
+  .page-sub { font-family: 'Caveat', cursive; font-weight: 600; color: var(--bark); font-size: 1.25rem; margin-bottom: 24px; }
   .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
   .btn { padding: 8px 16px; border-radius: 7px; border: none; font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 500; cursor: pointer; transition: all .18s; }
   .btn-primary { background: var(--moss); color: #fff; }
@@ -1054,6 +1054,12 @@ const PLANTS = [
     bad:['mais','spinacio','fagiolo'],
     notes:'Anche le foglie giovani sono commestibili. Ottima in doppia coltura (primavera e fine estate).' },
 
+  { id:'barbabietolaGialla', name:'Barbabietola gialla', icon:'💛', cat:'ortaggi', color:'#f39c12', family:'Amaranthaceae', size:1, spacing:15, nord:true, directSow:true, depth:'1.5', sun:'☀️ Sole', water:'💧 Media', season:'estate',
+    sow:[4,5,6,7],  plant:[],      harvest:[6,7,8,9],
+    good:['cipolla','aglio','insalata'],
+    bad:['fagiolo','fagiolinoRamp'],
+    notes:'Varietà "Wintersonne" — crescita rapida, sapore dolce, esterno arancione interno giallo. A crescita più veloce della barbabietola rossa. Foglie commestibili come le bietole.' },
+
   { id:'basilico',   name:'Basilico',         icon:'🌿', cat:'erbe',    color:'#27ae60', family:'Lamiaceae',    size:1, spacing:20,  nord:true,  depth:'0.3', sun:'☀️ Pieno sole',  water:'💧 Media',        season:'estate',
     sow:[3,4],      plant:[5,6],   harvest:[6,7,8,9],
     good:['tomato','peperone','asparago'],
@@ -1090,6 +1096,12 @@ const PLANTS = [
     bad:['aglio','cipolla'],
     notes:'Perenne. Al Nord soffre il gelo intenso: coprire la base con pacciame. Preferisce climi miti.' },
 
+  { id:'broccolo',   name:'Broccolo',         icon:'🥦', cat:'ortaggi', color:'#2e7d32', family:'Brassicaceae', size:4, spacing:50, nord:true, depth:'1', sun:'☀️ Sole', water:'💧💧 Alta', season:'autunno',
+    sow:[3,4,7,8],  plant:[5,6,9,10], harvest:[6,7,10,11,12],
+    good:['insalata','rosmarino','sedano','cipolle','aneto'],
+    bad:['tomato','fragola','fagiolo','aglio'],
+    notes:'Varietà "Ramoso Calabrese" — cima centrale + numerosi getti laterali per raccolta continua. Tagliare la testa principale sopra il fusto, poi raccogliere i germogli laterali per settimane. Resistente al freddo.' },
+
   { id:'cardo',      name:'Cardo',            icon:'🌾', cat:'ortaggi', color:'#8e6bbf', family:'Asteraceae',   size:6, spacing:100, nord:true,  depth:'2',   sun:'☀️ Sole',        water:'💧 Media',        season:'autunno',
     sow:[4,5],      plant:[6],     harvest:[10,11,12],
     good:['fagiolo','insalata'],
@@ -1120,6 +1132,12 @@ const PLANTS = [
     bad:['tomato','fragola','fagiolo','aglio'],
     notes:'Eccellente al Nord in autunno-inverno. Protegge dal gelo fino a -10°C. Usare reti anti-cavolaia.' },
 
+  { id:'cavoloPuntato', name:'Cavolo cappuccio puntato', icon:'🥬', cat:'ortaggi', color:'#4a7c3a', family:'Brassicaceae', size:4, spacing:50, nord:true, depth:'1', sun:'☀️ Sole', water:'💧💧 Alta', season:'primavera',
+    sow:[3,4],      plant:[5,6],   harvest:[6,7,8],
+    good:['insalata','rosmarino','sedano','cipolle','aneto'],
+    bad:['tomato','fragola','fagiolo','aglio'],
+    notes:'Varietà "Cuore di Bue" — testa a punta, precoce, croccante e dal sapore dolce. Semina diretta possibile. Resistente al freddo, ottimo per un primo raccolto di cavoli in tarda primavera.' },
+
   { id:'cavoloNero', name:'Cavolo nero',       icon:'🥬', cat:'ortaggi', color:'#1b5e20', family:'Brassicaceae', size:2, spacing:50, nord:true,  depth:'0.5', sun:'☀️ Sole',        water:'💧💧 Alta',       season:'autunno',
     sow:[6,7],      plant:[8,9],   harvest:[10,11,12,1,2],
     good:['insalata','sedano','rosmarino','cipolle'],
@@ -1131,6 +1149,12 @@ const PLANTS = [
     good:['insalata','rosmarino','sedano','cipolle','aneto'],
     bad:['tomato','fragola','fagiolo','aglio'],
     notes:'Simile al cavolo cappuccio ma testa viola-rossa, ricco di antociani. Ottimo crudo in insalata o per crauti rossi. Il colore si intensifica con il freddo autunnale.' },
+
+  { id:'cavoloRiccio', name:'Cavolo riccio (Kale)', icon:'🥬', cat:'ortaggi', color:'#2d5a27', family:'Brassicaceae', size:2, spacing:50, nord:true, depth:'1', sun:'☀️ Sole', water:'💧💧 Alta', season:'autunno',
+    sow:[6,7],      plant:[8,9],   harvest:[10,11,12,1,2],
+    good:['insalata','rosmarino','sedano','cipolle','aneto'],
+    bad:['tomato','fragola','fagiolo','aglio'],
+    notes:'Varietà "Westlandse Herfst" — foglie verdi arricciate, steli violacei, varietà tardiva. Coltivazione interna possibile. Migliora di sapore dopo le prime gelate, come il cavolo nero.' },
 
   { id:'cavoloRomano', name:'Cavolo Romano/Romanesco', icon:'🥦', cat:'ortaggi', color:'#00695c', family:'Brassicaceae', size:4, spacing:50, nord:true, depth:'0.5', sun:'☀️ Sole', water:'💧💧 Alta', season:'autunno',
     sow:[6,7],      plant:[8,9],   harvest:[10,11,12],
@@ -1294,6 +1318,12 @@ const PLANTS = [
     bad:[],
     notes:'Pianta perenne molto rustica. Raccogliere prima della fioritura per aroma massimo. Essicca perfettamente. Ottimo al Nord.' },
 
+  { id:'pastinaca',  name:'Pastinaca',        icon:'🥕', cat:'ortaggi', color:'#f5deb3', family:'Apiaceae',     size:1, spacing:15,  nord:true,  directSow:true,  depth:'1.5', sun:'☀️ Sole',        water:'💧 Media',        season:'primavera',
+    sow:[3,4,5],    plant:[],      harvest:[9,10,11,12],
+    good:['cipolla','aglio','rosmarino'],
+    bad:['aneto','sedano'],
+    notes:'Varietà "Halblange Turga" — radice bianca, buccia liscia, sapore delicato, varietà svizzera. Il gelo migliora il sapore: lasciarla in terra e raccogliere dopo le prime gelate autunnali. Ciclo lungo (110-130 giorni), pazienza ripagata.' },
+
   { id:'patata',     name:'Patata',           icon:'🥔', cat:'ortaggi', color:'#d4ac6e', family:'Solanaceae',   size:2, spacing:35,  nord:true,  depth:'10',  sun:'☀️ Sole',        water:'💧💧 Media',      season:'primavera',
     sow:[],         plant:[2,3,4], harvest:[6,7,8],
     good:['fagiolo','cavolo','mais','nasturzio'],
@@ -1330,11 +1360,23 @@ const PLANTS = [
     bad:['insalata','cipolla'],
     notes:'Germinazione lenta (3-4 sett.). Biennale. Resiste al freddo con leggera protezione.' },
 
+  { id:'rapa',       name:'Rapa',             icon:'🟣', cat:'ortaggi', color:'#8e44ad', family:'Brassicaceae', size:1, spacing:20,  nord:true,  directSow:true,  depth:'1.5', sun:'☀️ Sole',        water:'💧💧 Media',      season:'primavera',
+    sow:[3,4,8,9],  plant:[],      harvest:[5,6,10,11],
+    good:['insalata','carota','spinacio','pisello'],
+    bad:['cavolo','cavolfiore','ravanello'],
+    notes:'Varietà "Di Milano a Colletto Viola" — a crescita rapida, radice piatta e rotonda, base bianca, cima viola. Resistente al freddo. Foglie commestibili (ottime in minestre). Varietà classica italiana.' },
+
   { id:'ravanello',  name:'Ravanello',        icon:'🔴', cat:'ortaggi', color:'#e91e63', family:'Brassicaceae', size:1, spacing:5,   nord:true,  directSow:true,  depth:'1',   sun:'☀️ Sole',        water:'💧 Regolare',     season:'primavera',
     sow:[2,3,4,8,9],plant:[],      harvest:[3,4,5,9,10],
     good:['insalata','carota','spinacio','nasturzio'],
     bad:['cavolo','aneto'],
     notes:'Crescita rapidissima (3-4 settimane). Perfetto rompi-erba e indicatore.' },
+
+  { id:'ravanelloNero', name:'Ravanello nero invernale', icon:'⚫', cat:'ortaggi', color:'#2c2c2c', family:'Brassicaceae', size:1, spacing:8, nord:true, directSow:true, depth:'1.5', sun:'☀️ Sole', water:'💧 Regolare', season:'estate',
+    sow:[6,7,8],    plant:[],      harvest:[7,8,9,10],
+    good:['carota','insalata','pisello'],
+    bad:['cavolo','cavolfiore'],
+    notes:'Varietà "Gros Rond d\'Hiver" — esterno nero, interno bianco, si conserva a lungo (radice invernale da cantina). Sapore più piccante del ravanello classico. Proteggere dai parassiti (altica).' },
 
   { id:'rosmarino',  name:'Rosmarino',        icon:'🌲', cat:'erbe',    color:'#2e86ab', family:'Lamiaceae',    size:2, spacing:60,  nord:true,  depth:'0.3', sun:'☀️ Pieno sole',  water:'💧 Bassa',        season:'tuttoanno',
     sow:[3,4],      plant:[5],     harvest:[0,1,2,3,4,5,6,7,8,9,10,11],
@@ -1386,9 +1428,15 @@ const PLANTS = [
 
   { id:'valerianella', name:'Valerianella (Songino)', icon:'🥗', cat:'ortaggi', color:'#52be80', family:'Valerianaceae', size:1, spacing:10, nord:true,  directSow:true, depth:'0.5', sun:'🌤 Parziale', water:'💧 Media', season:'inverno',
     sow:[8,9,10,11,12,1], plant:[], harvest:[11,12,1,2,3],
-    good:['spinacio','ravanello','insalata'],
+    good:['carota','ravanello','cipolla'],
     bad:[],
-    notes:'Resistente al gelo: arriva a -15°C. Coltura invernale per eccellenza al Nord. Semina scalare ogni 2 settimane.' },
+    notes:'Radichetta invernale a crescita rapida. Semina diretta. Ottima sotto tunnel/copertura.' },
+
+  { id:'verza',      name:'Verza',            icon:'🥬', cat:'ortaggi', color:'#7fa876', family:'Brassicaceae', size:4, spacing:50, nord:true, depth:'1', sun:'☀️ Sole', water:'💧💧 Alta', season:'autunno',
+    sow:[6,7],      plant:[8,9],   harvest:[10,11,12,1],
+    good:['insalata','rosmarino','sedano','cipolle','aneto'],
+    bad:['tomato','fragola','fagiolo','aglio'],
+    notes:'Varietà "Verza di Vertus" — colore blu-verde, foglie grandi e arricciate, ottima capacità di conservazione. Semina diretta possibile. Resistente al freddo, varietà medio-tardiva.' },
 
   { id:'zucca',      name:'Zucca',           icon:'🎃', cat:'ortaggi', color:'#e67e22', family:'Cucurbitaceae', size:6, spacing:120, nord:true,  depth:'3',   sun:'☀️ Pieno sole',  water:'💧💧💧 Alta',     season:'estate',
     sow:[4,5],      plant:[5,6],   harvest:[9,10,11],
@@ -1969,7 +2017,7 @@ function renderPlanner() {
       const nameEl   = svgEl('text', {
         x:cx, y:cy + iconSize * 0.6 + nameSize,
         'text-anchor':'middle', 'dominant-baseline':'central',
-        'font-size':nameSize, fill:'#3B2A1A',
+        'font-size':nameSize, fill:'#17241A',
         'font-family':'DM Sans,sans-serif', style:'user-select:none;pointer-events:none'
       });
       nameEl.textContent = p.name.split('/')[0].split(' ')[0];
@@ -2366,14 +2414,16 @@ function renderPlantsDB() {
   }
   grid.innerHTML = list.map(p => {
     const info = PLANT_INFO[p.id] || {};
+    const hasVariety = !!PLANT_VARIETY[p.id];
     return `
-    <div class="plant-card" onclick="openPlantModal('${p.id}')">
+    <div class="plant-card" onclick="openPlantModal('${p.id}')" style="${hasVariety ? 'border-color:var(--moss);border-width:2px;' : ''}">
       <div class="plant-icon">${p.icon}</div>
       <h3>${p.name}</h3>
       <div class="plant-family">${p.family}</div>
       <div class="tags">
         <span class="tag cat">${catLabel(p.cat)}</span>
         <span class="tag" style="background:#e8f4fd;color:#2980b9" title="Distanza tra piante">${p.spacing}cm</span>
+        ${hasVariety ? `<span class="tag" style="background:#d4e8d0;color:#1a4d14;font-weight:600" title="Hai i semi di questa varietà: ${PLANT_VARIETY[p.id].varietyName}">🌱 Ho i semi</span>` : ''}
         ${info.support ? `<span class="tag" style="background:#fef3c7;color:#92400e" title="${info.support.tipo}">🧗 Tutore</span>` : ''}
         ${p.nord ? '<span class="tag" style="background:#eaf4e8;color:#27ae60">🏔 Nord ✓</span>' : '<span class="tag" style="background:#fef9e7;color:#e67e22">☀️ Sud/Centro</span>'}
         ${p.good.slice(0,1).map(g=>`<span class="tag good">✔ ${plantName(g)}</span>`).join('')}
@@ -2392,6 +2442,7 @@ function openPlantModal(id) {
   const p = PLANTS.find(x => x.id === id);
   if (!p) return;
   const info = PLANT_INFO[id] || {};
+  const variety = PLANT_VARIETY[id] || null;
   const M = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
   const monthList = (arr) => arr.length ? arr.map(m => M[((m-1)+12)%12]).join(', ') : '—';
   const seasonLabel = {primavera:'🌸 Primavera',estate:'☀️ Estate',autunno:'🍂 Autunno',inverno:'❄️ Inverno',tuttoanno:'🔄 Tutto l\'anno'}[p.season]||p.season||'—';
@@ -2411,6 +2462,19 @@ function openPlantModal(id) {
     cov.ombra ? `<div class="modal-stat" style="margin-bottom:6px"><div class="label">☂️ Ombreggio estivo</div><div class="value" style="font-size:.85rem">${cov.ombra}</div></div>` : '',
   ].filter(Boolean).join('');
 
+  const varietyHtml = variety ? `
+    <div style="margin:14px 0;background:#EEF5EC;border-radius:10px;padding:14px 16px;">
+      <div style="font-size:.85rem;font-weight:700;color:var(--moss);margin-bottom:8px;">🌱 Varietà nei tuoi semi: ${variety.varietyName}</div>
+      <div class="modal-grid" style="margin-bottom:8px;">
+        ${variety.ph ? `<div class="modal-stat"><div class="label">pH ideale suolo</div><div class="value">${variety.ph[0]}–${variety.ph[1]}</div></div>` : ''}
+        ${variety.germDays ? `<div class="modal-stat"><div class="label">Germinazione</div><div class="value">${variety.germDays[0]}–${variety.germDays[1]} giorni</div></div>` : ''}
+        ${variety.harvestDays ? `<div class="modal-stat"><div class="label">Giorni al raccolto</div><div class="value">${variety.harvestDays[0]}–${variety.harvestDays[1]} gg</div></div>` : ''}
+        ${variety.rowSpacingCm ? `<div class="modal-stat"><div class="label">Distanza tra le file</div><div class="value">${variety.rowSpacingCm} cm</div></div>` : ''}
+        ${variety.preCultTempC ? `<div class="modal-stat"><div class="label">Temp. germinazione</div><div class="value">${variety.preCultTempC[0]}–${variety.preCultTempC[1]}°C</div></div>` : ''}
+      </div>
+      ${variety.varietyNotes ? `<div style="font-size:.82rem;color:var(--text);line-height:1.5;font-style:italic;">${variety.varietyNotes}</div>` : ''}
+    </div>` : '';
+
   document.getElementById('modal-content').innerHTML = `
     <div class="modal-icon">${p.icon}</div>
     <h2>${p.name}</h2>
@@ -2424,6 +2488,8 @@ function openPlantModal(id) {
       <div class="modal-stat"><div class="label">Stagione</div><div class="value">${seasonLabel}</div></div>
       <div class="modal-stat"><div class="label">Al Nord Italia</div><div class="value">${p.nord ? '🏔 Sì, coltivabile' : '⚠️ Difficile, preferisce Sud/Centro'}</div></div>
     </div>
+
+    ${varietyHtml}
 
     <div class="modal-stat" style="margin:14px 0 8px;background:${info.support ? '#FEF3C7' : '#E8F5E9'};"><div class="label">🧗 Supporto / tutori</div><div class="value" style="font-size:.85rem">${supportHtml}${info.support?.note ? `<div style="font-size:.78rem;color:var(--muted);margin-top:4px;font-weight:400;">${info.support.note}</div>` : ''}</div></div>
 
@@ -2471,6 +2537,14 @@ const PLANT_INFO = {
   cavoloBrux:   { heightCm:[60,90],  support:{tipo:'tutore leggero',note:'piante alte e cariche, un paletto laterale evita che si pieghino col vento'}, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'utile in inverno', ombra:null } },
   cavolo:       { heightCm:[30,50],  support:null, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'utile in inverno', ombra:null } },
   cavoloRosso:  { heightCm:[30,50],  support:null, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'utile in inverno', ombra:null } },
+  barbabietolaGialla: { heightCm:[25,35], support:null, coverage:{ rete:'contro afidi', serra:'non necessaria', ombra:null } },
+  broccolo:     { heightCm:[40,70],  support:{tipo:'tutore leggero',note:'consigliato se molto carico di getti laterali'}, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'utile in autunno', ombra:null } },
+  cavoloPuntato:{ heightCm:[30,45],  support:null, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'non necessaria', ombra:null } },
+  cavoloRiccio: { heightCm:[50,90],  support:{tipo:'tutore leggero',note:'pianta alta e cespugliosa, un sostegno laterale evita che si pieghi col vento'}, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'non necessaria, molto resistente al gelo', ombra:null } },
+  pastinaca:    { heightCm:[30,50],  support:null, coverage:{ rete:null, serra:'non necessaria', ombra:null } },
+  ravanelloNero:{ heightCm:[20,30],  support:null, coverage:{ rete:'contro l\'altica (piccoli fori nelle foglie)', serra:'non necessaria', ombra:null } },
+  rapa:         { heightCm:[15,25],  support:null, coverage:{ rete:'contro l\'altica e la mosca del cavolo (stessa famiglia)', serra:'non necessaria', ombra:null } },
+  verza:        { heightCm:[35,55],  support:null, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'non necessaria', ombra:null } },
   cavoloNero:   { heightCm:[60,120], support:{tipo:'tutore leggero',note:'nel secondo anno diventa alto e può necessitare un sostegno'}, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'non necessaria, resiste bene al freddo', ombra:null } },
   cavoloRomano: { heightCm:[50,70],  support:null, coverage:{ rete:'anti-insetti contro la cavolaia — molto consigliata', serra:'utile in inverno', ombra:null } },
   cetriolo:     { heightCm:[150,200],support:{tipo:'rete verticale o tutore alto',note:'da coltivare sempre su rete/traliccio verticale: risparmia spazio e frutti più dritti e puliti'}, coverage:{ rete:'anti-afidi e mosca bianca, soprattutto se in coltura protetta', serra:'utile per anticipare la semina', ombra:null } },
@@ -2519,6 +2593,61 @@ const PLANT_INFO = {
   zucchino:     { heightCm:[40,60],  support:null, coverage:{ rete:'anti-afidi e mosca bianca, utile soprattutto da giovane', serra:'utile per anticipare il trapianto', ombra:null } },
 };
 
+// ═══════════════════════════════════════════════════════
+// DATI VARIETÀ — dalle buste sementi reali di Marco
+// ph: [min,max] pH ideale del suolo
+// germDays: [min,max] giorni alla germinazione
+// harvestDays: [min,max] giorni dalla semina/trapianto al raccolto
+// rowSpacingCm: distanza consigliata tra le file (oltre a quella tra piante)
+// preCultTempC: [min,max] temperatura ideale per la germinazione in semenzaio
+// varietyName: nome della varietà specifica posseduta
+// varietyNotes: caratteristiche riportate sulla busta
+// ═══════════════════════════════════════════════════════
+const PLANT_VARIETY = {
+  insalata:     { varietyName:'Reine des Glaces (Iceberg)', ph:[6.0,6.8], germDays:null, harvestDays:[30,70], rowSpacingCm:40, preCultTempC:[5,20],
+    varietyNotes:'Consistenza croccante, medio-precoce, alta resa, tollerante al caldo, sapore delicato, forma classica.' },
+  broccolo:     { varietyName:'Ramoso Calabrese', ph:[6.0,7.0], germDays:null, harvestDays:[70,120], rowSpacingCm:70, preCultTempC:[15,25],
+    varietyNotes:'Resistente al freddo, medio-precoce, sapore delicato, grandi teste, molti germogli laterali.' },
+  cavoloPuntato:{ varietyName:'Cuore di Bue', ph:[6.0,7.0], germDays:null, harvestDays:[70,120], rowSpacingCm:70, preCultTempC:[15,25],
+    varietyNotes:'Varietà precoce, testa a punta di media grandezza, sapore croccante e dolce.' },
+  cavolfiore:   { varietyName:'Snow Ball X', ph:[6.0,7.0], germDays:null, harvestDays:[70,120], rowSpacingCm:70, preCultTempC:[15,25],
+    varietyNotes:'Varietà tardiva, grandi teste, forma uniforme, resistente al freddo (hardy).' },
+  bietola:      { varietyName:'Perpetual Spinach', ph:[6.0,7.0], germDays:null, harvestDays:[50,70], rowSpacingCm:50, preCultTempC:[10,22],
+    varietyNotes:'Sapore simile allo spinacio, ideale per semine successive. Alta tolleranza all\'ombra, coltivazione interna possibile.' },
+  cavoloBrux:   { varietyName:'Brussels Sprouts standard', ph:[6.0,7.0], germDays:null, harvestDays:[70,120], rowSpacingCm:70, preCultTempC:[15,25],
+    varietyNotes:'Resistente al freddo, semina diretta possibile. Le teste completamente mature hanno le dimensioni di una noce.' },
+  cavoloNero:   { varietyName:'Nero di Toscana (Lacinato)', ph:[6.0,7.0], germDays:null, harvestDays:[70,120], rowSpacingCm:70, preCultTempC:[15,25],
+    varietyNotes:'Varietà precoce italiana, foglie lunghe e corrugate. Coltivazione interna possibile.' },
+  verza:        { varietyName:'Verza di Vertus', ph:[6.0,7.0], germDays:null, harvestDays:[70,120], rowSpacingCm:70, preCultTempC:[15,25],
+    varietyNotes:'Medio-tardiva, colore blu-verde, ottima capacità di conservazione, grande rotonda con foglie corrugate.' },
+  spinacio:     { varietyName:'Winter Giant', ph:[6.0,7.0], germDays:[5,14], harvestDays:[35,50], rowSpacingCm:20, preCultTempC:[7,24],
+    varietyNotes:'Forma classica, foglie verde molto scuro, resistentissimo al freddo, grandi foglie. Attenzione: monta a seme rapidamente col caldo.' },
+  cavoloRiccio: { varietyName:'Westlandse Herfst', ph:[6.0,7.0], germDays:null, harvestDays:[70,120], rowSpacingCm:70, preCultTempC:[15,25],
+    varietyNotes:'Varietà tardiva, foglie verdi arricciate, steli violacei.' },
+  valerianella: { varietyName:'Dutch Trophy', ph:[6.0,7.0], germDays:[7,14], harvestDays:[40,70], rowSpacingCm:20, preCultTempC:[5,21],
+    varietyNotes:'Ad alta resa, foglie verde molto scuro, sapore delicato. Attira gli impollinatori.' },
+  carota:       { varietyName:'Autumn King 2', ph:[6.0,7.0], germDays:null, harvestDays:[50,80], rowSpacingCm:30, preCultTempC:[7,25],
+    varietyNotes:'Varietà tardiva, grande taglia, lunga conservazione, forma uniforme — carota invernale.' },
+  zucca:        { varietyName:'Lunga di Napoli', ph:[6.0,6.8], germDays:null, harvestDays:[80,110], rowSpacingCm:120, preCultTempC:[20,35],
+    varietyNotes:'Varietà tardiva italiana, zucca invernale, lunga forma, si conserva a lungo dopo la raccolta. Sensibile al freddo.' },
+  cavoloRosso:  { varietyName:'Tête Noire 3', ph:[6.0,7.0], germDays:null, harvestDays:[70,120], rowSpacingCm:70, preCultTempC:[15,25],
+    varietyNotes:'Medio-precoce, teste rosso scuro molto ferme, ideale per stufare/brasare, si conserva bene.' },
+  ravanelloNero:{ varietyName:'Gros Rond d\'Hiver', ph:[6.0,7.0], germDays:[3,7], harvestDays:[21,35], rowSpacingCm:20, preCultTempC:[10,30],
+    varietyNotes:'Varietà tardiva, esterno nero, interno bianco, lunga conservazione — ravanello invernale.' },
+  cipollotto:   { varietyName:'Branca de Lisboa', ph:[6.2,6.8], germDays:null, harvestDays:[80,90], rowSpacingCm:20, preCultTempC:[10,25],
+    varietyNotes:'Varietà precoce, bulbo e foglie commestibili, sapore delicato. Famosa varietà portoghese.' },
+  barbabietolaGialla: { varietyName:'Wintersonne SG', ph:[6.0,7.0], germDays:null, harvestDays:[50,70], rowSpacingCm:50, preCultTempC:[10,22],
+    varietyNotes:'A crescita rapida, sapore dolce, esterno arancione interno giallo.' },
+  cavolo:       { varietyName:'Braunschweiger (bianco)', ph:[6.0,7.0], germDays:null, harvestDays:[70,120], rowSpacingCm:70, preCultTempC:[15,25],
+    varietyNotes:'Antica varietà tedesca, medio-tardiva, testa grande, ferma e piatta, si conserva bene.' },
+  cipolla:      { varietyName:'Stuttgarter Riesen', ph:[6.2,6.8], germDays:null, harvestDays:[100,120], rowSpacingCm:30, preCultTempC:[10,25],
+    varietyNotes:'Varietà classica tedesca, medio-precoce, forma grande e rotonda, ad alta resa.' },
+  pastinaca:    { varietyName:'Halblange Turga', ph:[6.0,7.0], germDays:[10,21], harvestDays:[110,130], rowSpacingCm:30, preCultTempC:[10,25],
+    varietyNotes:'Colore bianco, buccia liscia, sapore delicato, varietà svizzera. Il gelo migliora il sapore.' },
+  rapa:         { varietyName:'Di Milano a Colletto Viola', ph:[5.5,7.0], germDays:[5,14], harvestDays:[40,60], rowSpacingCm:50, preCultTempC:[7,25],
+    varietyNotes:'A crescita rapida, radice piatta e rotonda, base bianca, cima viola. Varietà italiana classica, foglie commestibili.' },
+};
+
 
 // ═══════════════════════════════════════════════════════
 // SOGLIE TERMICHE PER PIANTA (°C, medie mensili)
@@ -2540,6 +2669,14 @@ const THRESHOLDS = {
   fagiolinoRamp:{ sowMin:14, sowMax:30, plantMin:12, plantMax:32, harvestMin:14, harvestMax:34 },
   cavolo:       { sowMin: 8, sowMax:28, plantMin: 5, plantMax:30, harvestMin:-2, harvestMax:20 },
   cavoloRosso:  { sowMin: 8, sowMax:28, plantMin: 5, plantMax:30, harvestMin:-2, harvestMax:20 },
+  barbabietolaGialla: { sowMin: 8, sowMax:26, plantMin: 7, plantMax:28, harvestMin: 4, harvestMax:28 },
+  broccolo:     { sowMin:10, sowMax:26, plantMin: 8, plantMax:28, harvestMin: 2, harvestMax:24 },
+  cavoloPuntato:{ sowMin: 8, sowMax:24, plantMin: 5, plantMax:24, harvestMin: 4, harvestMax:22 },
+  cavoloRiccio: { sowMin: 8, sowMax:28, plantMin: 5, plantMax:30, harvestMin:-4, harvestMax:18 },
+  pastinaca:    { sowMin: 7, sowMax:22, plantMin: 6, plantMax:24, harvestMin:-2, harvestMax:20 },
+  ravanelloNero:{ sowMin:10, sowMax:30, plantMin: 8, plantMax:30, harvestMin: 6, harvestMax:28 },
+  rapa:         { sowMin: 7, sowMax:25, plantMin: 7, plantMax:25, harvestMin: 4, harvestMax:24 },
+  verza:        { sowMin: 8, sowMax:28, plantMin: 5, plantMax:30, harvestMin:-4, harvestMax:20 },
   cavolfiore:   { sowMin: 8, sowMax:28, plantMin: 7, plantMax:30, harvestMin: 2, harvestMax:20 },
   cavoloBrux:   { sowMin: 8, sowMax:28, plantMin: 7, plantMax:30, harvestMin:-4, harvestMax:18 },
   carciofo:     { sowMin:10, sowMax:26, plantMin: 8, plantMax:26, harvestMin: 8, harvestMax:28 },
@@ -2804,6 +2941,14 @@ const PIANO_DATA = {
   fagiolinoRamp:{ piantePer2:6, scalare:3,  conservabile:true,  come:'Surgelati sbollentati o sott\'olio' },
   cavolo:       { piantePer2:2, scalare:0,  conservabile:true,  come:'Crauti (fermentazione lattica), surgelato a foglie' },
   cavoloRosso:  { piantePer2:2, scalare:0,  conservabile:true,  come:'Crauti rossi (fermentazione lattica), sottaceto, surgelato a foglie' },
+  barbabietolaGialla: { piantePer2:6, scalare:4, conservabile:true, come:'Sottaceto, essiccata a chips, foglie surgelate come le bietole' },
+  broccolo:     { piantePer2:2, scalare:0,  conservabile:true,  come:'Surgelato a cimette sbollentate — si conserva a lungo' },
+  cavoloPuntato:{ piantePer2:2, scalare:0,  conservabile:true,  come:'Surgelato a foglie sbollentate, consumo fresco ottimo' },
+  cavoloRiccio: { piantePer2:3, scalare:0,  conservabile:true,  come:'Surgelato sbollentato, chips essiccate al forno' },
+  pastinaca:    { piantePer2:6, scalare:0,  conservabile:true,  come:'Si conserva in terra fino a primavera, oppure in sabbia fresca come le carote' },
+  ravanelloNero:{ piantePer2:4, scalare:0,  conservabile:true,  come:'Si conserva a lungo in cantina fresca, come le rape invernali' },
+  rapa:         { piantePer2:6, scalare:3,  conservabile:true,  come:'Si conserva in cantina fresca come le carote, oppure surgelata a cubetti sbollentati' },
+  verza:        { piantePer2:2, scalare:0,  conservabile:true,  come:'Surgelata a foglie sbollentate, ottima capacità di conservazione anche fresca' },
   cavolfiore:   { piantePer2:2, scalare:0,  conservabile:true,  come:'Surgelato a cimette sbollentate' },
   cavoloBrux:   { piantePer2:2, scalare:0,  conservabile:true,  come:'Surgelato sbollentato — si conserva fino a 12 mesi' },
   carciofo:     { piantePer2:2, scalare:0,  conservabile:true,  come:'Sott\'olio, cuori surgelati' },
@@ -2863,11 +3008,11 @@ const FAMIGLIE = {
   Solanaceae:    ['tomato','peperone','melanzana','patata'],
   Cucurbitaceae: ['zucchino','zucca','cetriolo'],
   Fabaceae:      ['fagiolo','fagiolinoRamp','pisello','fava','liquirizia'],
-  Brassicaceae:  ['cavolo','cavolfiore','cavoloBrux','rucola','ravanello','cavoloNero','cimeDiRapa','cavoloRomano','cavoloRosso'],
+  Brassicaceae:  ['cavolo','cavolfiore','cavoloBrux','rucola','ravanello','cavoloNero','cimeDiRapa','cavoloRomano','cavoloRosso','broccolo','cavoloPuntato','cavoloRiccio','ravanelloNero','verza','rapa'],
   Asteraceae:    ['insalata','carciofo','cardo','indivia','calendula','echinacea','tarassaco'],
   Alliaceae:     ['aglio','cipolla','porroInv','cipollotto'],
-  Apiaceae:      ['carota','sedano','prezzemolo','aneto'],
-  Amaranthaceae: ['spinacio','bietola','barbabietola'],
+  Apiaceae:      ['carota','sedano','prezzemolo','aneto','pastinaca'],
+  Amaranthaceae: ['spinacio','bietola','barbabietola','barbabietolaGialla'],
   Lamiaceae:     ['basilico','rosmarino','salvia','timo','menta','origano','maggiorana','melissa'],
   Rosaceae:      ['fragola'],
   Tropaeolaceae: ['nasturzio'],
@@ -3215,7 +3360,7 @@ function renderRaccolti() {
 const GUIDE_CONSERVE = [
   { id:'surgela', tipo:'surgela', icon:'❄️', titolo:'Surgelazione',
     difficolta:1, stagione:['estate','autunno'],
-    piante:['zucchino','fagiolinoRamp','fagiolo','pisello','spinacio','bietola','mais','cavolfiore','cavoloBrux','peperone','melanzana','cavoloNero','cavoloRomano','cavoloRosso','cimeDiRapa','asparago','sedano','porroInv','finocchio','cardo','indivia','rucola','borragine'],
+    piante:['zucchino','fagiolinoRamp','fagiolo','pisello','spinacio','bietola','mais','cavolfiore','cavoloBrux','peperone','melanzana','cavoloNero','cavoloRomano','cavoloRosso','cimeDiRapa','asparago','sedano','porroInv','finocchio','cardo','indivia','rucola','borragine','broccolo','cavoloPuntato','cavoloRiccio','verza','barbabietolaGialla','rapa'],
     desc:'Ideale per chi inizia. Mantiene quasi tutti i nutrienti e il sapore. Funziona per la maggior parte degli ortaggi.',
     passi:[
       'Lava e taglia gli ortaggi nella forma che userai in cucina (rondelle, cimette, pezzi)',
@@ -3303,7 +3448,7 @@ const GUIDE_CONSERVE = [
 
   { id:'trecce', tipo:'cantina', icon:'🧄', titolo:'Conservazione in trecce/cantina',
     difficolta:1, stagione:['estate','autunno'],
-    piante:['aglio','cipolla','patata','zucca'],
+    piante:['aglio','cipolla','patata','zucca','pastinaca','ravanelloNero','rapa'],
     desc:'Il metodo classico — nessun trattamento, solo il posto giusto.',
     passi:[
       'Lascia essiccare in campo: aglio e cipolle 2-3 settimane dopo l\'estrazione',
